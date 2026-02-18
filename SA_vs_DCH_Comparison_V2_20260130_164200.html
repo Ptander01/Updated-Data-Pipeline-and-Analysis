@@ -1,0 +1,2412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SA vs DCH Comparison Report V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1877F2;
+            --sa-color: #E91E63;
+            --dch-color: #4CAF50;
+            --conflict-color: #FF9800;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f2f5;
+            color: #1c1e21;
+            line-height: 1.5;
+        }
+
+        /* Left Navigation */
+        .nav-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-logo {
+            color: white;
+            font-size: 1.2em;
+            font-weight: 700;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .nav-section {
+            padding: 10px 20px;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .nav-link {
+            display: block;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: rgba(24, 119, 242, 0.2);
+            color: white;
+            border-left-color: var(--primary);
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+        }
+
+        /* Main content with sidebar offset */
+        .main-content {
+            margin-left: 240px;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), #0d47a1);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+        }
+
+        .header .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-top: 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric-box {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-value.sa { color: var(--sa-color); }
+        .metric-value.dch { color: var(--dch-color); }
+        .metric-value.conflict { color: var(--conflict-color); }
+        .metric-value.primary { color: var(--primary); }
+
+        .metric-label {
+            color: #65676b;
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin: 20px 0;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: #4b4f56;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .badge-sa { background: #fce4ec; color: var(--sa-color); }
+        .badge-dch { background: #e8f5e9; color: var(--dch-color); }
+        .badge-conflict { background: #fff3e0; color: #e65100; }
+        .badge-match { background: #e3f2fd; color: var(--primary); }
+
+        .stat-highlight {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .stat-highlight h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .correlation-box {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .correlation-value {
+            font-size: 3em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .correlation-label {
+            flex: 1;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #65676b;
+            font-size: 0.9em;
+        }
+
+        .scroll-table {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .grade {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+
+        .grade-a { background: #4CAF50; color: white; }
+        .grade-b { background: #8BC34A; color: white; }
+        .grade-c { background: #FFC107; color: #333; }
+        .grade-d { background: #FF9800; color: white; }
+        .grade-f { background: #f44336; color: white; }
+
+        .two-col-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 24px;
+        }
+
+        .essential-flag {
+            background: #ffeb3b;
+            color: #333;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .direction-sa { color: var(--sa-color); font-weight: 600; }
+        .direction-dch { color: var(--dch-color); font-weight: 600; }
+
+        .ci-range {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .chart-row, .two-col-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        .explanation-box {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95em;
+        }
+
+        .explanation-box h4 {
+            margin: 0 0 8px 0;
+            color: var(--primary);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .explanation-box p {
+            margin: 0;
+            color: #444;
+        }
+
+        .methodology-note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Navigation Sidebar -->
+    <nav class="nav-sidebar">
+        <div class="nav-logo">📊 SA vs DCH V2</div>
+
+        <div class="nav-section">Overview</div>
+        <a href="#summary" class="nav-link"><span class="nav-icon">📋</span>Executive Summary</a>
+        <a href="#metrics" class="nav-link"><span class="nav-icon">📈</span>Accuracy Metrics</a>
+
+        <div class="nav-section">Analysis</div>
+        <a href="#charts" class="nav-link"><span class="nav-icon">📊</span>Visualizations</a>
+        <a href="#conflicts" class="nav-link"><span class="nav-icon">⚠️</span>Top Conflicts</a>
+        <a href="#company" class="nav-link"><span class="nav-icon">🏢</span>Company Coverage</a>
+
+        <div class="nav-section">Coverage</div>
+        <a href="#exclusive" class="nav-link"><span class="nav-icon">🔎</span>Exclusive Records</a>
+        <a href="#netnew" class="nav-link"><span class="nav-icon">🚧</span>Net New Sites</a>
+        <a href="#groundtruth" class="nav-link"><span class="nav-icon">🎯</span>Ground Truth</a>
+        <a href="#conclusions" class="nav-link"><span class="nav-icon">📋</span>Conclusions</a>
+        <a href="#geography" class="nav-link"><span class="nav-icon">🌍</span>Geographic Dist.</a>
+        <a href="#essential" class="nav-link"><span class="nav-icon">⭐</span>Essential DCs</a>
+
+        <div class="nav-section">Info</div>
+        <a href="#methodology" class="nav-link"><span class="nav-icon">📖</span>Methodology</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <h1>🔍 SemiAnalysis vs DataCenterHawk Comparison</h1>
+                <div class="subtitle">Enhanced Statistical Analysis Report (V2) | Generated: 2026-01-30 16:45:29</div>
+            </div>
+
+        <!-- Executive Summary -->
+        <div class="card" id="summary">
+            <h2>📊 Executive Summary</h2>
+
+            <div class="explanation-box">
+                <h4>What This Report Shows</h4>
+                <p>This analysis compares data center records from SemiAnalysis (SA) and DataCenterHawk (DCH) to identify
+                overlapping facilities, unique records in each source, and capacity discrepancies. Facilities are matched
+                using spatial proximity (within 500m) and then compared on key attributes like capacity and ownership.</p>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-value sa">5,772</div>
+                    <div class="metric-label">SemiAnalysis Records</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value dch">7,052</div>
+                    <div class="metric-label">DataCenterHawk Records</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value primary">4,951</div>
+                    <div class="metric-label">Matched Pairs</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value conflict">3,844</div>
+                    <div class="metric-label">Significant Conflicts</div>
+                </div>
+            </div>
+
+            <div class="stat-highlight">
+                <h3>Key Findings</h3>
+                <ul>
+                    <li><strong>Spatial Overlap:</strong> 85.8% of SA records have a DCH match within 500m</li>
+                    <li><strong>SA-Only Records:</strong> 821 facilities only in SemiAnalysis</li>
+                    <li><strong>DCH-Only Records:</strong> 2,101 facilities only in DataCenterHawk</li>
+                    <li><strong>Capacity Correlation:</strong> r = 0.642 (r² = 0.412)</li>
+                    <li><strong>Significant Conflicts:</strong> 77.6% of matched pairs have >20% or >10MW capacity difference</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Statistical Accuracy Metrics -->
+        <div class="card" id="metrics">
+            <h2>📈 Capacity Agreement Metrics</h2>
+
+            <div class="explanation-box">
+                <h4>Understanding These Metrics</h4>
+                <p><strong>MAPE</strong> (Mean Absolute Percentage Error) measures the average percentage difference
+                between SA and DCH capacity values - lower is better. <strong>Bias</strong> indicates if one source
+                systematically reports higher values. <strong>CV</strong> (Coefficient of Variation) shows how
+                consistent the disagreements are. <strong>Grade</strong> provides an overall accuracy rating from A (excellent) to F (poor).</p>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-value primary">29.1%</div>
+                    <div class="metric-label">MAPE (Mean Abs % Error)</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value sa">+35.2%</div>
+                    <div class="metric-label">Systematic Bias</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value conflict">391.9%</div>
+                    <div class="metric-label">Coefficient of Variation</div>
+                </div>
+                <div class="metric-box">
+                <div class="grade grade-c">C</div>
+                    <div class="metric-label" style="margin-top: 8px;">Agreement Grade</div>
+                </div>
+            </div>
+
+            <div class="correlation-box">
+                <div class="correlation-value">0.642</div>
+                <div class="correlation-label">
+                    <strong>Pearson Correlation Coefficient</strong><br>
+                    Measures linear relationship between SA and DCH capacity values.
+                    Moderate correlation.
+                </div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Formula</th>
+                    <th>Value</th>
+                    <th>Interpretation</th>
+                </tr>
+                <tr>
+                    <td><strong>MAPE</strong></td>
+                    <td>mean(|SA - DCH| / max) × 100</td>
+                    <td>29.1%</td>
+                    <td>Overall accuracy (lower = better)</td>
+                </tr>
+                <tr>
+                    <td><strong>Bias %</strong></td>
+                    <td>mean(SA - DCH) / mean(DCH) × 100</td>
+                    <td>+35.2%</td>
+                    <td>SA reports higher</td>
+                </tr>
+                <tr>
+                    <td><strong>CV</strong></td>
+                    <td>std(delta) / mean(|delta|) × 100</td>
+                    <td>391.9%</td>
+                    <td>Consistency of disagreement</td>
+                </tr>
+                <tr>
+                    <td><strong>Pearson r</strong></td>
+                    <td>correlation(SA_cap, DCH_cap)</td>
+                    <td>0.642</td>
+                    <td>Linear relationship strength</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Capacity Analysis Charts -->
+        <div class="card" id="charts">
+            <h2>📊 Capacity Visualizations</h2>
+
+            <div class="explanation-box">
+                <h4>Interpreting These Charts</h4>
+                <p>The <strong>Delta Distribution</strong> histogram shows how capacity differences are spread - a bell curve
+                centered at 0 indicates good agreement. The <strong>Scatter Plot</strong> compares capacity values directly -
+                points on the diagonal line represent perfect agreement. The <strong>Company</strong> and <strong>Region</strong>
+                charts reveal which segments have the best/worst coverage overlap between sources.</p>
+            </div>
+
+            <div class="chart-row">
+                <div>
+                    <h3>Capacity Delta Distribution (MW)</h3>
+                    <div class="chart-container">
+                        <canvas id="histogramChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3>SA vs DCH Capacity Scatter</h3>
+                    <div class="chart-container">
+                        <canvas id="scatterChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div>
+                    <h3>Records by Company (Top 12)</h3>
+                    <div class="chart-container">
+                        <canvas id="companyChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3>Coverage by Region</h3>
+                    <div class="chart-container">
+                        <canvas id="regionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Capacity Conflicts -->
+        <div class="card" id="conflicts">
+            <h2>⚠️ Top 25 Largest Capacity Conflicts</h2>
+
+            <div class="explanation-box">
+                <h4>Why These Conflicts Matter</h4>
+                <p>Large capacity discrepancies between sources may indicate: (1) different measurement methodologies,
+                (2) outdated information in one source, (3) different facility definitions, or (4) planned vs operational
+                capacity differences. These records should be prioritized for manual verification.</p>
+            </div>
+
+            <p>Facilities with the largest absolute difference in reported capacity between sources.</p>
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Location</th>
+                            <th>SA Company</th>
+                            <th>DCH Company</th>
+                            <th>SA (MW)</th>
+                            <th>DCH (MW)</th>
+                            <th>Delta (MW)</th>
+                            <th>Delta %</th>
+                            <th>Direction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td>1</td>
+                            <td>Holy Ridge, Louisiana United States</td>
+                            <td>Meta</td>
+                            <td>Meta</td>
+                            <td>4,000.0</td>
+                            <td>120.0</td>
+                            <td><strong>+3,880.0</strong></td>
+                            <td>97.0%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>2</td>
+                            <td>Muhos,  Finland</td>
+                            <td>Google</td>
+                            <td>Google</td>
+                            <td>3,200.0</td>
+                            <td>16.9</td>
+                            <td><strong>+3,183.1</strong></td>
+                            <td>99.5%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>3</td>
+                            <td>Hamlet, North Carolina United States</td>
+                            <td>AWS</td>
+                            <td>AWS</td>
+                            <td>2,000.0</td>
+                            <td>66.0</td>
+                            <td><strong>+1,934.0</strong></td>
+                            <td>96.7%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>4</td>
+                            <td>Berwick, Pennsylvania United States</td>
+                            <td>AWS</td>
+                            <td>AWS</td>
+                            <td>1,824.0</td>
+                            <td>66.0</td>
+                            <td><strong>+1,758.0</strong></td>
+                            <td>96.4%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>5</td>
+                            <td>West Memphis, Arkansas United States</td>
+                            <td>Google</td>
+                            <td>Google</td>
+                            <td>1,740.0</td>
+                            <td>80.0</td>
+                            <td><strong>+1,660.0</strong></td>
+                            <td>95.4%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>6</td>
+                            <td>El Paso, Texas United States</td>
+                            <td>Meta</td>
+                            <td>Meta</td>
+                            <td>2,224.0</td>
+                            <td>600.0</td>
+                            <td><strong>+1,624.0</strong></td>
+                            <td>73.0%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>7</td>
+                            <td>Lueders, Texas United States</td>
+                            <td>Google</td>
+                            <td>Google</td>
+                            <td>3,000.0</td>
+                            <td>1,600.0</td>
+                            <td><strong>+1,400.0</strong></td>
+                            <td>46.7%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>8</td>
+                            <td>New Carlisle, Indiana United States</td>
+                            <td>AWS</td>
+                            <td>AWS</td>
+                            <td>1,440.0</td>
+                            <td>48.0</td>
+                            <td><strong>+1,392.0</strong></td>
+                            <td>96.7%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>9</td>
+                            <td>Goodnight, Texas United States</td>
+                            <td>Google</td>
+                            <td>Crusoe</td>
+                            <td>1,442.0</td>
+                            <td>103.0</td>
+                            <td><strong>+1,339.0</strong></td>
+                            <td>92.9%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>10</td>
+                            <td>Reno, Nevada United States</td>
+                            <td>Tract</td>
+                            <td>Tract</td>
+                            <td>1,200.0</td>
+                            <td>2,500.0</td>
+                            <td><strong>-1,300.0</strong></td>
+                            <td>52.0%</td>
+                            <td class="direction-dch">DCH Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>11</td>
+                            <td>McCarran, Nevada United States</td>
+                            <td>Tract</td>
+                            <td>Tract</td>
+                            <td>2,500.0</td>
+                            <td>1,215.0</td>
+                            <td><strong>+1,285.0</strong></td>
+                            <td>51.4%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>12</td>
+                            <td>Boydton, Virginia United States</td>
+                            <td>Microsoft</td>
+                            <td>Microsoft</td>
+                            <td>480.0</td>
+                            <td>1,680.0</td>
+                            <td><strong>-1,200.0</strong></td>
+                            <td>71.4%</td>
+                            <td class="direction-dch">DCH Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>13</td>
+                            <td>Ridgeland, Mississippi United States</td>
+                            <td>AWS</td>
+                            <td>AWS</td>
+                            <td>1,200.0</td>
+                            <td>66.0</td>
+                            <td><strong>+1,134.0</strong></td>
+                            <td>94.5%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>14</td>
+                            <td>Moseley, Virginia United States</td>
+                            <td>Google</td>
+                            <td>Google</td>
+                            <td>2,088.0</td>
+                            <td>960.0</td>
+                            <td><strong>+1,128.0</strong></td>
+                            <td>54.0%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>15</td>
+                            <td>Santa Teresa, New Mexico United States</td>
+                            <td>STACK Infrastructure</td>
+                            <td>Stack</td>
+                            <td>2,400.0</td>
+                            <td>1,276.0</td>
+                            <td><strong>+1,124.0</strong></td>
+                            <td>46.8%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>16</td>
+                            <td>Covington, Georgia United States</td>
+                            <td>AWS</td>
+                            <td>AWS</td>
+                            <td>2,040.0</td>
+                            <td>1,020.0</td>
+                            <td><strong>+1,020.0</strong></td>
+                            <td>50.0%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>17</td>
+                            <td>Jackson, Georgia United States</td>
+                            <td>AWS</td>
+                            <td>AWS</td>
+                            <td>1,200.0</td>
+                            <td>2,112.0</td>
+                            <td><strong>-912.0</strong></td>
+                            <td>43.2%</td>
+                            <td class="direction-dch">DCH Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>18</td>
+                            <td>Van Meter, Iowa United States</td>
+                            <td>AWS</td>
+                            <td>AWS</td>
+                            <td>975.0</td>
+                            <td>66.0</td>
+                            <td><strong>+909.0</strong></td>
+                            <td>93.2%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>19</td>
+                            <td>Abilene, Texas United States</td>
+                            <td>Crusoe</td>
+                            <td>Crusoe</td>
+                            <td>1,200.0</td>
+                            <td>336.0</td>
+                            <td><strong>+864.0</strong></td>
+                            <td>72.0%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>20</td>
+                            <td>Cedar Rapids, Iowa United States</td>
+                            <td>QTS</td>
+                            <td>QTS</td>
+                            <td>1,000.0</td>
+                            <td>180.0</td>
+                            <td><strong>+820.0</strong></td>
+                            <td>82.0%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>21</td>
+                            <td>Cedar Rapids, Iowa United States</td>
+                            <td>QTS</td>
+                            <td>QTS</td>
+                            <td>992.0</td>
+                            <td>180.0</td>
+                            <td><strong>+812.0</strong></td>
+                            <td>81.9%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>22</td>
+                            <td>Lueders, Texas United States</td>
+                            <td>Google</td>
+                            <td>Google</td>
+                            <td>880.0</td>
+                            <td>80.0</td>
+                            <td><strong>+800.0</strong></td>
+                            <td>90.9%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>23</td>
+                            <td>Kline Township, Pennsylvania United Stat</td>
+                            <td>AWS</td>
+                            <td>AWS</td>
+                            <td>1,584.0</td>
+                            <td>792.0</td>
+                            <td><strong>+792.0</strong></td>
+                            <td>50.0%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>24</td>
+                            <td>Cedar Rapids, Iowa United States</td>
+                            <td>Google</td>
+                            <td>Google</td>
+                            <td>870.0</td>
+                            <td>80.0</td>
+                            <td><strong>+790.0</strong></td>
+                            <td>90.8%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                        <tr>
+                            <td>25</td>
+                            <td>Millersport, Ohio United States</td>
+                            <td>Vantage Data Centers</td>
+                            <td>Vantage</td>
+                            <td>880.0</td>
+                            <td>128.0</td>
+                            <td><strong>+752.0</strong></td>
+                            <td>85.5%</td>
+                            <td class="direction-sa">SA Higher</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Company Analysis -->
+        <div class="card" id="company">
+            <h2>🏢 Company Coverage Analysis</h2>
+
+            <div class="explanation-box">
+                <h4>How to Read This Table</h4>
+                <p><strong>Matched</strong> shows facilities found in both sources. <strong>SA Only</strong> and <strong>DCH Only</strong>
+                indicate exclusive records in each source. Large numbers in exclusive columns suggest coverage gaps.
+                <strong>Conflicts</strong> counts matched facilities with >20% capacity difference.</p>
+            </div>
+
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Matched</th>
+                            <th>SA Only</th>
+                            <th>DCH Only</th>
+                            <th>SA Total (MW)</th>
+                            <th>DCH Total (MW)</th>
+                            <th>Conflicts</th>
+                            <th>Mean Delta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td><strong>AWS</strong></td>
+                            <td>611</td>
+                            <td><span class="badge badge-sa">44</span></td>
+                            <td><span class="badge badge-dch">223</span></td>
+                            <td>45,241</td>
+                            <td>54,023</td>
+                            <td><span class="badge badge-conflict">443</span></td>
+                            <td>+8.1 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Microsoft</strong></td>
+                            <td>426</td>
+                            <td><span class="badge badge-sa">44</span></td>
+                            <td><span class="badge badge-dch">53</span></td>
+                            <td>31,403</td>
+                            <td>35,053</td>
+                            <td><span class="badge badge-conflict">274</span></td>
+                            <td>-17.6 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Google</strong></td>
+                            <td>234</td>
+                            <td><span class="badge badge-sa">44</span></td>
+                            <td><span class="badge badge-dch">62</span></td>
+                            <td>44,011</td>
+                            <td>32,385</td>
+                            <td><span class="badge badge-conflict">191</span></td>
+                            <td>+49.2 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Equinix</strong></td>
+                            <td>261</td>
+                            <td><span class="badge badge-sa">2</span></td>
+                            <td><span class="badge badge-dch">56</span></td>
+                            <td>965</td>
+                            <td>4,492</td>
+                            <td><span class="badge badge-conflict">223</span></td>
+                            <td>-7.6 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Digital Realty</strong></td>
+                            <td>262</td>
+                            <td><span class="badge badge-sa">6</span></td>
+                            <td><span class="badge badge-dch">50</span></td>
+                            <td>2,843</td>
+                            <td>6,824</td>
+                            <td><span class="badge badge-conflict">232</span></td>
+                            <td>-8.3 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Meta</strong></td>
+                            <td>166</td>
+                            <td><span class="badge badge-sa">33</span></td>
+                            <td><span class="badge badge-dch">58</span></td>
+                            <td>19,003</td>
+                            <td>15,378</td>
+                            <td><span class="badge badge-conflict">145</span></td>
+                            <td>+39.2 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>QTS</strong></td>
+                            <td>106</td>
+                            <td><span class="badge badge-sa">11</span></td>
+                            <td><span class="badge badge-dch">75</span></td>
+                            <td>11,102</td>
+                            <td>11,530</td>
+                            <td><span class="badge badge-conflict">79</span></td>
+                            <td>+42.1 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>NTT Global Data Centers</strong></td>
+                            <td>134</td>
+                            <td><span class="badge badge-sa">10</span></td>
+                            <td><span class="badge badge-dch">34</span></td>
+                            <td>1,864</td>
+                            <td>4,852</td>
+                            <td><span class="badge badge-conflict">116</span></td>
+                            <td>-11.0 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>CyrusOne</strong></td>
+                            <td>78</td>
+                            <td><span class="badge badge-sa">1</span></td>
+                            <td><span class="badge badge-dch">57</span></td>
+                            <td>1,316</td>
+                            <td>5,000</td>
+                            <td><span class="badge badge-conflict">63</span></td>
+                            <td>-13.1 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>STACK Infrastructure</strong></td>
+                            <td>92</td>
+                            <td><span class="badge badge-sa">10</span></td>
+                            <td><span class="badge badge-dch">0</span></td>
+                            <td>7,249</td>
+                            <td>4,772</td>
+                            <td><span class="badge badge-conflict">55</span></td>
+                            <td>+16.2 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>EdgeConneX</strong></td>
+                            <td>69</td>
+                            <td><span class="badge badge-sa">6</span></td>
+                            <td><span class="badge badge-dch">17</span></td>
+                            <td>2,242</td>
+                            <td>3,403</td>
+                            <td><span class="badge badge-conflict">59</span></td>
+                            <td>-8.4 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>DataBank</strong></td>
+                            <td>83</td>
+                            <td><span class="badge badge-sa">0</span></td>
+                            <td><span class="badge badge-dch">6</span></td>
+                            <td>1,212</td>
+                            <td>1,440</td>
+                            <td><span class="badge badge-conflict">70</span></td>
+                            <td>-1.0 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Vantage Data Centers</strong></td>
+                            <td>75</td>
+                            <td><span class="badge badge-sa">10</span></td>
+                            <td><span class="badge badge-dch">0</span></td>
+                            <td>10,906</td>
+                            <td>3,890</td>
+                            <td><span class="badge badge-conflict">51</span></td>
+                            <td>-0.2 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>CloudHQ</strong></td>
+                            <td>53</td>
+                            <td><span class="badge badge-sa">5</span></td>
+                            <td><span class="badge badge-dch">9</span></td>
+                            <td>4,095</td>
+                            <td>5,083</td>
+                            <td><span class="badge badge-conflict">21</span></td>
+                            <td>-35.0 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Centersquare</strong></td>
+                            <td>62</td>
+                            <td><span class="badge badge-sa">0</span></td>
+                            <td><span class="badge badge-dch">0</span></td>
+                            <td>104</td>
+                            <td>509</td>
+                            <td><span class="badge badge-conflict">58</span></td>
+                            <td>-7.0 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>STTelemedia Global Data Centres</strong></td>
+                            <td>35</td>
+                            <td><span class="badge badge-sa">5</span></td>
+                            <td><span class="badge badge-dch">18</span></td>
+                            <td>542</td>
+                            <td>1,272</td>
+                            <td><span class="badge badge-conflict">29</span></td>
+                            <td>-17.1 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Great Britain</strong></td>
+                            <td>0</td>
+                            <td><span class="badge badge-sa">47</span></td>
+                            <td><span class="badge badge-dch">0</span></td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td><span class="badge badge-conflict">0</span></td>
+                            <td>+0.0 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Flexential</strong></td>
+                            <td>41</td>
+                            <td><span class="badge badge-sa">0</span></td>
+                            <td><span class="badge badge-dch">2</span></td>
+                            <td>141</td>
+                            <td>390</td>
+                            <td><span class="badge badge-conflict">39</span></td>
+                            <td>-5.1 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>DATA4</strong></td>
+                            <td>39</td>
+                            <td><span class="badge badge-sa">2</span></td>
+                            <td><span class="badge badge-dch">2</span></td>
+                            <td>1,348</td>
+                            <td>761</td>
+                            <td><span class="badge badge-conflict">37</span></td>
+                            <td>-7.5 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Cologix</strong></td>
+                            <td>31</td>
+                            <td><span class="badge badge-sa">0</span></td>
+                            <td><span class="badge badge-dch">12</span></td>
+                            <td>702</td>
+                            <td>1,312</td>
+                            <td><span class="badge badge-conflict">28</span></td>
+                            <td>-8.5 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>TierPoint</strong></td>
+                            <td>39</td>
+                            <td><span class="badge badge-sa">1</span></td>
+                            <td><span class="badge badge-dch">3</span></td>
+                            <td>35</td>
+                            <td>157</td>
+                            <td><span class="badge badge-conflict">39</span></td>
+                            <td>-2.7 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>CoreSite</strong></td>
+                            <td>36</td>
+                            <td><span class="badge badge-sa">1</span></td>
+                            <td><span class="badge badge-dch">3</span></td>
+                            <td>182</td>
+                            <td>447</td>
+                            <td><span class="badge badge-conflict">31</span></td>
+                            <td>-7.7 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Switch</strong></td>
+                            <td>29</td>
+                            <td><span class="badge badge-sa">5</span></td>
+                            <td><span class="badge badge-dch">6</span></td>
+                            <td>1,099</td>
+                            <td>1,697</td>
+                            <td><span class="badge badge-conflict">25</span></td>
+                            <td>-25.1 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Ascenty</strong></td>
+                            <td>33</td>
+                            <td><span class="badge badge-sa">1</span></td>
+                            <td><span class="badge badge-dch">5</span></td>
+                            <td>266</td>
+                            <td>488</td>
+                            <td><span class="badge badge-conflict">26</span></td>
+                            <td>-5.7 MW</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>NEXTDC</strong></td>
+                            <td>16</td>
+                            <td><span class="badge badge-sa">14</span></td>
+                            <td><span class="badge badge-dch">8</span></td>
+                            <td>1,646</td>
+                            <td>1,255</td>
+                            <td><span class="badge badge-conflict">14</span></td>
+                            <td>-47.8 MW</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Exclusive Records -->
+        <div class="card" id="exclusive">
+            <h2>🔎 Exclusive Records Analysis</h2>
+
+            <div class="explanation-box">
+                <h4>Understanding Coverage Gaps</h4>
+                <p><strong>SA-Only</strong> records exist only in SemiAnalysis - these may be newer facilities, different
+                naming conventions, or facilities DCH hasn't cataloged. <strong>DCH-Only</strong> records exist only in
+                DataCenterHawk - investigating these can help identify gaps in SA's coverage. Larger capacity
+                facilities should be prioritized for reconciliation.</p>
+            </div>
+
+            <p>Facilities that exist in only one source - potential gaps in coverage.</p>
+
+            <div class="two-col-grid">
+                <div>
+                    <h3><span class="badge badge-sa">SA-Only</span> Top 20 by Capacity</h3>
+                    <div class="scroll-table" style="max-height: 400px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>Capacity (MW)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>HUMAIN</td>
+                                    <td>Riyadh, Saudi Arabia</td>
+                                    <td>6,400.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Khazna Data Centers</td>
+                                    <td>Al Dhafra, United Arab Emirate</td>
+                                    <td>4,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Lancium</td>
+                                    <td>Turkey, United States</td>
+                                    <td>3,021.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Homer City Redevelopment</td>
+                                    <td>Homer City, United States</td>
+                                    <td>3,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Scala Data Centers</td>
+                                    <td>Eldorado do Sul, Brazil</td>
+                                    <td>3,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Dammam, Saudi Arabia</td>
+                                    <td>3,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Vantage Data Centers</td>
+                                    <td>Abilene, United States</td>
+                                    <td>2,800.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Softbank</td>
+                                    <td>Gail, United States</td>
+                                    <td>2,568.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Softbank</td>
+                                    <td>Rosebud, United States</td>
+                                    <td>2,500.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Reliance</td>
+                                    <td>Jamnagar, India</td>
+                                    <td>2,400.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Kajaani, Finland</td>
+                                    <td>2,400.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>AWS</td>
+                                    <td>Jackson, United States</td>
+                                    <td>2,040.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Tract</td>
+                                    <td>Lockhart, United States</td>
+                                    <td>2,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>xAI</td>
+                                    <td>Southaven, United States</td>
+                                    <td>2,000.0</td>
+                                    <td>Under Construction</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Madhurawada, India</td>
+                                    <td>2,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Lancium</td>
+                                    <td>Childress, United States</td>
+                                    <td>2,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Vantage Data Centers</td>
+                                    <td>Port Washington,, United State</td>
+                                    <td>2,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Meta</td>
+                                    <td>Lebanon, United States</td>
+                                    <td>1,992.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Chevron</td>
+                                    <td>Pecos, United States</td>
+                                    <td>1,724.1</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>xAI</td>
+                                    <td>Memphis, United States</td>
+                                    <td>1,600.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3><span class="badge badge-dch">DCH-Only</span> Top 20 by Capacity</h3>
+                    <div class="scroll-table" style="max-height: 400px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>Capacity (MW)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>Aligned</td>
+                                    <td>MacArthur, United States</td>
+                                    <td>2,400.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Muhos, Finland</td>
+                                    <td>1,600.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Datavolt</td>
+                                    <td>Duba, Saudi Arabia</td>
+                                    <td>1,500.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Adriatic DC</td>
+                                    <td>Cerano, Italy</td>
+                                    <td>1,500.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Vantage</td>
+                                    <td>Abilene, United States</td>
+                                    <td>1,400.0</td>
+                                    <td>Under Construction</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Otanmäki, Finland</td>
+                                    <td>1,200.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Tract</td>
+                                    <td>Buckeye, United States</td>
+                                    <td>1,200.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>AWS</td>
+                                    <td>New Florence, United States</td>
+                                    <td>1,122.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>ISPT</td>
+                                    <td>Kemps Creek, Australia</td>
+                                    <td>1,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Edged Energy</td>
+                                    <td>Badajoz, Extremadura, Spain</td>
+                                    <td>1,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Edged Energy</td>
+                                    <td>Cáceres, Extremadura, Spain</td>
+                                    <td>1,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Elsham Tech Park</td>
+                                    <td>Lincolnshire, United Kingdom</td>
+                                    <td>1,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Tract</td>
+                                    <td>Altoona, United States</td>
+                                    <td>1,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>O'Leary Ventures</td>
+                                    <td>Groveville, Canada</td>
+                                    <td>1,000.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Forsyth, United States</td>
+                                    <td>960.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>AWS</td>
+                                    <td>Tolar, United States</td>
+                                    <td>960.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Starwood Digital Ventures</td>
+                                    <td>New Castle, United States</td>
+                                    <td>960.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>AWS</td>
+                                    <td>Hamlet, United States</td>
+                                    <td>924.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>AWS</td>
+                                    <td>Louisa, United States</td>
+                                    <td>924.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Tract</td>
+                                    <td>Glen Allen, United States</td>
+                                    <td>900.0</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Net New Sites Analysis -->
+        <div class="card" id="netnew">
+            <h2>🚧 Net New Sites Analysis</h2>
+
+            <div class="explanation-box">
+                <h4>Understanding Net New Site Coverage</h4>
+                <p>This section analyzes facilities that are <strong>Under Construction</strong>, <strong>Announced</strong>,
+                or <strong>Planned</strong>. Comparing how each source reports on future data centers helps assess their
+                predictive capabilities and early detection of new construction projects.</p>
+                <p><strong>Key insight:</strong> A high "SA-Only" count may indicate SemiAnalysis detects projects earlier,
+                while high "DCH-Only" suggests DataCenterHawk has exclusive intelligence on certain developments.</p>
+            </div>
+
+            <h3>Net New Summary</h3>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-value primary">2,437</div>
+                    <div class="metric-label">SA Net New Sites</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value primary">2,905</div>
+                    <div class="metric-label">DCH Net New Sites</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">1,424</div>
+                    <div class="metric-label">Both Sources Report</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value sa">449</div>
+                    <div class="metric-label">SA Only</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value dch">1,317</div>
+                    <div class="metric-label">DCH Only</div>
+                </div>
+            </div>
+
+            <h3>Coverage & Agreement Rates</h3>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-value">81.6%</div>
+                    <div class="metric-label">SA Net New in DCH</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">54.7%</div>
+                    <div class="metric-label">DCH Net New in SA</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">22.2%</div>
+                    <div class="metric-label">Capacity MAPE (Matched)</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">+39.5%</div>
+                    <div class="metric-label">Capacity Bias</div>
+                </div>
+            </div>
+
+            <h3>Capacity by Source (Net New MW)</h3>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-value">339,030</div>
+                    <div class="metric-label">SA Total MW</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">260,949</div>
+                    <div class="metric-label">DCH Total MW</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value sa">134,380</div>
+                    <div class="metric-label">SA-Only MW</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value dch">121,465</div>
+                    <div class="metric-label">DCH-Only MW</div>
+                </div>
+            </div>
+
+            <h3>Breakdown by Status</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>SA Total</th>
+                        <th>DCH Total</th>
+                        <th>SA Matched</th>
+                        <th>DCH Matched</th>
+                        <th>SA Only</th>
+                        <th>DCH Only</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td><strong>Under Construction</strong></td>
+                        <td>619</td>
+                        <td>622</td>
+                        <td>519</td>
+                        <td>426</td>
+                        <td class="direction-sa">100</td>
+                        <td class="direction-dch">196</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Announced</strong></td>
+                        <td>1,818</td>
+                        <td>2,283</td>
+                        <td>1,469</td>
+                        <td>1,162</td>
+                        <td class="direction-sa">349</td>
+                        <td class="direction-dch">1,121</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Planned</strong></td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="direction-sa">0</td>
+                        <td class="direction-dch">0</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <h3>Top Exclusive Net New Sites</h3>
+            <div class="grid-2col">
+                <div>
+                    <h4><span class="badge badge-sa">SA-Only</span> Top Net New by Capacity</h4>
+                    <div class="scroll-table" style="max-height: 350px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>MW</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>HUMAIN</td>
+                                    <td>Riyadh, Saudi Arabia</td>
+                                    <td>6,400</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Khazna Data Centers</td>
+                                    <td>Al Dhafra, United Arab Emira</td>
+                                    <td>4,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Lancium</td>
+                                    <td>Turkey, United States</td>
+                                    <td>3,021</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Homer City Redevelopment</td>
+                                    <td>Homer City, United States</td>
+                                    <td>3,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Scala Data Centers</td>
+                                    <td>Eldorado do Sul, Brazil</td>
+                                    <td>3,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Dammam, Saudi Arabia</td>
+                                    <td>3,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Vantage Data Centers</td>
+                                    <td>Abilene, United States</td>
+                                    <td>2,800</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Softbank</td>
+                                    <td>Gail, United States</td>
+                                    <td>2,568</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Softbank</td>
+                                    <td>Rosebud, United States</td>
+                                    <td>2,500</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Reliance</td>
+                                    <td>Jamnagar, India</td>
+                                    <td>2,400</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Kajaani, Finland</td>
+                                    <td>2,400</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>AWS</td>
+                                    <td>Jackson, United States</td>
+                                    <td>2,040</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Tract</td>
+                                    <td>Lockhart, United States</td>
+                                    <td>2,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>xAI</td>
+                                    <td>Southaven, United States</td>
+                                    <td>2,000</td>
+                                    <td>Under Construction</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Madhurawada, India</td>
+                                    <td>2,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h4><span class="badge badge-dch">DCH-Only</span> Top Net New by Capacity</h4>
+                    <div class="scroll-table" style="max-height: 350px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>MW</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>Aligned</td>
+                                    <td>MacArthur, United States</td>
+                                    <td>2,400</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Muhos, Finland</td>
+                                    <td>1,600</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Datavolt</td>
+                                    <td>Duba, Saudi Arabia</td>
+                                    <td>1,500</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Adriatic DC</td>
+                                    <td>Cerano, Italy</td>
+                                    <td>1,500</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Vantage</td>
+                                    <td>Abilene, United States</td>
+                                    <td>1,400</td>
+                                    <td>Under Construction</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Otanmäki, Finland</td>
+                                    <td>1,200</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Tract</td>
+                                    <td>Buckeye, United States</td>
+                                    <td>1,200</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>AWS</td>
+                                    <td>New Florence, United States</td>
+                                    <td>1,122</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>ISPT</td>
+                                    <td>Kemps Creek, Australia</td>
+                                    <td>1,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Edged Energy</td>
+                                    <td>Badajoz, Extremadura, Spain</td>
+                                    <td>1,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Edged Energy</td>
+                                    <td>Cáceres, Extremadura, Spain</td>
+                                    <td>1,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Elsham Tech Park</td>
+                                    <td>Lincolnshire, United Kingdom</td>
+                                    <td>1,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Tract</td>
+                                    <td>Altoona, United States</td>
+                                    <td>1,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>O'Leary Ventures</td>
+                                    <td>Groveville, Canada</td>
+                                    <td>1,000</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Google</td>
+                                    <td>Forsyth, United States</td>
+                                    <td>960</td>
+                                    <td>Announced</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conclusions & Recommendations -->
+        <div class="card" id="conclusions">
+            <h2>📋 Conclusions & Recommendations</h2>
+
+            <div class="explanation-box">
+                <h4>Summary: Which Source Has Greater Recall of Net New Sites?</h4>
+                <p><strong>DCH has greater recall by site count</strong>, but <strong>SA captures more capacity</strong>.
+                This reflects fundamentally different coverage strategies between the two sources.</p>
+            </div>
+
+            <h3>Net New Site Comparison Summary</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>SemiAnalysis</th>
+                        <th>DataCenterHawk</th>
+                        <th>Winner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Total Net New Sites</strong></td>
+                        <td>2,437</td>
+                        <td>2,905</td>
+                        <td><span class="badge badge-dch">DCH (+19%)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Net New Capacity (MW)</strong></td>
+                        <td>339,030</td>
+                        <td>260,949</td>
+                        <td><span class="badge badge-sa">SA (+30%)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exclusive Sites</strong></td>
+                        <td>449</td>
+                        <td>1,317</td>
+                        <td><span class="badge badge-dch">DCH (2.9x more)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exclusive Capacity (MW)</strong></td>
+                        <td>134,380</td>
+                        <td>121,465</td>
+                        <td><span class="badge badge-sa">SA (+11%)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Avg MW per Net New Site</strong></td>
+                        <td>139 MW</td>
+                        <td>90 MW</td>
+                        <td><span class="badge badge-sa">SA (1.5x larger)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="stat-highlight">
+                <h4>💡 Key Interpretation</h4>
+                <ul>
+                    <li><strong>DCH has broader coverage</strong> — They track ~468 more net new sites, including many smaller colo/regional facilities</li>
+                    <li><strong>SA captures larger projects</strong> — Fewer sites but ~78,081 MW more capacity, suggesting focus on hyperscaler mega-projects</li>
+                    <li><strong>DCH-only sites are smaller</strong> — 1,317 sites with 121,465 MW = avg 92 MW each</li>
+                    <li><strong>SA-only sites are larger</strong> — 449 sites with 134,380 MW = avg 299 MW each</li>
+                </ul>
+            </div>
+
+            <h3>Additional Insights for Source Reliability</h3>
+
+            <h4>A. Net New MAPE vs Overall MAPE</h4>
+            <ul>
+                <li><strong>Net New MAPE:</strong> 22.2% vs <strong>Overall MAPE:</strong> 29.1%</li>
+                <li>Sources agree better on future projects than existing facilities</li>
+                <li>This suggests both sources are tracking similar announcements, with differences in how they estimate capacity</li>
+            </ul>
+
+            <h4>B. Coverage Asymmetry</h4>
+            <ul>
+                <li><strong>81.6%</strong> of SA's net new sites appear in DCH</li>
+                <li><strong>54.7%</strong> of DCH's net new sites appear in SA</li>
+                <li><strong>Implication:</strong> SA is more selective/focused — almost everything SA tracks, DCH also tracks</li>
+                <li>DCH has broader but shallower coverage — many sites SA doesn't track (likely smaller colo)</li>
+                <li>When SA has a site, it's likely validated by DCH (high confirmation rate)</li>
+            </ul>
+
+            <h4>C. Capacity Bias Interpretation</h4>
+            <ul>
+                <li>SA reports <strong>+39.5%</strong> higher capacity on net new sites</li>
+                <li>Combined with SA's better ground truth accuracy (11.9% vs 17.6% MAPE), this suggests SA is capturing planned expansions that DCH hasn't recorded yet, <strong>not</strong> over-estimating</li>
+            </ul>
+
+            <h3>📊 Recommendation Framework</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Use Case</th>
+                        <th>Recommended Source</th>
+                        <th>Rationale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Hyperscaler pipeline tracking</strong></td>
+                        <td><span class="badge badge-sa">SemiAnalysis</span></td>
+                        <td>Larger avg project size, focus on mega-projects</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Colo market coverage</strong></td>
+                        <td><span class="badge badge-dch">DataCenterHawk</span></td>
+                        <td>Broader site count, regional facility coverage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Capacity forecasting</strong></td>
+                        <td><span class="badge badge-sa">SemiAnalysis</span></td>
+                        <td>Better ground truth MAPE (11.9% vs 17.6%)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Site discovery / completeness</strong></td>
+                        <td><span class="badge badge-dch">DataCenterHawk</span></td>
+                        <td>More total sites, broader geographic coverage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>High-confidence subset</strong></td>
+                        <td><span class="badge badge-match">Both Agree</span></td>
+                        <td>1,424 matched sites with cross-validation</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="methodology-note">
+                <strong>⚠️ Best Practice:</strong> For capacity planning, use SA as the primary source for magnitude estimates,
+                but cross-reference with DCH for site discovery. When both sources agree on a site, confidence is highest.
+                For strategic hyperscaler facilities, SA's accuracy advantage makes it the preferred source.
+            </div>
+        </div>
+
+        <!-- Geographic Analysis -->
+        <div class="card" id="geography">
+            <h2>🌍 Geographic Distribution</h2>
+
+            <div class="explanation-box">
+                <h4>Regional Coverage Patterns</h4>
+                <p>This table shows how the source coverage varies by country. High <strong>SA Only</strong> or
+                <strong>DCH Only</strong> counts in specific countries may indicate regional strengths or gaps in each
+                data source's coverage methodology.</p>
+            </div>
+
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>Matched</th>
+                            <th>SA Only</th>
+                            <th>DCH Only</th>
+                            <th>Conflicts</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td><strong>United States</strong></td>
+                            <td>2,655</td>
+                            <td>229</td>
+                            <td>1,015</td>
+                            <td>2,028</td>
+                            <td>3,899</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Japan</strong></td>
+                            <td>220</td>
+                            <td>23</td>
+                            <td>46</td>
+                            <td>190</td>
+                            <td>289</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>India</strong></td>
+                            <td>152</td>
+                            <td>48</td>
+                            <td>61</td>
+                            <td>107</td>
+                            <td>261</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Unknown</strong></td>
+                            <td>5</td>
+                            <td>230</td>
+                            <td>0</td>
+                            <td>3</td>
+                            <td>235</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Australia</strong></td>
+                            <td>115</td>
+                            <td>67</td>
+                            <td>31</td>
+                            <td>103</td>
+                            <td>213</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Great Britain</strong></td>
+                            <td>185</td>
+                            <td>12</td>
+                            <td>0</td>
+                            <td>146</td>
+                            <td>197</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Germany</strong></td>
+                            <td>141</td>
+                            <td>5</td>
+                            <td>42</td>
+                            <td>110</td>
+                            <td>188</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Canada</strong></td>
+                            <td>119</td>
+                            <td>11</td>
+                            <td>46</td>
+                            <td>98</td>
+                            <td>176</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Brazil</strong></td>
+                            <td>116</td>
+                            <td>7</td>
+                            <td>16</td>
+                            <td>85</td>
+                            <td>139</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Malaysia</strong></td>
+                            <td>63</td>
+                            <td>50</td>
+                            <td>17</td>
+                            <td>55</td>
+                            <td>130</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Netherlands</strong></td>
+                            <td>115</td>
+                            <td>6</td>
+                            <td>8</td>
+                            <td>93</td>
+                            <td>129</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>France</strong></td>
+                            <td>71</td>
+                            <td>8</td>
+                            <td>49</td>
+                            <td>67</td>
+                            <td>128</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Spain</strong></td>
+                            <td>60</td>
+                            <td>3</td>
+                            <td>59</td>
+                            <td>47</td>
+                            <td>122</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Italy</strong></td>
+                            <td>54</td>
+                            <td>2</td>
+                            <td>54</td>
+                            <td>38</td>
+                            <td>110</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong>Ireland</strong></td>
+                            <td>101</td>
+                            <td>2</td>
+                            <td>6</td>
+                            <td>82</td>
+                            <td>109</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Methodology Section -->
+        <div class="card" id="methodology">
+            <h2>📖 Methodology & Definitions</h2>
+
+            <div class="explanation-box">
+                <h4>How This Comparison Was Performed</h4>
+                <p>Records from the gold_buildings_full layer are filtered by source (SA vs DCH), then spatially matched
+                using the Haversine formula with a 500m threshold. When multiple potential matches exist,
+                the closest spatial match is selected. Capacity comparisons use the full_capacity_mw field.</p>
+            </div>
+
+            <h3>Statistical Definitions</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Definition</th>
+                    <th>Interpretation</th>
+                </tr>
+                <tr>
+                    <td><strong>MAPE</strong></td>
+                    <td>Mean Absolute Percentage Error = mean(|SA - DCH| / max(SA, DCH)) × 100</td>
+                    <td>0-10%: Excellent, 10-20%: Good, 20-35%: Moderate, 35-50%: Significant, >50%: Poor</td>
+                </tr>
+                <tr>
+                    <td><strong>Bias %</strong></td>
+                    <td>Systematic bias = mean(SA - DCH) / mean(DCH) × 100</td>
+                    <td>Positive = SA reports higher capacity on average; Negative = DCH reports higher</td>
+                </tr>
+                <tr>
+                    <td><strong>CV</strong></td>
+                    <td>Coefficient of Variation = std(delta) / mean(|delta|) × 100</td>
+                    <td>Lower CV indicates more consistent disagreements (easier to calibrate)</td>
+                </tr>
+                <tr>
+                    <td><strong>Pearson r</strong></td>
+                    <td>Correlation coefficient between SA and DCH capacity values</td>
+                    <td>>0.9: Strong, 0.7-0.9: Moderate, <0.7: Weak linear relationship</td>
+                </tr>
+                <tr>
+                    <td><strong>Significant Conflict</strong></td>
+                    <td>Matched pair with >20% capacity delta OR >10 MW absolute difference</td>
+                    <td>These records require manual review and reconciliation</td>
+                </tr>
+            </table>
+
+            <div class="methodology-note">
+                <strong>⚠️ Important Note:</strong> This comparison uses spatial matching only. Two facilities at the same
+                location may represent different buildings or expansions. Company name matching is performed separately
+                and may not always align due to naming variations between sources.
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Generated by SA vs DCH Comparison Script V2 | 2026-01-30 16:45:29</p>
+            <p>Spatial matching threshold: 500m | Source: gold_buildings_full</p>
+        </div>
+        </div><!-- End container -->
+    </div><!-- End main-content -->
+
+    <!-- Chart.js Scripts -->
+    <script>
+        // Histogram Chart
+        const histogramCtx = document.getElementById('histogramChart').getContext('2d');
+        new Chart(histogramCtx, {
+            type: 'bar',
+            data: {
+                labels: ["<-50", "-50 to -20", "-20 to -10", "-10 to -5", "-5 to 0", "0 to 5", "5 to 10", "10 to 20", "20 to 50", ">50"],
+                datasets: [{
+                    label: 'Count of Pairs',
+                    data: [324, 776, 573, 577, 1235, 949, 80, 66, 118, 253],
+                    backgroundColor: 'rgba(24, 119, 242, 0.7)',
+                    borderColor: 'rgba(24, 119, 242, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: false },
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Number of Pairs' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Capacity Delta (MW)' }
+                    }
+                }
+            }
+        });
+
+        // Scatter Plot
+        const scatterCtx = document.getElementById('scatterChart').getContext('2d');
+        new Chart(scatterCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'SA vs DCH Capacity',
+                    data: [{"x": 14.4, "y": 14.4}, {"x": 8.1, "y": 17.7}, {"x": 87.0, "y": 80.0}, {"x": 48.0, "y": 48.0}, {"x": 29.4, "y": 29.4}, {"x": 22.666666666666657, "y": 60.0}, {"x": 51.0, "y": 50.96}, {"x": 18.0, "y": 44.0}, {"x": 1.0, "y": 2.6}, {"x": 10.0, "y": 39.2}, {"x": 35.3, "y": 66.0}, {"x": 174.0, "y": 80.0}, {"x": 1.96, "y": 2.0}, {"x": 51.0, "y": 50.96}, {"x": 17.5, "y": 17.0}, {"x": 51.0, "y": 51.0}, {"x": 42.0, "y": 48.0}, {"x": 48.0, "y": 48.0}, {"x": 21.0, "y": 57.05}, {"x": 50.0, "y": 50.0}, {"x": 12.0, "y": 82.3}, {"x": 64.0, "y": 64.0}, {"x": 54.0, "y": 54.0}, {"x": 24.0, "y": 32.0}, {"x": 293.0, "y": 293.0}, {"x": 0.25, "y": 0.75}, {"x": 120.0, "y": 66.0}, {"x": 56.0, "y": 57.6}, {"x": 1.125, "y": 3.075}, {"x": 2.0, "y": 13.33}, {"x": 80.0, "y": 80.0}, {"x": 8.8, "y": 17.6}, {"x": 83.0, "y": 90.0}, {"x": 30.0, "y": 30.0}, {"x": 13.0, "y": 26.0}, {"x": 9.0, "y": 16.537}, {"x": 16.0, "y": 16.0}, {"x": 35.0, "y": 27.400000000000002}, {"x": 12.0, "y": 12.0}, {"x": 114.0, "y": 57.6}, {"x": 41.35, "y": 13.65}, {"x": 1.9, "y": 2.0}, {"x": 20.0, "y": 60.0}, {"x": 4.0, "y": 3.5}, {"x": 60.0, "y": 36.0}, {"x": 87.0, "y": 80.0}, {"x": 72.0, "y": 72.0}, {"x": 700.0, "y": 1170.0}, {"x": 48.0, "y": 48.0}, {"x": 87.0, "y": 80.0}, {"x": 1.2, "y": 2.4}, {"x": 7.199999999999999, "y": 28.8}, {"x": 21.0, "y": 16.0}, {"x": 192.0, "y": 192.0}, {"x": 48.0, "y": 48.0}, {"x": 20.0, "y": 25.0}, {"x": 4.8, "y": 4.8}, {"x": 315.0, "y": 50.0}, {"x": 48.0, "y": 48.0}, {"x": 60.0, "y": 84.0}, {"x": 30.0, "y": 30.0}, {"x": 2.0, "y": 4.8}, {"x": 50.96, "y": 50.96}, {"x": 10.0, "y": 20.0}, {"x": 12.0, "y": 12.0}, {"x": 384.0, "y": 48.0}, {"x": 22.5, "y": 39.0}, {"x": 48.0, "y": 48.0}, {"x": 1.0, "y": 1.625}, {"x": 2.4, "y": 4.6}, {"x": 96.0, "y": 48.0}, {"x": 8.0, "y": 20.0}, {"x": 60.0, "y": 70.60000000000001}, {"x": 216.0, "y": 216.0}, {"x": 480.0, "y": 480.0}, {"x": 12.0, "y": 12.0}, {"x": 96.0, "y": 96.0}, {"x": 48.0, "y": 48.0}, {"x": 10.0, "y": 10.0}, {"x": 3.645, "y": 9.645}, {"x": 48.0, "y": 48.0}, {"x": 17.0, "y": 20.0}, {"x": 48.0, "y": 48.0}, {"x": 27.0, "y": 27.0}, {"x": 83.0, "y": 72.0}, {"x": 0.75, "y": 4.0}, {"x": 2.0, "y": 1.05}, {"x": 4.0, "y": 3.2}, {"x": 87.0, "y": 80.0}, {"x": 0.15, "y": 0.15}, {"x": 38.0, "y": 35.6}, {"x": 9.0, "y": 9.0}, {"x": 11.1, "y": 11.559999999999999}, {"x": 3.0, "y": 9.0}, {"x": 0.4, "y": 3.8}, {"x": 18.4, "y": 8.4}, {"x": 1.9, "y": 2.0}, {"x": 36.0, "y": 52.0}, {"x": 50.96, "y": 50.96}, {"x": 35.0, "y": 27.400000000000002}, {"x": 3.6, "y": 9.0}, {"x": 5.0, "y": 7.0}, {"x": 120.0, "y": 66.0}, {"x": 16.0, "y": 20.0}, {"x": 44.0, "y": 44.0}, {"x": 29.0, "y": 560.0}, {"x": 6.0, "y": 14.8}, {"x": 7.5, "y": 10.0}, {"x": 5.0, "y": 5.0}, {"x": 249.0, "y": 80.0}, {"x": 100.0, "y": 100.0}, {"x": 17.0, "y": 28.799999999999997}, {"x": 174.0, "y": 80.0}, {"x": 5.0, "y": 5.0}, {"x": 6.0, "y": 8.0}, {"x": 48.0, "y": 48.0}, {"x": 13.0, "y": 13.0}, {"x": 1.75, "y": 2.75}, {"x": 30.0, "y": 34.0}, {"x": 150.0, "y": 108.0}, {"x": 87.0, "y": 80.0}, {"x": 1.0, "y": 7.0}, {"x": 74.0, "y": 48.0}, {"x": 18.0, "y": 18.0}, {"x": 7.2, "y": 7.2}, {"x": 300.0, "y": 300.0}, {"x": 19.2, "y": 19.2}, {"x": 18.0, "y": 18.0}, {"x": 4.0, "y": 16.0}, {"x": 11.0, "y": 15.2}, {"x": 48.0, "y": 48.0}, {"x": 25.0, "y": 60.0}, {"x": 65.0, "y": 65.0}, {"x": 72.0, "y": 96.0}, {"x": 48.0, "y": 48.0}, {"x": 50.96, "y": 50.96}, {"x": 27.0, "y": 27.0}, {"x": 72.0, "y": 48.0}, {"x": 72.0, "y": 48.0}, {"x": 48.0, "y": 48.0}, {"x": 144.0, "y": 48.0}, {"x": 144.0, "y": 72.0}, {"x": 144.0, "y": 72.0}, {"x": 144.0, "y": 72.0}, {"x": 144.0, "y": 72.0}, {"x": 65.0, "y": 80.0}, {"x": 550.0, "y": 80.0}, {"x": 16.5, "y": 36.0}, {"x": 21.6, "y": 40.8}, {"x": 48.0, "y": 48.0}, {"x": 11.8, "y": 11.8}, {"x": 48.0, "y": 48.0}, {"x": 96.0, "y": 96.0}, {"x": 174.0, "y": 80.0}, {"x": 27.0, "y": 27.0}, {"x": 50.96, "y": 50.96}, {"x": 1.0, "y": 2.0}, {"x": 9.0, "y": 18.0}, {"x": 48.0, "y": 48.0}, {"x": 21.0, "y": 24.0}, {"x": 21.9, "y": 48.0}, {"x": 8.5, "y": 10.0}, {"x": 120.0, "y": 60.0}, {"x": 2500.0, "y": 1215.0}, {"x": 60.0, "y": 40.0}, {"x": 33.8, "y": 33.8}, {"x": 0.5, "y": 4.5}, {"x": 8.0, "y": 16.0}, {"x": 1.48, "y": 2.7}, {"x": 80.0, "y": 80.0}, {"x": 36.0, "y": 36.0}, {"x": 100.0, "y": 120.0}, {"x": 14.0, "y": 14.0}, {"x": 72.0, "y": 72.0}, {"x": 6.0, "y": 13.8}, {"x": 24.0, "y": 24.0}, {"x": 50.96, "y": 50.96}, {"x": 60.0, "y": 66.0}, {"x": 24.0, "y": 9.8}, {"x": 32.1, "y": 49.1}, {"x": 6.0, "y": 8.0}, {"x": 1.5, "y": 6.0}, {"x": 9.9, "y": 9.6}, {"x": 2.0, "y": 12.75}, {"x": 15.0, "y": 18.0}, {"x": 58.0, "y": 58.0}, {"x": 28.799999999999997, "y": 28.799999999999997}, {"x": 14.0, "y": 24.0}, {"x": 1200.0, "y": 2500.0}, {"x": 2.0, "y": 3.6}, {"x": 120.0, "y": 66.0}, {"x": 48.0, "y": 48.0}, {"x": 4.0, "y": 4.0}, {"x": 36.0, "y": 36.0}, {"x": 1.2, "y": 7.2}, {"x": 3.84, "y": 5.0}, {"x": 48.0, "y": 48.0}, {"x": 17.0, "y": 33.0}, {"x": 4.8, "y": 4.8}, {"x": 0.5, "y": 1.3}, {"x": 4.0, "y": 28.0}, {"x": 2.5, "y": 11.5}, {"x": 50.0, "y": 50.96}, {"x": 63.6, "y": 31.6}, {"x": 2.7, "y": 6.1}, {"x": 80.0, "y": 25.0}, {"x": 80.0, "y": 80.0}, {"x": 16.0, "y": 16.0}, {"x": 65.0, "y": 65.0}, {"x": 135.0, "y": 135.0}, {"x": 135.0, "y": 135.0}, {"x": 8.0, "y": 10.1}, {"x": 27.0, "y": 48.0}, {"x": 48.0, "y": 48.0}, {"x": 0.8, "y": 0.2}, {"x": 36.0, "y": 36.0}, {"x": 48.0, "y": 48.0}, {"x": 87.0, "y": 80.0}, {"x": 48.0, "y": 48.0}, {"x": 3.0, "y": 4.0}, {"x": 15.0, "y": 18.0}, {"x": 10.0, "y": 36.0}, {"x": 35.0, "y": 27.400000000000002}, {"x": 66.0, "y": 66.0}, {"x": 1.5, "y": 3.0}, {"x": 32.0, "y": 32.0}, {"x": 96.0, "y": 96.0}, {"x": 83.0, "y": 72.0}, {"x": 6.0, "y": 7.9}, {"x": 90.0, "y": 90.0}, {"x": 48.0, "y": 48.0}, {"x": 384.0, "y": 288.0}, {"x": 120.0, "y": 66.0}, {"x": 2.0, "y": 4.5}, {"x": 23.0, "y": 24.0}, {"x": 1248.0, "y": 1248.0}, {"x": 0.75, "y": 6.0}, {"x": 40.0, "y": 40.0}, {"x": 18.0, "y": 18.0}, {"x": 49.5, "y": 48.0}, {"x": 3.333333333333333, "y": 5.0}, {"x": 20.0, "y": 20.0}, {"x": 60.0, "y": 60.0}, {"x": 16.15, "y": 6.95}, {"x": 2.0, "y": 2.0}, {"x": 60.0, "y": 66.0}, {"x": 12.0, "y": 12.0}, {"x": 50.0, "y": 52.0}, {"x": 6.4, "y": 8.64}, {"x": 0.5, "y": 3.3000000000000003}, {"x": 7.5, "y": 9.0}, {"x": 6.0, "y": 10.0}, {"x": 3.0, "y": 8.57}, {"x": 57.0, "y": 80.0}, {"x": 50.96, "y": 50.96}, {"x": 35.0, "y": 27.400000000000002}, {"x": 3.0, "y": 10.0}, {"x": 9.6, "y": 9.6}, {"x": 54.0, "y": 36.0}, {"x": 20.0, "y": 6.0}, {"x": 36.0, "y": 36.0}, {"x": 4.0, "y": 4.0}, {"x": 4.2, "y": 16.0}, {"x": 40.0, "y": 5.0}, {"x": 36.0, "y": 40.0}, {"x": 48.0, "y": 48.0}, {"x": 140.0, "y": 150.0}, {"x": 20.0, "y": 24.0}, {"x": 70.0, "y": 70.60000000000001}, {"x": 49.0, "y": 30.0}, {"x": 174.0, "y": 80.0}, {"x": 60.0, "y": 70.60000000000001}, {"x": 48.0, "y": 48.0}, {"x": 1.96, "y": 2.0}, {"x": 31.4, "y": 31.400000000000002}, {"x": 6.0, "y": 12.3}, {"x": 4.0, "y": 7.800000000000001}, {"x": 48.0, "y": 48.0}, {"x": 50.4, "y": 50.4}, {"x": 48.0, "y": 48.0}, {"x": 36.0, "y": 36.0}, {"x": 2.0, "y": 21.7}, {"x": 32.0, "y": 48.0}, {"x": 25.0, "y": 27.0}, {"x": 18.0, "y": 120.0}, {"x": 29.0, "y": 35.0}, {"x": 0.1, "y": 1.9000000000000001}, {"x": 48.0, "y": 48.0}, {"x": 65.0, "y": 65.0}, {"x": 135.0, "y": 135.0}, {"x": 9.0, "y": 12.0}, {"x": 60.0, "y": 30.0}, {"x": 72.0, "y": 80.0}, {"x": 36.0, "y": 34.0}, {"x": 2.8, "y": 3.5}, {"x": 30.0, "y": 34.0}, {"x": 32.0, "y": 48.0}, {"x": 75.0, "y": 75.0}, {"x": 60.0, "y": 70.60000000000001}, {"x": 30.0, "y": 30.0}, {"x": 280.0, "y": 280.0}, {"x": 6.4, "y": 8.0}, {"x": 48.0, "y": 48.0}, {"x": 12.0, "y": 48.0}, {"x": 12.0, "y": 12.0}, {"x": 19.8, "y": 36.800000000000004}, {"x": 0.7, "y": 6.5}, {"x": 1.5, "y": 5.5}, {"x": 27.0, "y": 23.400000000000002}, {"x": 35.0, "y": 48.0}, {"x": 4.0, "y": 4.0}, {"x": 24.0, "y": 40.0}, {"x": 112.0, "y": 128.0}, {"x": 13.0, "y": 18.0}, {"x": 76.5, "y": 76.5}, {"x": 25.0, "y": 30.400000000000002}, {"x": 48.0, "y": 48.0}, {"x": 65.0, "y": 48.0}, {"x": 50.96, "y": 48.0}, {"x": 13.0, "y": 11.0}, {"x": 76.0, "y": 79.0}, {"x": 80.0, "y": 40.0}, {"x": 28.0, "y": 28.0}, {"x": 135.0, "y": 135.0}, {"x": 288.0, "y": 288.0}, {"x": 22.1, "y": 22.1}, {"x": 50.0, "y": 50.0}, {"x": 96.0, "y": 48.0}, {"x": 0.7, "y": 1.19}, {"x": 58.0, "y": 58.0}, {"x": 112.0, "y": 112.0}, {"x": 1.3, "y": 3.9000000000000004}, {"x": 24.0, "y": 54.0}, {"x": 22.1, "y": 22.1}, {"x": 48.0, "y": 48.0}, {"x": 36.0, "y": 50.0}, {"x": 7.0, "y": 20.0}, {"x": 24.0, "y": 48.0}, {"x": 100.0, "y": 192.0}, {"x": 2.45, "y": 8.8}, {"x": 48.0, "y": 48.0}, {"x": 48.0, "y": 48.0}, {"x": 10.0, "y": 32.0}, {"x": 51.35, "y": 51.35}, {"x": 48.0, "y": 48.0}, {"x": 11.0, "y": 30.0}, {"x": 216.0, "y": 96.0}, {"x": 35.0, "y": 27.400000000000002}, {"x": 3.6, "y": 7.2}, {"x": 50.0, "y": 43.1}, {"x": 15.0, "y": 30.0}, {"x": 160.0, "y": 218.5}, {"x": 14.0, "y": 28.0}, {"x": 1.96, "y": 2.0}, {"x": 0.6, "y": 1.6}, {"x": 36.0, "y": 36.0}, {"x": 96.0, "y": 96.0}, {"x": 500.0, "y": 500.0}, {"x": 149.0, "y": 160.0}, {"x": 45.0, "y": 45.0}, {"x": 35.0, "y": 27.400000000000002}, {"x": 7.0, "y": 7.54}, {"x": 48.0, "y": 48.0}, {"x": 16.0, "y": 62.0}, {"x": 1.0, "y": 3.0}, {"x": 0.3, "y": 0.55}, {"x": 600.0, "y": 600.0}, {"x": 33.0, "y": 43.0}, {"x": 510.0, "y": 510.0}, {"x": 190.0, "y": 190.0}, {"x": 65.0, "y": 65.0}, {"x": 90.0, "y": 38.0}, {"x": 48.0, "y": 48.0}, {"x": 38.0, "y": 36.0}, {"x": 765.0, "y": 765.0}, {"x": 24.0, "y": 24.0}, {"x": 83.0, "y": 30.0}, {"x": 27.0, "y": 27.0}, {"x": 15.0, "y": 30.0}, {"x": 0.7, "y": 0.2}, {"x": 295.0, "y": 295.0}, {"x": 8.8, "y": 28.3}, {"x": 36.0, "y": 78.7}, {"x": 36.0, "y": 36.0}, {"x": 48.0, "y": 48.0}, {"x": 9.1, "y": 11.384}, {"x": 15.0, "y": 24.0}, {"x": 40.0, "y": 36.0}, {"x": 83.0, "y": 90.0}, {"x": 14.3, "y": 30.0}, {"x": 21.3, "y": 21.3}, {"x": 15.0, "y": 16.0}, {"x": 80.0, "y": 80.0}, {"x": 200.0, "y": 192.0}, {"x": 76.5, "y": 76.5}, {"x": 384.0, "y": 384.0}, {"x": 2.5, "y": 6.491}, {"x": 768.0, "y": 768.0}, {"x": 192.0, "y": 192.0}, {"x": 210.0, "y": 210.0}, {"x": 3.0, "y": 6.0}, {"x": 4.8, "y": 7.199999999999999}, {"x": 40.0, "y": 40.0}, {"x": 120.0, "y": 60.0}, {"x": 26.0, "y": 26.0}, {"x": 26.8, "y": 30.0}, {"x": 8.5, "y": 16.5}, {"x": 2.0, "y": 10.0}, {"x": 19.0, "y": 18.0}, {"x": 12.0, "y": 17.5}, {"x": 10.0, "y": 10.0}, {"x": 6.0, "y": 8.0}, {"x": 32.0, "y": 32.0}, {"x": 1.25, "y": 16.0}, {"x": 20.0, "y": 20.0}, {"x": 84.0, "y": 42.0}, {"x": 9.75, "y": 12.0}, {"x": 9.0, "y": 9.0}, {"x": 18.299999999999997, "y": 53.0}, {"x": 74.0, "y": 74.0}, {"x": 35.0, "y": 27.400000000000002}, {"x": 1.5, "y": 4.785}, {"x": 72.0, "y": 144.0}, {"x": 48.0, "y": 48.0}, {"x": 2.0, "y": 3.2}, {"x": 408.0, "y": 384.0}, {"x": 60.0, "y": 60.0}, {"x": 20.25, "y": 27.0}, {"x": 130.0, "y": 60.0}, {"x": 3.0, "y": 1.6}, {"x": 50.0, "y": 21.900000000000002}, {"x": 33.0, "y": 33.0}, {"x": 48.0, "y": 48.0}, {"x": 48.0, "y": 28.0}, {"x": 20.0, "y": 20.0}, {"x": 45.5, "y": 4.5}, {"x": 50.0, "y": 53.0}, {"x": 72.0, "y": 96.0}, {"x": 100.0, "y": 100.0}, {"x": 2.25, "y": 17.975}, {"x": 4.0, "y": 6.2}, {"x": 20.0, "y": 20.0}, {"x": 48.0, "y": 48.0}, {"x": 16.5, "y": 16.5}, {"x": 6.0, "y": 11.8}, {"x": 18.0, "y": 18.0}, {"x": 51.35, "y": 51.35}, {"x": 2.25, "y": 2.25}, {"x": 4.4, "y": 3.6}, {"x": 20.0, "y": 44.8}, {"x": 50.96, "y": 50.96}, {"x": 96.0, "y": 96.0}, {"x": 15.0, "y": 30.0}, {"x": 87.0, "y": 80.0}, {"x": 65.0, "y": 65.0}, {"x": 2.8, "y": 5.0}, {"x": 0.5, "y": 0.95}, {"x": 10.0, "y": 15.0}, {"x": 20.0, "y": 20.0}, {"x": 0.5, "y": 0.905}, {"x": 35.0, "y": 48.0}, {"x": 1.6, "y": 1.6}, {"x": 59.2, "y": 74.0}, {"x": 18.0, "y": 18.0}, {"x": 2.2, "y": 8.8}, {"x": 16.0, "y": 48.0}, {"x": 1.95, "y": 3.9}, {"x": 88.0, "y": 48.0}, {"x": 120.0, "y": 120.0}, {"x": 36.0, "y": 36.0}, {"x": 6.0, "y": 12.0}, {"x": 0.5, "y": 3.5}, {"x": 54.0, "y": 54.0}, {"x": 48.0, "y": 48.0}, {"x": 70.0, "y": 32.0}, {"x": 2.3, "y": 3.8000000000000003}, {"x": 192.0, "y": 192.0}, {"x": 16.0, "y": 33.0}, {"x": 40.0, "y": 48.0}, {"x": 83.0, "y": 80.0}, {"x": 4.2, "y": 14.2}, {"x": 24.0, "y": 32.0}, {"x": 16.0, "y": 16.0}, {"x": 40.0, "y": 40.0}, {"x": 3.0, "y": 14.675}, {"x": 3.0, "y": 10.0}, {"x": 120.0, "y": 14.4}, {"x": 16.0, "y": 18.0}, {"x": 0.95, "y": 1.69}, {"x": 5.075, "y": 9.875}, {"x": 9.9, "y": 23.700000000000003}, {"x": 5.0, "y": 9.6}, {"x": 84.0, "y": 84.0}, {"x": 8.0, "y": 16.0}, {"x": 6.0, "y": 16.0}, {"x": 48.0, "y": 48.0}, {"x": 23.0, "y": 19.2}, {"x": 2.0, "y": 3.0000000000000004}, {"x": 100.0, "y": 700.0}, {"x": 0.6, "y": 1.4}],
+                    backgroundColor: 'rgba(233, 30, 99, 0.5)',
+                    borderColor: 'rgba(233, 30, 99, 0.8)',
+                    pointRadius: 4
+                },
+                {
+                    label: 'Perfect Agreement Line',
+                    data: [{x: 0, y: 0}, {x: 500, y: 500}],
+                    type: 'line',
+                    borderColor: 'rgba(76, 175, 80, 0.8)',
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'SA Capacity (MW)' },
+                        beginAtZero: true
+                    },
+                    y: {
+                        title: { display: true, text: 'DCH Capacity (MW)' },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Company Chart
+        const companyCtx = document.getElementById('companyChart').getContext('2d');
+        new Chart(companyCtx, {
+            type: 'bar',
+            data: {
+                labels: ["AWS", "Microsoft", "Google", "Equinix", "Digital Realty", "Meta", "QTS", "NTT Global Data Cent", "CyrusOne", "STACK Infrastructure", "EdgeConneX", "DataBank"],
+                datasets: [
+                    {
+                        label: 'Matched',
+                        data: [611, 426, 234, 261, 262, 166, 106, 134, 78, 92, 69, 83],
+                        backgroundColor: 'rgba(24, 119, 242, 0.7)'
+                    },
+                    {
+                        label: 'SA Only',
+                        data: [44, 44, 44, 2, 6, 33, 11, 10, 1, 10, 6, 0],
+                        backgroundColor: 'rgba(233, 30, 99, 0.7)'
+                    },
+                    {
+                        label: 'DCH Only',
+                        data: [223, 53, 62, 56, 50, 58, 75, 34, 57, 0, 17, 6],
+                        backgroundColor: 'rgba(76, 175, 80, 0.7)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                }
+            }
+        });
+
+        // Region Chart
+        const regionCtx = document.getElementById('regionChart').getContext('2d');
+        new Chart(regionCtx, {
+            type: 'bar',
+            data: {
+                labels: ["AMER", "EMEA", "APAC", "Unknown"],
+                datasets: [
+                    {
+                        label: 'Matched',
+                        data: [2823, 1039, 847, 242],
+                        backgroundColor: 'rgba(24, 119, 242, 0.7)'
+                    },
+                    {
+                        label: 'SA Only',
+                        data: [242, 122, 294, 163],
+                        backgroundColor: 'rgba(233, 30, 99, 0.7)'
+                    },
+                    {
+                        label: 'DCH Only',
+                        data: [1102, 593, 320, 86],
+                        backgroundColor: 'rgba(76, 175, 80, 0.7)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

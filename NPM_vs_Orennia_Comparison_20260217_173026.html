@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPM vs Orennia Comparison Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: #0f3460;
+            --text-primary: #eee;
+            --text-secondary: #aaa;
+            --accent: #4facfe;
+            --accent2: #0f3460;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --border: #333;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        h1 {
+            text-align: center;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        h2 {
+            color: var(--accent);
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        h3 {
+            color: var(--text-primary);
+            margin: 20px 0 10px 0;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .grade {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+
+        .grade-a { background: var(--success); color: white; }
+        .grade-b { background: #2ecc71; color: white; }
+        .grade-c { background: var(--warning); color: white; }
+        .grade-d { background: #e67e22; color: white; }
+        .grade-f { background: var(--danger); color: white; }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.2em;
+            background: #f39c12;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-card);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        tr:hover { background: var(--bg-card); }
+
+        .chart-container {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            height: 320px;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .highlight-box {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent);
+            margin: 15px 0;
+        }
+
+        .match-yes { color: var(--success); font-weight: bold; }
+        .match-no { color: var(--text-secondary); }
+
+        .number { font-family: 'Consolas', monospace; }
+
+        .recommendation {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .recommendation h4 {
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .recommendation ul {
+            margin-left: 20px;
+        }
+
+        .recommendation li {
+            margin: 8px 0;
+        }
+
+        .source-orennia { color: #3498db; }
+        .source-npm { color: #1abc9c; }
+
+        @media (max-width: 768px) {
+            .chart-row, .two-col { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NPM vs Orennia Comparison Report</h1>
+        <p class="subtitle">Generated: 2026-02-17 17:30 | Threshold: 500m</p>
+
+        <!-- Executive Summary -->
+        <h2>Executive Summary</h2>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <span class="severity-badge">MODERATE OVERLAP</span>
+            <p style="margin-top: 10px; color: var(--text-secondary);">Significant overlap but both provide unique records</p>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">3,575</div>
+                <div class="metric-label">Orennia Records</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">1,567</div>
+                <div class="metric-label">NPM Records</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">55.3%</div>
+                <div class="metric-label">NPM Overlap Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">24.2%</div>
+                <div class="metric-label">Orennia Overlap Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">688</div>
+                <div class="metric-label">NPM-Only Records</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">2,709</div>
+                <div class="metric-label">Orennia-Only Records</div>
+            </div>
+        </div>
+
+        <!-- Source Overlap Analysis (Sam's Hypothesis Investigation) -->
+        <h2>🔍 Source Overlap Analysis</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            <em>Investigation into whether NPM and Orennia share the same underlying data source</em>
+        </p>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <span class="severity-badge" style="background: var(--success);">
+                WEAK EVIDENCE (Score: 2/9)
+            </span>
+            <p style="margin-top: 10px; color: var(--text-secondary); max-width: 800px; margin-left: auto; margin-right: auto;">
+                Sources appear largely independent - overlap is typical of two sources tracking the same market.
+            </p>
+        </div>
+
+        <div class="two-col">
+            <!-- Coordinate Analysis -->
+            <div class="data-card">
+                <h3>📍 Coordinate Analysis</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 15px;">
+                    Key indicator: If sources share data, coordinates should be nearly identical
+                </p>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Distance Threshold</th><th>Count</th><th>Percentage</th><th>Interpretation</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Exact match (0-1m)</td>
+                            <td class="number">33</td>
+                            <td class="number">3.8%</td>
+                            <td>✓ Low</td>
+                        </tr>
+                        <tr>
+                            <td>Very close (0-10m)</td>
+                            <td class="number">102</td>
+                            <td class="number">11.8%</td>
+                            <td>✓ Low</td>
+                        </tr>
+                        <tr>
+                            <td>Close (0-100m)</td>
+                            <td class="number">489</td>
+                            <td class="number">56.5%</td>
+                            <td>Typical geocoding variance</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Capacity Analysis -->
+            <div class="data-card">
+                <h3>⚡ Capacity Value Analysis</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 15px;">
+                    Identical capacity values suggest shared underlying data
+                </p>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Metric</th><th>Count</th><th>Percentage</th><th>Interpretation</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Pairs with both capacities</td>
+                            <td class="number">409</td>
+                            <td class="number">-</td>
+                            <td>Analysis base</td>
+                        </tr>
+                        <tr>
+                            <td>Identical capacity values</td>
+                            <td class="number">140</td>
+                            <td class="number">34.2%</td>
+                            <td>⚠️ High - shared source</td>
+                        </tr>
+                        <tr>
+                            <td>Within 5% of each other</td>
+                            <td class="number">159</td>
+                            <td class="number">38.9%</td>
+                            <td>✓ Normal</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <!-- Company Match Analysis -->
+            <div class="data-card">
+                <h3>🏢 Company Name Analysis</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Metric</th><th>Count</th><th>Percentage</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Same company name</td>
+                            <td class="number">582</td>
+                            <td class="number">67.2%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Smoking Gun Analysis -->
+            <div class="data-card">
+                <h3>🎯 Smoking Gun Analysis</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 15px;">
+                    Records matching ALL criteria: exact coords + same company + same/similar capacity
+                </p>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Metric</th><th>Count</th><th>Percentage</th><th>Interpretation</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Smoking gun matches</td>
+                            <td class="number">1</td>
+                            <td class="number">0.1%</td>
+                            <td>✓ No systematic copying</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="highlight-box" style="border-left-color: var(--success);">
+            <strong>Bottom Line for Sam:</strong><br/>
+            The data shows <strong>overlap typical of two independent sources tracking the same market</strong>, not evidence of direct data sourcing. Both likely pull from common public records (utility filings, planning applications). Orennia has broader coverage with significantly more records than NPM.
+        </div>
+
+        <!-- Capacity Statistics -->
+        <h2>Capacity Comparison Statistics</h2>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">32.9%</div>
+                <div class="metric-label">MAPE (Mean Absolute % Error)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" style="color: var(--success)">
+                    -31.3%
+                </div>
+                <div class="metric-label">Systematic Bias (Orennia vs NPM)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">0.744</div>
+                <div class="metric-label">Pearson Correlation</div>
+            </div>
+            <div class="metric-card">
+                <span class="grade grade-c">C</span>
+                <div class="metric-label">Agreement Grade</div>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <strong>Interpretation:</strong>
+            MAPE of 32.9% indicates moderate agreement between sources on capacity values.
+             Orennia reports 31.3% lower capacity on average compared to NPM.
+             Pearson r of 0.74 shows strong correlation — the sources agree well on which facilities are bigger vs smaller, but with significant scatter around the trend.
+        </div>
+
+        <div class="highlight-box" style="border-left-color: var(--warning);">
+            <strong>Bottom Line:</strong>
+            The sources strongly agree on the <em>ranking</em> of facilities (bigger vs smaller), but disagree substantially on <em>actual MW values</em>
+             — with NPM consistently reporting 31% lower capacity.
+        </div>
+
+          <!-- Methodology Section -->
+          <h2>📋 Methodology</h2>
+          <div class="highlight-box" style="border-left-color: var(--info);">
+              <strong>How This Analysis Works (Aligned with SA vs DCH Workflow):</strong>
+              <p style="margin: 10px 0; color: var(--text-secondary);">
+                  This comparison follows the methodology established in <code>SA_VS_DCH_COMPARISON_WORKFLOW.md</code>
+                  and <code>UCID_SA_DCH_IMPROVEMENT_PLAN.md</code>.
+              </p>
+
+              <strong>Matching Mode Used: Building-Level Spatial (1-to-1 Optimal)</strong>
+              <ul style="margin: 10px 0; padding-left: 20px;">
+                  <li><strong>1-to-1 Optimal Matching:</strong> Each record matches at most ONE counterpart. Uses a greedy algorithm prioritizing closest distances first, ensuring symmetric pair counts.</li>
+                  <li><strong>Distance Threshold:</strong> 500m default. Records farther apart are considered unmatched.</li>
+                  <li><strong>Company Normalization:</strong> Company names normalized (e.g., "Amazon Web Services" → "AWS") for company match flagging.</li>
+              </ul>
+
+              <strong>Available Matching Modes:</strong>
+              <table class="data-table" style="margin: 10px 0;">
+                  <tr><th>Mode</th><th>Description</th><th>Best For</th></tr>
+                  <tr>
+                      <td><code>spatial</code></td>
+                      <td>Distance only (current)</td>
+                      <td>Understanding raw record overlap</td>
+                  </tr>
+                  <tr>
+                      <td><code>company_aware</code></td>
+                      <td>Distance + same company required</td>
+                      <td>Preventing false matches at multi-tenant sites</td>
+                  </tr>
+                  <tr>
+                      <td><code>ucid</code> (recommended)</td>
+                      <td>UCID-based campus matching</td>
+                      <td>Accurate site counting, requires post-ingestion pipeline</td>
+                  </tr>
+              </table>
+
+              <strong>Questions This Analysis Answers:</strong>
+              <ul style="margin: 10px 0; padding-left: 20px;">
+                  <li>What percentage of NPM records have a corresponding Orennia record nearby? (Overlap rate)</li>
+                  <li>For matched pairs, do they agree on company attribution?</li>
+                  <li>How closely do capacity values agree between sources? (MAPE, Bias, Pearson r)</li>
+                  <li>Is there evidence that sources share the same underlying data source? (Source Overlap Analysis)</li>
+              </ul>
+
+              <strong>Key Limitations:</strong>
+              <ul style="margin: 10px 0; padding-left: 20px;">
+                  <li><strong>Building-level granularity:</strong> This analysis compares individual building records, not UCID-aggregated campuses. A campus with 5 buildings in Orennia may match 3 buildings in NPM (showing as 3 pairs, not 1 campus).</li>
+                  <li><strong>Multi-tenant risk:</strong> Without company-aware matching, records from different companies at the same location may be incorrectly matched.</li>
+                  <li><strong>Capacity comparisons:</strong> Only include pairs where both sources report capacity values.</li>
+              </ul>
+
+              <strong>For More Accurate Campus-Level Comparison:</strong>
+              <p style="margin: 10px 0; color: var(--text-secondary);">
+                  Run the full post-ingestion pipeline first (<code>run_post_ingestion.py</code>) to generate UCIDs,
+                  then use campus-level comparison from <code>gold_campus_full</code> for accurate site counts.
+                  See <code>SA_VS_DCH_COMPARISON_WORKFLOW.md</code> for the recommended approach.
+              </p>
+          </div>
+
+          <!-- Spatial Matching -->
+          <h2>Spatial Proximity Matching</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 15px;">
+              <em>Using 1-to-1 optimal matching: each record matches at most one counterpart (symmetric pair counts)</em>
+          </p>
+
+          <table>
+              <thead>
+                  <tr>
+                      <th>Threshold</th>
+                      <th>Matched Pairs</th>
+                      <th>Orennia Coverage</th>
+                      <th>NPM Coverage</th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                <tr>
+                    <td>250m</td>
+                    <td class="number">710</td>
+                    <td class="number">710 (19.9%)</td>
+                    <td class="number">710 (45.3%)</td>
+                </tr>
+                <tr>
+                    <td>500m</td>
+                    <td class="number">866</td>
+                    <td class="number">866 (24.2%)</td>
+                    <td class="number">866 (55.3%)</td>
+                </tr>
+                <tr>
+                    <td>1km</td>
+                    <td class="number">997</td>
+                    <td class="number">997 (27.9%)</td>
+                    <td class="number">997 (63.6%)</td>
+                </tr>
+                <tr>
+                    <td>2km</td>
+                    <td class="number">1,108</td>
+                    <td class="number">1,108 (31.0%)</td>
+                    <td class="number">1,108 (70.7%)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Match Quality -->
+        <h2>Match Quality Analysis</h2>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">67.2%</div>
+                <div class="metric-label">Company Name Match</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">96.7%</div>
+                <div class="metric-label">State Match</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">75.1%</div>
+                <div class="metric-label">Status Match</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <h2>Distribution Comparison</h2>
+
+        <div class="chart-row">
+            <div class="chart-container">
+                <h3>Top States by Source</h3>
+                <canvas id="stateChart" height="250"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Status Distribution</h3>
+                <canvas id="statusChart" height="250"></canvas>
+            </div>
+        </div>
+
+        <!-- Company Overlap -->
+        <h2>Company Analysis</h2>
+
+        <div class="two-col">
+            <div class="highlight-box">
+                <h4>Company Overlap</h4>
+                <p><strong>Orennia unique companies:</strong> 910</p>
+                <p><strong>NPM unique companies:</strong> 321</p>
+                <p><strong>Common companies:</strong> 105</p>
+            </div>
+            <div class="highlight-box">
+                <h4>Top Common Companies</h4>
+                <p>365 data centers, aligned data centers, apple, applied digital, archer datacenters, ark data centers, at&t, avaio digital, aws, beale infrastructure, bitfarms, bohler, centersquare, ceranet, chirisa technology parks</p>
+            </div>
+        </div>
+
+        <!-- Capacity by Source -->
+        <h2>Total Capacity by Source</h2>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value source-orennia">361,476</div>
+                <div class="metric-label">Orennia Total MW</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value source-npm">182,848</div>
+                <div class="metric-label">NPM Total MW</div>
+            </div>
+        </div>
+
+        <!-- Detailed Match Examples -->
+        <h2>Match Examples (Closest 20)</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Distance</th>
+                    <th>Company Match</th>
+                    <th>Orennia Company</th>
+                    <th>NPM Company</th>
+                    <th>Orennia MW</th>
+                    <th>NPM MW</th>
+                    <th>Delta</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">8</td>
+                    <td class="number">0</td>
+                    <td class="number">+8</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-no">no</td>
+                    <td>Microsoft</td>
+                    <td>Meta (FKA Facebook) | Bla</td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number">+0</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">10</td>
+                    <td class="number">0</td>
+                    <td class="number">+10</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">10</td>
+                    <td class="number">0</td>
+                    <td class="number">+10</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-no">no</td>
+                    <td>Comcast Cable</td>
+                    <td>Aligned Data Centers</td>
+                    <td class="number">0</td>
+                    <td class="number">108</td>
+                    <td class="number">-108</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">6</td>
+                    <td class="number">0</td>
+                    <td class="number">+6</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">12</td>
+                    <td class="number">0</td>
+                    <td class="number">+12</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>CoreSite</td>
+                    <td>CoreSite</td>
+                    <td class="number">7</td>
+                    <td class="number">0</td>
+                    <td class="number">+8</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">10</td>
+                    <td class="number">0</td>
+                    <td class="number">+10</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>CoreSite</td>
+                    <td>CoreSite</td>
+                    <td class="number">3</td>
+                    <td class="number">0</td>
+                    <td class="number">+3</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">12</td>
+                    <td class="number">0</td>
+                    <td class="number">+12</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>CoreSite</td>
+                    <td>CoreSite</td>
+                    <td class="number">0</td>
+                    <td class="number">0</td>
+                    <td class="number">+0</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>CoreSite</td>
+                    <td>CoreSite</td>
+                    <td class="number">26</td>
+                    <td class="number">0</td>
+                    <td class="number">+26</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>CoreSite</td>
+                    <td>CoreSite</td>
+                    <td class="number">7</td>
+                    <td class="number">0</td>
+                    <td class="number">+7</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">20</td>
+                    <td class="number">0</td>
+                    <td class="number">+20</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>CoreSite</td>
+                    <td>CoreSite</td>
+                    <td class="number">4</td>
+                    <td class="number">0</td>
+                    <td class="number">+4</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">10</td>
+                    <td class="number">0</td>
+                    <td class="number">+10</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">5</td>
+                    <td class="number">0</td>
+                    <td class="number">+5</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">18</td>
+                    <td class="number">0</td>
+                    <td class="number">+18</td>
+                </tr>
+                <tr>
+                    <td class="number">0m</td>
+                    <td class="match-yes">YES</td>
+                    <td>Centersquare</td>
+                    <td>Centersquare</td>
+                    <td class="number">15</td>
+                    <td class="number">0</td>
+                    <td class="number">+15</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Significant Conflicts -->
+        <h2>Significant Capacity Conflicts (&gt;20% difference)</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Distance</th>
+                    <th>Orennia Company</th>
+                    <th>NPM Company</th>
+                    <th>Orennia MW</th>
+                    <th>NPM MW</th>
+                    <th>Delta MW</th>
+                    <th>Delta %</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td class="number">204m</td>
+                    <td>CloudHQ</td>
+                    <td>CloudHQ</td>
+                    <td class="number">144</td>
+                    <td class="number">1,256</td>
+                    <td class="number">-1,112</td>
+                    <td class="number">-88.5%</td>
+                </tr>
+                <tr>
+                    <td class="number">1m</td>
+                    <td>PCM</td>
+                    <td>Meta (FKA Facebook)</td>
+                    <td class="number">2</td>
+                    <td class="number">1,000</td>
+                    <td class="number">-998</td>
+                    <td class="number">-99.8%</td>
+                </tr>
+                <tr>
+                    <td class="number">423m</td>
+                    <td>Bresco Broadband</td>
+                    <td>5C Group</td>
+                    <td class="number">0</td>
+                    <td class="number">900</td>
+                    <td class="number">-900</td>
+                    <td class="number">-100.0%</td>
+                </tr>
+                <tr>
+                    <td class="number">58m</td>
+                    <td>Meta</td>
+                    <td>Mortenson | Meta (FK</td>
+                    <td class="number">1,500</td>
+                    <td class="number">2,262</td>
+                    <td class="number">-762</td>
+                    <td class="number">-33.7%</td>
+                </tr>
+                <tr>
+                    <td class="number">346m</td>
+                    <td>Amazon</td>
+                    <td>Talen Energy | Amazo</td>
+                    <td class="number">240</td>
+                    <td class="number">960</td>
+                    <td class="number">-720</td>
+                    <td class="number">-75.0%</td>
+                </tr>
+                <tr>
+                    <td class="number">167m</td>
+                    <td>CloudHQ</td>
+                    <td>CloudHQ</td>
+                    <td class="number">84</td>
+                    <td class="number">600</td>
+                    <td class="number">-516</td>
+                    <td class="number">-86.0%</td>
+                </tr>
+                <tr>
+                    <td class="number">422m</td>
+                    <td>Franks Investment Co</td>
+                    <td>Bohler</td>
+                    <td class="number">190</td>
+                    <td class="number">700</td>
+                    <td class="number">-510</td>
+                    <td class="number">-72.9%</td>
+                </tr>
+                <tr>
+                    <td class="number">380m</td>
+                    <td>QTS</td>
+                    <td>Compass Datacenters </td>
+                    <td class="number">2,147</td>
+                    <td class="number">1,700</td>
+                    <td class="number">+447</td>
+                    <td class="number">+20.8%</td>
+                </tr>
+                <tr>
+                    <td class="number">155m</td>
+                    <td>Digital Realty</td>
+                    <td>Digital Realty | NVI</td>
+                    <td class="number">537</td>
+                    <td class="number">96</td>
+                    <td class="number">+441</td>
+                    <td class="number">+82.1%</td>
+                </tr>
+                <tr>
+                    <td class="number">399m</td>
+                    <td>Meta</td>
+                    <td>Meta (FKA Facebook) </td>
+                    <td class="number">460</td>
+                    <td class="number">30</td>
+                    <td class="number">+430</td>
+                    <td class="number">+93.5%</td>
+                </tr>
+                <tr>
+                    <td class="number">25m</td>
+                    <td>LOGIX Communications</td>
+                    <td>Serverfarm</td>
+                    <td class="number">1</td>
+                    <td class="number">410</td>
+                    <td class="number">-409</td>
+                    <td class="number">-99.7%</td>
+                </tr>
+                <tr>
+                    <td class="number">257m</td>
+                    <td>Stream Data Centers</td>
+                    <td>Stack Infrastructure</td>
+                    <td class="number">399</td>
+                    <td class="number">40</td>
+                    <td class="number">+359</td>
+                    <td class="number">+90.0%</td>
+                </tr>
+                <tr>
+                    <td class="number">44m</td>
+                    <td>Meta</td>
+                    <td>Meta (FKA Facebook)</td>
+                    <td class="number">410</td>
+                    <td class="number">60</td>
+                    <td class="number">+350</td>
+                    <td class="number">+85.4%</td>
+                </tr>
+                <tr>
+                    <td class="number">67m</td>
+                    <td>CloudHQ</td>
+                    <td>CloudHQ</td>
+                    <td class="number">53</td>
+                    <td class="number">382</td>
+                    <td class="number">-329</td>
+                    <td class="number">-86.1%</td>
+                </tr>
+                <tr>
+                    <td class="number">398m</td>
+                    <td>Vantage Data Centers</td>
+                    <td>Turner Construction </td>
+                    <td class="number">288</td>
+                    <td class="number">600</td>
+                    <td class="number">-312</td>
+                    <td class="number">-52.0%</td>
+                </tr>
+                <tr>
+                    <td class="number">359m</td>
+                    <td>Google</td>
+                    <td>Sentinel Data Center</td>
+                    <td class="number">53</td>
+                    <td class="number">300</td>
+                    <td class="number">-246</td>
+                    <td class="number">-82.0%</td>
+                </tr>
+                <tr>
+                    <td class="number">92m</td>
+                    <td>Digital Realty</td>
+                    <td>Digital Realty</td>
+                    <td class="number">168</td>
+                    <td class="number">400</td>
+                    <td class="number">-232</td>
+                    <td class="number">-58.0%</td>
+                </tr>
+                <tr>
+                    <td class="number">125m</td>
+                    <td>CloudHQ</td>
+                    <td>CloudHQ | Holder Con</td>
+                    <td class="number">84</td>
+                    <td class="number">300</td>
+                    <td class="number">-216</td>
+                    <td class="number">-72.0%</td>
+                </tr>
+                <tr>
+                    <td class="number">12m</td>
+                    <td>Applied Digital</td>
+                    <td>Applied Digital</td>
+                    <td class="number">215</td>
+                    <td class="number">430</td>
+                    <td class="number">-215</td>
+                    <td class="number">-50.0%</td>
+                </tr>
+                <tr>
+                    <td class="number">304m</td>
+                    <td>QTS</td>
+                    <td>QTS Data Centers</td>
+                    <td class="number">69</td>
+                    <td class="number">278</td>
+                    <td class="number">-208</td>
+                    <td class="number">-75.0%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Recommendations -->
+        <h2>Recommendations</h2>
+
+        <div class="recommendation">
+            <h4>Data Source Strategy</h4>
+            <ul>
+                <li><strong>Primary Source:</strong> Use <span class="source-orennia">Orennia</span> as the primary data source (larger coverage: 3,575 vs 1,567 records)</li>
+                <li><strong>NPM Unique Records:</strong> 688 NPM records (44.7%) do NOT overlap with Orennia - consider keeping these for expanded coverage</li>
+                <li><strong>Deduplication:</strong> Run UCID generation to properly cluster the 866 overlapping records</li>
+            </ul>
+        </div>
+
+        <div class="recommendation">
+            <h4>Data Quality Considerations</h4>
+            <ul>
+                <li><strong>Company Match Rate:</strong> 67.2% of matched pairs have the same company - investigate mismatches for data quality issues</li>
+                <li><strong>Capacity Agreement:</strong> Grade C (32.9% MAPE) - review conflicts before merging</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- Chart.js Scripts -->
+    <script>
+        // State Distribution Chart
+        const stateCtx = document.getElementById('stateChart').getContext('2d');
+        new Chart(stateCtx, {
+            type: 'bar',
+            data: {
+                labels: ["VA", "TX", "CA", "GA", "IL", "OH", "AZ", "NY", "PA", "AB"],
+                datasets: [
+                    {
+                        label: 'Orennia',
+                        data: [502, 453, 262, 160, 159, 144, 127, 123, 94, 90],
+                        backgroundColor: '#3498db'
+                    },
+                    {
+                        label: 'NPM',
+                        data: [214, 250, 118, 81, 77, 83, 58, 27, 44, 0],
+                        backgroundColor: '#1abc9c'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { color: '#eee' } } },
+                scales: {
+                    x: { ticks: { color: '#aaa' }, grid: { color: '#333' } },
+                    y: { ticks: { color: '#aaa' }, grid: { color: '#333' }, beginAtZero: true }
+                },
+                layout: { padding: 10 }
+            }
+        });
+
+        // Status Distribution Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'bar',
+            data: {
+                labels: ["Active", "Under Construction", "Planned", "Cancelled", "Unknown"],
+                datasets: [
+                    {
+                        label: 'Orennia',
+                        data: [2304, 0, 1189, 0, 82],
+                        backgroundColor: '#3498db'
+                    },
+                    {
+                        label: 'NPM',
+                        data: [831, 94, 631, 0, 11],
+                        backgroundColor: '#1abc9c'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { color: '#eee' } } },
+                scales: {
+                    x: { ticks: { color: '#aaa' }, grid: { color: '#333' } },
+                    y: { ticks: { color: '#aaa' }, grid: { color: '#333' }, beginAtZero: true }
+                },
+                layout: { padding: 10 }
+            }
+        });
+    </script>
+</body>
+</html>

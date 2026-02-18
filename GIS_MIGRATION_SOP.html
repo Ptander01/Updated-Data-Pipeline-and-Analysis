@@ -1,0 +1,2683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIS Migration SOP | ESRI to Open-Source Stack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+/* Neomorphism Dark Theme - Matching Pipeline Diagnostic Report */
+
+:root {
+    --bg-dark: #1a1a2e;
+    --bg-card: rgba(255,255,255,0.05);
+    --accent-blue: #4facfe;
+    --accent-cyan: #00f2fe;
+    --accent-green: #34d399;
+    --accent-yellow: #fbbf24;
+    --accent-red: #f87171;
+    --accent-purple: #a78bfa;
+    --text-light: #e8e8e8;
+    --text-muted: #8892b0;
+    --shadow-dark: rgba(0,0,0,0.4);
+    --shadow-light: rgba(255,255,255,0.05);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    color: #e8e8e8;
+    line-height: 1.7;
+}
+
+/* Layout with fixed sidebar */
+.page-wrapper { display: flex; min-height: 100vh; }
+
+/* Fixed Left Navigation with Neomorphism */
+.sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 260px;
+    background: linear-gradient(180deg, rgba(15,52,96,0.95) 0%, rgba(22,33,62,0.98) 100%);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    padding: 25px 15px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-logo {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+.sidebar-title {
+    font-size: 0.85rem;
+    color: var(--accent-blue);
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.nav-section { margin-bottom: 8px; }
+
+.nav-section-title {
+    padding: 12px 15px 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 10px 15px;
+    margin: 2px 0;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.nav-link:hover {
+    color: var(--accent-cyan);
+    background: rgba(79,172,254,0.1);
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2), inset -2px -2px 5px rgba(255,255,255,0.05);
+    transform: translateX(5px);
+}
+
+.nav-link.active {
+    color: var(--accent-cyan);
+    background: linear-gradient(135deg, rgba(79,172,254,0.15), rgba(0,242,254,0.1));
+    box-shadow: 0 4px 15px rgba(79,172,254,0.2);
+}
+
+/* Main content area - WIDER */
+.main-content {
+    margin-left: 260px;
+    flex: 1;
+    padding: 40px 50px;
+    max-width: 1800px;
+}
+
+/* Hero/Header with Neomorphism */
+.hero {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 50px;
+    background: linear-gradient(135deg, rgba(79,172,254,0.15), rgba(0,242,254,0.08));
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow:
+        8px 8px 20px rgba(0,0,0,0.4),
+        -4px -4px 15px rgba(255,255,255,0.03),
+        inset 1px 1px 2px rgba(255,255,255,0.1);
+}
+
+.hero-badge {
+    display: inline-block;
+    background: rgba(79,172,254,0.2);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(79,172,254,0.3);
+}
+
+.hero h1 {
+    font-size: 2.8rem;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+    text-shadow: 0 0 40px rgba(79,172,254,0.3);
+}
+
+.hero p {
+    font-size: 1.15rem;
+    color: #8892b0;
+    max-width: 700px;
+    margin: 0 auto 20px;
+}
+
+.hero-meta {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.hero-meta span { display: flex; align-items: center; gap: 8px; }
+
+/* Sections with Neomorphism - COLLAPSIBLE */
+section {
+    background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border-radius: 24px;
+    padding: 0;
+    margin-bottom: 35px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow:
+        10px 10px 25px rgba(0,0,0,0.35),
+        -5px -5px 15px rgba(255,255,255,0.02);
+    overflow: hidden;
+    scroll-margin-top: 32px;
+}
+
+.section-header {
+    padding: 25px 35px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg, rgba(79,172,254,0.08), transparent);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.3s ease;
+}
+
+.section-header:hover {
+    background: linear-gradient(90deg, rgba(79,172,254,0.15), rgba(0,242,254,0.05));
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    color: #4facfe;
+    margin: 0;
+    padding: 0;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.section-number {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.collapse-icon {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+}
+
+.section-header.collapsed .collapse-icon { transform: rotate(-90deg); }
+
+.section-content {
+    padding: 30px 35px;
+    max-height: 10000px;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+}
+
+.section-content.collapsed {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* Headings inside sections */
+h3 {
+    font-size: 1.25rem;
+    color: #00f2fe;
+    margin: 30px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,242,254,0.2);
+}
+
+h4 {
+    font-size: 1.05rem;
+    color: #e8e8e8;
+    margin: 20px 0 12px;
+    font-weight: 600;
+}
+
+p { color: #c9d1d9; margin-bottom: 15px; }
+
+/* Cards with Neomorphism */
+.card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow:
+        6px 6px 15px rgba(0,0,0,0.3),
+        -3px -3px 10px rgba(255,255,255,0.02);
+    transition: all 0.4s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        10px 10px 25px rgba(0,0,0,0.4),
+        -5px -5px 15px rgba(255,255,255,0.03),
+        0 0 30px rgba(79,172,254,0.1);
+}
+
+.card h3 {
+    color: #4facfe;
+    margin-top: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Info boxes with glow */
+.info-box {
+    background: linear-gradient(135deg, rgba(79,172,254,0.12), rgba(0,242,254,0.08));
+    border: 1px solid rgba(79,172,254,0.25);
+    border-radius: 16px;
+    padding: 20px 25px;
+    margin: 20px 0;
+    box-shadow: 0 4px 20px rgba(79,172,254,0.15);
+}
+
+.info-box.success, .info-box.tip {
+    background: linear-gradient(135deg, rgba(52,211,153,0.12), rgba(16,185,129,0.08));
+    border-color: rgba(52,211,153,0.25);
+    box-shadow: 0 4px 20px rgba(52,211,153,0.15);
+}
+
+.info-box.warning {
+    background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.08));
+    border-color: rgba(251,191,36,0.25);
+    box-shadow: 0 4px 20px rgba(251,191,36,0.15);
+}
+
+.info-box.error {
+    background: linear-gradient(135deg, rgba(248,113,113,0.12), rgba(239,68,68,0.08));
+    border-color: rgba(248,113,113,0.25);
+    box-shadow: 0 4px 20px rgba(248,113,113,0.15);
+}
+
+.info-box-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #e8e8e8;
+}
+
+/* Lists */
+ul, ol {
+    margin: 12px 0 20px 24px;
+    color: #c9d1d9;
+}
+
+li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+li strong {
+    color: #4facfe;
+}
+
+/* Tables with depth */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 2px 2px 8px rgba(0,0,0,0.3);
+}
+
+th, td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+th {
+    color: #4facfe;
+    font-weight: 600;
+    background: rgba(79,172,254,0.1);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+td { color: #c9d1d9; }
+tr:hover td { background: rgba(255,255,255,0.03); }
+tr:last-child td { border-bottom: none; }
+
+/* Code blocks */
+pre {
+    background: rgba(0,0,0,0.35);
+    border-radius: 16px;
+    padding: 24px;
+    overflow-x: auto;
+    margin: 20px 0;
+    box-shadow: inset 3px 3px 10px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+code {
+    font-family: 'JetBrains Mono', 'SF Mono', Monaco, monospace;
+    font-size: 0.9rem;
+    color: #00f2fe;
+}
+
+:not(pre) > code {
+    background: rgba(79,172,254,0.15);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+/* Category Dividers */
+.category-divider {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 45px 0 30px 0;
+    padding: 0 10px;
+}
+
+.category-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(79,172,254,0.4), transparent);
+}
+
+.category-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(79,172,254,0.8);
+    white-space: nowrap;
+    padding: 8px 20px;
+    background: linear-gradient(135deg, rgba(79,172,254,0.1), rgba(0,242,254,0.05));
+    border: 1px solid rgba(79,172,254,0.2);
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(79,172,254,0.1);
+}
+
+/* Timeline with Neomorphism */
+.timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, #4facfe, #00f2fe);
+    border-radius: 3px;
+    box-shadow: 0 0 15px rgba(79,172,254,0.4);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 8px;
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(79,172,254,0.5);
+}
+
+.timeline-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #4facfe;
+    margin-bottom: 16px;
+}
+
+.timeline-content {
+    background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow:
+        5px 5px 15px rgba(0,0,0,0.3),
+        -3px -3px 10px rgba(255,255,255,0.02);
+}
+
+/* Feature Grid */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin: 24px 0;
+}
+
+.feature-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow:
+        6px 6px 15px rgba(0,0,0,0.3),
+        -3px -3px 10px rgba(255,255,255,0.02);
+    transition: all 0.4s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        12px 12px 30px rgba(0,0,0,0.45),
+        -6px -6px 18px rgba(255,255,255,0.05),
+        0 0 30px rgba(79,172,254,0.15);
+}
+
+.feature-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.feature-card h4 {
+    color: #4facfe;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.feature-card p {
+    font-size: 0.9rem;
+    color: #8892b0;
+    margin: 0;
+}
+
+/* Comparison Grid */
+.comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 24px 0;
+}
+
+/* Progress bars */
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.progress-green { background: linear-gradient(90deg, #34d399, #10b981); }
+.progress-blue { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+.progress-yellow { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+.progress-red { background: linear-gradient(90deg, #f87171, #ef4444); }
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-blue { background: rgba(79,172,254,0.2); color: #4facfe; }
+.badge-green { background: rgba(52,211,153,0.2); color: #34d399; }
+.badge-yellow { background: rgba(251,191,36,0.2); color: #fbbf24; }
+.badge-red { background: rgba(248,113,113,0.2); color: #f87171; }
+.badge-purple { background: rgba(167,139,250,0.2); color: #a78bfa; }
+
+/* Architecture Layers Diagram */
+.architecture-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 24px 0;
+}
+
+.arch-layer {
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid;
+    box-shadow:
+        6px 6px 15px rgba(0,0,0,0.3),
+        -3px -3px 10px rgba(255,255,255,0.02);
+}
+
+.arch-layer-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.arch-layer-icon {
+    font-size: 1.5rem;
+}
+
+.arch-layer-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #e8e8e8;
+}
+
+.arch-layer-content {
+    color: #c9d1d9;
+}
+
+.arch-component {
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: inset 2px 2px 6px rgba(0,0,0,0.3);
+}
+
+.arch-component strong {
+    color: #e8e8e8;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.arch-component ul {
+    margin: 8px 0 8px 20px;
+    padding: 0;
+}
+
+.arch-component li {
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.arch-component code {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: #8892b0;
+}
+
+.arch-arrow {
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--accent-cyan);
+    padding: 8px 0;
+    text-shadow: 0 0 10px rgba(0,242,254,0.5);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 50px;
+    padding: 30px;
+    color: #8892b0;
+    font-size: 0.9rem;
+    background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border-radius: 16px;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .sidebar { width: 220px; }
+    .main-content { margin-left: 220px; padding: 30px 35px; }
+}
+
+@media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main-content { margin-left: 0; padding: 20px 15px; }
+    .hero h1 { font-size: 2rem; }
+    .section-content { padding: 20px; }
+    .comparison-grid { grid-template-columns: 1fr; }
+}
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">GIS SOP</div>
+            <div class="sidebar-title">Migration Guide</div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Overview</div>
+            <a href="#executive-summary" class="nav-link">Executive Summary</a>
+            <a href="#projects-in-scope" class="nav-link">Projects In Scope</a>
+            <a href="#architecture" class="nav-link">Architecture Overview</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Infrastructure</div>
+            <a href="#data-storage" class="nav-link">Data Storage Options</a>
+            <a href="#tile-serving" class="nav-link">Tile Serving & APIs</a>
+            <a href="#tile-interactivity" class="nav-link">Vector Tile Interactivity</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Frontend</div>
+            <a href="#frontend-stack" class="nav-link">Frontend Stack</a>
+            <a href="#entrypoints-customization" class="nav-link">Entrypoints Customization</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Implementation</div>
+            <a href="#data-pipelines" class="nav-link">Data Pipelines</a>
+            <a href="#migration-steps" class="nav-link">Migration Steps</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Progress & Team</div>
+            <a href="#deployment-testing" class="nav-link">Deployment Testing</a>
+            <a href="#team-management" class="nav-link">Team & Roles</a>
+            <a href="#progress-log" class="nav-link">Progress Log</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Reference</div>
+            <a href="#dataset-guidelines" class="nav-link">Dataset Size Guidelines</a>
+            <a href="#tools-resources" class="nav-link">Tools & Resources</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <div class="hero">
+            <span class="hero-badge">Standard Operating Procedure</span>
+            <h1>GIS Migration: ESRI to Open-Source Stack</h1>
+            <p>A comprehensive guide for migrating spatial data science workflows to Meta's internal infrastructure using open-source technologies.</p>
+            <div class="hero-meta">
+                <span>📋 Author: Infra Intel Team</span>
+                <span>📅 Updated: January 2026</span>
+                <span>📌 Status: Draft</span>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <section id="executive-summary">
+            <div class="section-header">
+                <h2><span class="section-number">1</span> Executive Summary</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="card">
+                    <h3>Objective</h3>
+                    <p>This document outlines the standard operating procedures for migrating Data Center Real Estate GIS workflows from ESRI (ArcGIS Online/ArcGIS Pro) to Meta's internal geospatial infrastructure. The goal is to leverage Meta's world-class enterprise-scale data architecture to deliver faster, more scalable, and more cost-effective spatial analytics and visualization capabilities.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Why Migrate? ESRI Limitations</h3>
+                    <p>While ESRI's ArcGIS platform has served as our primary GIS tooling, several limitations are driving the need for migration:</p>
+                    <ul>
+                        <li><strong>Scalability Constraints:</strong> ESRI's hosted feature services struggle with large datasets (millions of features), leading to slow query times and rendering issues</li>
+                        <li><strong>Cost Structure:</strong> Per-seat licensing and credit-based consumption models create unpredictable costs that scale poorly with organizational growth</li>
+                        <li><strong>Data Silos:</strong> Data stored in ESRI's ecosystem is isolated from Meta's broader data infrastructure, requiring manual ETL processes and duplicating storage</li>
+                        <li><strong>Limited Integration:</strong> Connecting ESRI services to internal data sources, authentication systems, and analytics pipelines requires significant custom development</li>
+                        <li><strong>Vendor Lock-in:</strong> Proprietary formats (File Geodatabases, Enterprise Geodatabases) and ESRI-specific APIs create dependencies that limit flexibility</li>
+                        <li><strong>Performance at Scale:</strong> Complex spatial queries and real-time analytics are constrained by ESRI's architecture, particularly for global datasets</li>
+                        <li><strong>Access Management:</strong> ESRI's sharing and permissions model doesn't align well with Meta's group-based access control patterns</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Benefits of Meta's Enterprise Architecture</h3>
+                    <p>Meta's internal geospatial infrastructure offers significant advantages that address these limitations:</p>
+                    <ul>
+                        <li><strong>Petabyte-Scale Storage:</strong> Hive and Manifold provide virtually unlimited storage capacity with built-in redundancy and global replication</li>
+                        <li><strong>High-Performance Queries:</strong> Presto/Spark integration enables sub-second queries across billions of spatial features using distributed computing</li>
+                        <li><strong>Unified Data Platform:</strong> Direct integration with existing data warehouse tables eliminates ETL overhead and ensures single source of truth</li>
+                        <li><strong>Native H3 Support:</strong> Built-in H3 hexagonal indexing provides consistent spatial aggregation, fast point-in-polygon operations, and efficient tile generation</li>
+                        <li><strong>Enterprise Authentication:</strong> Seamless integration with Meta's identity management, enabling granular access control via existing groups and permissions</li>
+                        <li><strong>Cost Efficiency:</strong> No per-seat licensing—leverage existing infrastructure investments with marginal cost for additional users</li>
+                        <li><strong>Scheduled Pipelines:</strong> Chronos integration enables reliable, scheduled data refreshes with monitoring, alerting, and automatic retry logic</li>
+                        <li><strong>Customizable Frontends:</strong> Entrypoints and FBMap provide flexible UI frameworks that can be tailored to specific workflow requirements</li>
+                        <li><strong>Version Control & Reproducibility:</strong> All code, configurations, and pipeline definitions live in source control with full audit trails</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Migration Approach</h3>
+                    <p>We will pursue a <strong>phased migration strategy</strong> starting with read-only visualization use cases before tackling editing and complex spatial analysis. This de-risks the transition and allows stakeholders to maintain productivity during the migration period.</p>
+                    <p><strong>Recommended Strategy:</strong> Choose one project (e.g., <em>Parcel Query</em> or <em>Site Scout</em>) to work out kinks and establish patterns, then apply lessons learned to subsequent projects.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects In Scope -->
+        <section id="projects-in-scope">
+            <div class="section-header">
+                <h2><span class="section-number">2</span> Projects In Scope</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <p>The following projects have been identified for migration. Each project description includes its core functionality, data ingredients, and technical requirements.</p>
+
+                <div class="card">
+                    <h3>1. Site Scout</h3>
+                    <p><strong>Functionality:</strong> Interactive map-based tool for identifying and evaluating potential data center sites. Enables real estate analysts to explore geographic areas, filter by site criteria, and shortlist candidate locations.</p>
+                    <div class="info-box">
+                        <strong>Key Features:</strong>
+                        <ul>
+                            <li>Geographic search and filtering by region, country, or custom boundary</li>
+                            <li>Multi-criteria scoring based on power availability, fiber connectivity, land cost, and regulatory environment</li>
+                            <li>Side-by-side site comparison views</li>
+                            <li>Export shortlisted sites for further analysis</li>
+                        </ul>
+                    </div>
+                    <p><strong>Data Ingredients:</strong></p>
+                    <ul>
+                        <li>Global administrative boundaries (countries, states, municipalities)</li>
+                        <li>Power grid infrastructure layers (substations, transmission lines, capacity data)</li>
+                        <li>Fiber network routes and points of presence</li>
+                        <li>Land parcel data with ownership and zoning attributes</li>
+                        <li>Environmental constraint layers (flood zones, protected areas)</li>
+                    </ul>
+                    <p><strong>Requirements:</strong></p>
+                    <ul>
+                    <li>Fast tile rendering for global-scale exploration</li>
+                    <li>Dynamic attribute filtering without full page reload</li>
+                    <li>User-defined scoring weights with real-time recalculation</li>
+                    <li>Integration with site evaluation workflows downstream</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>2. Workspace</h3>
+                <p><strong>Functionality:</strong> Collaborative spatial workspace for teams to create, share, and annotate map views. Serves as a shared canvas for project-based spatial analysis and stakeholder communication.</p>
+                <div class="info-box">
+                    <strong>Key Features:</strong>
+                    <ul>
+                        <li>Saved map views with custom layer configurations</li>
+                        <li>Drawing/annotation tools for markups and area-of-interest definition</li>
+                        <li>Team sharing with role-based permissions</li>
+                        <li>Commenting and discussion threads anchored to map locations</li>
+                        <li>Version history for map configurations</li>
+                    </ul>
+                </div>
+                <p><strong>Data Ingredients:</strong></p>
+                <ul>
+                    <li>User-created feature layers (points, lines, polygons)</li>
+                    <li>Shared base layers from other projects (parcels, infrastructure)</li>
+                    <li>Uploaded external datasets (spreadsheets with coordinates, KML/GeoJSON files)</li>
+                    <li>User preferences and saved view metadata</li>
+                </ul>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Real-time collaborative editing (or near-real-time sync)</li>
+                    <li>Flexible layer management with user-uploaded data support</li>
+                    <li>Group-based access control aligned with Meta's permission model</li>
+                    <li>Export capabilities (PDF maps, data downloads)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>3. Comp Intel (Competitive Intelligence)</h3>
+                <p><strong>Functionality:</strong> Geospatial competitive intelligence suite providing situational awareness for strategic planning. This is a <strong>parent category</strong> encompassing multiple related tools for market analysis and site evaluation.</p>
+                <div class="info-box" style="background: linear-gradient(135deg, rgba(167,139,250,0.12), rgba(139,92,246,0.08)); border-color: rgba(167,139,250,0.25);">
+                    <strong>🗂️ Sub-Projects under Comp Intel:</strong>
+                    <ul>
+                        <li><strong>3a. Imagery</strong> — Aerial/satellite imagery viewer</li>
+                        <li><strong>3b. Consensus</strong> — Decision-support for site selection</li>
+                        <li><strong>3c. Parcel Query</strong> — Land parcel search tool</li>
+                        <li><strong>3d. Graveyard</strong> — Archive of evaluated sites</li>
+                    </ul>
+                </div>
+                <p><strong>Shared Data Ingredients:</strong></p>
+                <ul>
+                    <li>Competitor data center locations (point features with attributes)</li>
+                    <li>Permit and planning application data (where available)</li>
+                    <li>News/press release feeds with location extraction</li>
+                    <li>Market boundary definitions</li>
+                    <li>Historical snapshots for trend analysis</li>
+                </ul>
+                <p><strong>Shared Requirements:</strong></p>
+                <ul>
+                    <li>Scheduled data ingestion from external sources</li>
+                    <li>Time-series visualization (slider or animation)</li>
+                    <li>Alert/notification system for new activity</li>
+                    <li>Confidential data handling and restricted access</li>
+                </ul>
+            </div>
+
+            <!-- Comp Intel Sub-Projects -->
+            <div class="category-divider">
+                <span class="category-line"></span>
+                <span class="category-label">Comp Intel Sub-Projects</span>
+                <span class="category-line"></span>
+            </div>
+
+            <div class="card" style="margin-left: 24px; border-left: 3px solid #a78bfa;">
+                <h3>3a. Imagery</h3>
+                <p><strong>Functionality:</strong> Aerial and satellite imagery viewer for site assessment, construction monitoring, and change detection. Provides visual ground truth for remote site evaluation.</p>
+                <div class="info-box">
+                    <strong>Key Features:</strong>
+                    <ul>
+                        <li>Multi-temporal imagery comparison (before/after sliders)</li>
+                        <li>High-resolution zoom for detailed site inspection</li>
+                        <li>Imagery measurement tools (distance, area)</li>
+                        <li>Integration with site boundary layers</li>
+                        <li>Imagery ordering/tasking workflow integration</li>
+                    </ul>
+                </div>
+                <p><strong>Data Ingredients:</strong></p>
+                <ul>
+                    <li>Satellite imagery (Maxar, Planet, Airbus, etc.)</li>
+                    <li>Aerial/drone imagery from site visits</li>
+                    <li>Imagery metadata (capture date, resolution, cloud cover)</li>
+                    <li>Site boundary polygons for clipping/focus</li>
+                </ul>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Efficient raster tile serving for large imagery datasets</li>
+                    <li>COG (Cloud Optimized GeoTIFF) support for streaming</li>
+                    <li>Date/time filtering across imagery archive</li>
+                    <li>Licensing compliance for commercial imagery</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-left: 24px; border-left: 3px solid #a78bfa;">
+                <h3>3b. Consensus</h3>
+                <p><strong>Functionality:</strong> Collaborative decision-support tool for reaching team consensus on site selections and project priorities. Combines quantitative scoring with qualitative input from stakeholders.</p>
+                <div class="info-box">
+                    <strong>Key Features:</strong>
+                    <ul>
+                        <li>Multi-criteria decision analysis (MCDA) framework</li>
+                        <li>Stakeholder voting and weighting input</li>
+                        <li>Sensitivity analysis (how do rankings change with different weights?)</li>
+                        <li>Decision audit trail and rationale documentation</li>
+                    </ul>
+                </div>
+                <p><strong>Data Ingredients:</strong></p>
+                <ul>
+                    <li>Candidate site attributes (from Site Scout or manual entry)</li>
+                    <li>Scoring criteria definitions and weight configurations</li>
+                    <li>Stakeholder preference inputs</li>
+                    <li>Historical decision records for reference</li>
+                </ul>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Interactive weight adjustment with real-time score recalculation</li>
+                    <li>Multi-user input aggregation</li>
+                    <li>Visualization of score distributions and rankings</li>
+                    <li>Export decision summaries for executive review</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-left: 24px; border-left: 3px solid #a78bfa;">
+                <h3>3c. Parcel Query</h3>
+                <p><strong>Functionality:</strong> Search and retrieval tool for land parcel data. Enables users to find parcels by location, owner, size, zoning, or other attributes and retrieve detailed property information.</p>
+                <div class="info-box">
+                    <strong>Key Features:</strong>
+                    <ul>
+                        <li>Spatial search (draw polygon, buffer around point)</li>
+                        <li>Attribute search (owner name, parcel ID, acreage range)</li>
+                        <li>Parcel detail popups with full attribute display</li>
+                        <li>Bulk export of query results</li>
+                        <li>Link to external property databases and county assessor sites</li>
+                    </ul>
+                </div>
+                <p><strong>Data Ingredients:</strong></p>
+                <ul>
+                    <li>Parcel boundary polygons (national/global coverage where available)</li>
+                    <li>Parcel attributes (owner, acreage, zoning, assessed value, land use)</li>
+                    <li>Regular update feeds from data vendors</li>
+                </ul>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>High-performance spatial queries (point-in-polygon, intersection)</li>
+                    <li>Scalable to tens of millions of parcel records</li>
+                    <li>Incremental data update pipeline</li>
+                    <li>API access for integration with other tools</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-left: 24px; border-left: 3px solid #a78bfa;">
+                <h3>3d. Graveyard</h3>
+                <p><strong>Functionality:</strong> Archive and reference tool for sites that were evaluated but not pursued. Preserves institutional knowledge about why sites were rejected to avoid re-evaluation and inform future searches.</p>
+                <div class="info-box">
+                    <strong>Key Features:</strong>
+                    <ul>
+                        <li>Searchable archive of rejected/deferred sites</li>
+                        <li>Rejection reason categorization and notes</li>
+                        <li>Map view of all historical sites with status indicators</li>
+                        <li>"Revive" workflow if conditions change</li>
+                    </ul>
+                </div>
+                <p><strong>Data Ingredients:</strong></p>
+                <ul>
+                    <li>Historical site evaluation records</li>
+                    <li>Site geometries (points or polygons)</li>
+                    <li>Rejection reasons and evaluation notes</li>
+                    <li>Timestamps and evaluator attribution</li>
+                </ul>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Full-text search across notes and reasons</li>
+                    <li>Temporal queries (sites rejected in date range)</li>
+                    <li>Link to original evaluation data where available</li>
+                    <li>Low maintenance—primarily append-only data pattern</li>
+                </ul>
+            </div>
+
+            <!-- End of Comp Intel Sub-Projects -->
+            <div class="category-divider">
+                <span class="category-line"></span>
+                <span class="category-label">Standalone Projects</span>
+                <span class="category-line"></span>
+            </div>
+
+            <div class="card">
+                <h3>4. H3 Layer Creation</h3>
+                <p><strong>Functionality:</strong> Utility tooling for generating H3 hexagonal grid layers from source data. Enables consistent spatial aggregation, privacy-preserving data publication, and optimized tile generation.</p>
+                <div class="info-box">
+                    <strong>Key Features:</strong>
+                    <ul>
+                        <li>Convert point data to H3 cell aggregations</li>
+                        <li>Generate H3 grids at specified resolutions</li>
+                        <li>Aggregate polygon data to H3 cells (area-weighted)</li>
+                        <li>H3-indexed data export for downstream tools</li>
+                    </ul>
+                </div>
+                <p><strong>Data Ingredients:</strong></p>
+                <ul>
+                    <li>Source point, line, or polygon datasets</li>
+                    <li>Aggregation configuration (resolution, statistics to compute)</li>
+                    <li>H3 resolution hierarchy definitions</li>
+                </ul>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Efficient H3 indexing at scale (Presto UDFs or Spark)</li>
+                    <li>Support for multiple H3 resolutions (typically 4-9 for visualization)</li>
+                    <li>Batch processing pipeline integration</li>
+                    <li>Quality validation (no gaps, correct aggregation)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>5. L-SIM (Land Simulation)</h3>
+                <p><strong>Functionality:</strong> Scenario modeling tool for simulating land use, development potential, and site configuration options. Supports "what-if" analysis for site planning and capacity estimation.</p>
+                <div class="info-box">
+                    <strong>Key Features:</strong>
+                    <ul>
+                        <li>Buildable area calculation based on constraints</li>
+                        <li>Facility footprint placement simulation</li>
+                        <li>Capacity estimation based on land configuration</li>
+                        <li>Constraint layer overlay (setbacks, easements, slopes)</li>
+                        <li>Multiple scenario comparison</li>
+                    </ul>
+                </div>
+                <p><strong>Data Ingredients:</strong></p>
+                <ul>
+                    <li>Parcel boundaries and site polygons</li>
+                    <li>Constraint layers (wetlands, setbacks, slopes, easements)</li>
+                    <li>Building footprint templates and specifications</li>
+                    <li>Zoning and development regulations</li>
+                </ul>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Geometric operations (buffer, difference, union)</li>
+                    <li>Real-time recalculation as parameters change</li>
+                    <li>3D visualization (optional, for advanced scenarios)</li>
+                    <li>Scenario save/load and comparison reporting</li>
+                </ul>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #e8f4fd 0%, #f5f5f5 100%);">
+                <h3>🤔 Any Missing Projects?</h3>
+                <p>Review the list above and identify any additional projects that should be included in the migration scope. Consider:</p>
+                <ul>
+                    <li>One-off analysis tools or scripts currently run in ArcGIS Pro</li>
+                    <li>Dashboards or web maps shared with stakeholders</li>
+                    <li>Scheduled reports or automated workflows</li>
+                    <li>Data maintenance/editing workflows</li>
+                </ul>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #fff8e6 0%, #f5f5f5 100%);">
+                <h3>💡 Recommended Starting Point</h3>
+                <p>We recommend selecting <strong>one project to pilot</strong> before migrating the others. Good candidates for the pilot:</p>
+                <ul>
+                    <li><strong>Parcel Query:</strong> Read-only, well-defined data model, clear success criteria, exercises core infrastructure (Hive tables, SMM tiles, FBMap frontend)</li>
+                    <li><strong>Site Scout:</strong> High visibility, clear value demonstration, but more complex due to multi-layer filtering</li>
+                    <li><strong>H3 Layer Creation:</strong> Infrastructure/utility project that benefits all other projects once complete</li>
+                </ul>
+                <p>Working out kinks on the pilot will establish patterns, documentation, and reusable components that accelerate subsequent migrations.</p>
+            </div>
+        </section>
+
+        <!-- Architecture Overview -->
+        <section id="architecture">
+            <div class="section-header">
+                <h2><span class="section-number">3</span> Architecture Overview</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>Technology Stack Comparison</h3>
+                <p>The table below maps GIS components from the current ESRI stack to Meta's internal infrastructure and open-source alternatives:</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Current ESRI Tool</th>
+                            <th>Meta Internal Option</th>
+                            <th>Open Source Alternative</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Spatial Database</strong></td>
+                            <td>ArcGIS Enterprise Geodatabase, ArcGIS Online Hosted Feature Layers</td>
+                            <td><strong>Hive Tables</strong> (WKT + H3)</td>
+                            <td>PostgreSQL + PostGIS, DuckDB</td>
+                        </tr>
+                        <tr>
+                            <td><strong>File Storage</strong></td>
+                            <td>File Geodatabase (.gdb), Shapefiles on network drives</td>
+                            <td><strong>Manifold Buckets</strong></td>
+                            <td>S3, MinIO, Azure Blob</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vector Tile Server</strong></td>
+                            <td>ArcGIS Vector Tile Service</td>
+                            <td><strong>Super Map Maker (SMM)</strong></td>
+                            <td>Martin, pg_tileserv, Tippecanoe + static hosting</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature Service / WFS</strong></td>
+                            <td>ArcGIS Feature Service, WFS</td>
+                            <td><strong>Tupperware + FastAPI</strong></td>
+                            <td>GeoServer, pygeoapi, pg_featureserv</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spatial Index / KNN</strong></td>
+                            <td>ArcGIS Locator, Spatial indexes</td>
+                            <td><strong>Laser / LaserKNN</strong></td>
+                            <td>Redis Geospatial, Elasticsearch, PostGIS indexes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Web Map Library</strong></td>
+                            <td>ArcGIS JS API, ESRI Leaflet</td>
+                            <td><strong>FBMap / MapLibre GL JS</strong></td>
+                            <td>MapLibre GL JS, Leaflet, OpenLayers</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Web App Framework</strong></td>
+                            <td>ArcGIS Experience Builder, Web AppBuilder</td>
+                            <td><strong>Entrypoints</strong> (React + StyleX)</td>
+                            <td>Next.js, Vite + React, Vue</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Large-Scale Viz</strong></td>
+                            <td>ArcGIS Pro 3D, Scene Viewer</td>
+                            <td><strong>Deck.gl</strong></td>
+                            <td>Deck.gl, Kepler.gl, CesiumJS</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Desktop GIS</strong></td>
+                            <td>ArcGIS Pro, ArcMap</td>
+                            <td><strong>Bento Notebooks</strong> (Spatial kernel)</td>
+                            <td>QGIS, Jupyter + GeoPandas</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ETL / Pipelines</strong></td>
+                            <td>ArcGIS Data Interoperability, ModelBuilder, Notebooks</td>
+                            <td><strong>Dataswarm Pipelines</strong></td>
+                            <td>Apache Airflow, Dagster, Prefect</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scheduled Tasks</strong></td>
+                            <td>ArcGIS Notebook scheduled tasks, Windows Task Scheduler</td>
+                            <td><strong>Chronos</strong></td>
+                            <td>cron, Airflow scheduler, GitHub Actions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Distributed Processing</strong></td>
+                            <td>ArcGIS GeoAnalytics Server</td>
+                            <td><strong>Spark / Presto</strong></td>
+                            <td>Apache Spark, Apache Sedona, Dask</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Geocoding</strong></td>
+                            <td>ArcGIS World Geocoder</td>
+                            <td><strong>Internal Geocoder</strong></td>
+                            <td>Nominatim, Pelias, Mapbox Geocoding API</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Basemaps</strong></td>
+                            <td>ESRI Basemaps (World Imagery, Topographic, etc.)</td>
+                            <td><strong>Mapillary, internal imagery</strong></td>
+                            <td>OpenStreetMap, Mapbox, Stadia Maps</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="category-divider">
+                    <span class="category-line"></span>
+                    <span class="category-label">Recommended Architecture</span>
+                    <span class="category-line"></span>
+                </div>
+
+                <h3>Internal GIS Stack Architecture</h3>
+
+                <!-- Visual Architecture Diagram using HTML/CSS -->
+                <div class="architecture-layers">
+                    <!-- Frontend Layer -->
+                    <div class="arch-layer" style="background: linear-gradient(135deg, rgba(79,172,254,0.15), rgba(0,242,254,0.08)); border-color: rgba(79,172,254,0.3);">
+                        <div class="arch-layer-header">
+                            <span class="arch-layer-icon">🖥️</span>
+                            <span class="arch-layer-title">FRONTEND LAYER</span>
+                        </div>
+                        <div class="arch-layer-content">
+                            <div class="arch-component">
+                                <strong>InternalFB Entrypoints</strong> (React + StyleX)
+                                <ul>
+                                    <li>FBMap / MapLibre GL JS (vector maps)</li>
+                                    <li>Deck.gl (large-scale visualization)</li>
+                                    <li>D3.js (charts & analytics)</li>
+                                </ul>
+                                <code>URL: https://internalfb.com/your-tool-name/dashboard</code>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">▼</div>
+
+                    <!-- Tile Serving Layer -->
+                    <div class="arch-layer" style="background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(16,185,129,0.08)); border-color: rgba(52,211,153,0.3);">
+                        <div class="arch-layer-header">
+                            <span class="arch-layer-icon">🗺️</span>
+                            <span class="arch-layer-title">TILE SERVING LAYER</span>
+                        </div>
+                        <div class="arch-layer-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="arch-component">
+                                <strong>Super Map Maker (SMM)</strong>
+                                <ul>
+                                    <li>Vector tiles (MVT)</li>
+                                    <li>Heat maps (z1-z11)</li>
+                                    <li>Full geo (z12-z16)</li>
+                                </ul>
+                            </div>
+                            <div class="arch-component">
+                                <strong>ESRI WFS</strong> <span class="badge badge-yellow">Optional - Legacy</span>
+                                <ul>
+                                    <li>Feature services</li>
+                                    <li>Attribute table access</li>
+                                    <li>QGIS/ArcGIS compatibility</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">▼</div>
+
+                    <!-- API / Backend Layer -->
+                    <div class="arch-layer" style="background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(139,92,246,0.08)); border-color: rgba(167,139,250,0.3);">
+                        <div class="arch-layer-header">
+                            <span class="arch-layer-icon">⚙️</span>
+                            <span class="arch-layer-title">API / BACKEND LAYER</span>
+                        </div>
+                        <div class="arch-layer-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="arch-component">
+                                <strong>Tupperware Services</strong>
+                                <ul>
+                                    <li>FastAPI / Thrift</li>
+                                    <li>REST endpoints</li>
+                                    <li>GeoJSON APIs</li>
+                                </ul>
+                            </div>
+                            <div class="arch-component">
+                                <strong>Laser / LaserKNN</strong>
+                                <ul>
+                                    <li>Real-time geospatial queries</li>
+                                    <li>KNN searches</li>
+                                    <li>Tile index lookups</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">▼</div>
+
+                    <!-- Data Layer -->
+                    <div class="arch-layer" style="background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.08)); border-color: rgba(251,191,36,0.3);">
+                        <div class="arch-layer-header">
+                            <span class="arch-layer-icon">💾</span>
+                            <span class="arch-layer-title">DATA LAYER</span>
+                        </div>
+                        <div class="arch-layer-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="arch-component">
+                                <strong>Hive Tables</strong>
+                                <ul>
+                                    <li>WKT geometry column</li>
+                                    <li>100M+ records</li>
+                                    <li>H3 spatial indexing</li>
+                                </ul>
+                            </div>
+                            <div class="arch-component">
+                                <strong>Manifold Buckets</strong>
+                                <ul>
+                                    <li>Raw files (Shapefiles, GeoTIFFs)</li>
+                                    <li>Large datasets (3.5+ GB)</li>
+                                    <li>GeoPackages, GeoJSON</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">▼</div>
+
+                    <!-- Processing Layer -->
+                    <div class="arch-layer" style="background: linear-gradient(135deg, rgba(248,113,113,0.15), rgba(239,68,68,0.08)); border-color: rgba(248,113,113,0.3);">
+                        <div class="arch-layer-header">
+                            <span class="arch-layer-icon">🔄</span>
+                            <span class="arch-layer-title">PROCESSING LAYER</span>
+                        </div>
+                        <div class="arch-layer-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="arch-component">
+                                <strong>Bento Notebooks</strong>
+                                <ul>
+                                    <li>Spatial kernel</li>
+                                    <li>GDAL, Shapely, etc.</li>
+                                    <li>Interactive analysis</li>
+                                </ul>
+                            </div>
+                            <div class="arch-component">
+                                <strong>Dataswarm Pipelines</strong>
+                                <ul>
+                                    <li>Scheduled ETL</li>
+                                    <li>Hive → Laser indexing</li>
+                                    <li>Tile generation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Storage Options -->
+        <section id="data-storage">
+            <h2><span class="section-number">3</span> Data Storage Options</h2>
+
+            <h3>Decision Matrix</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dataset Size</th>
+                            <th>Record Count</th>
+                            <th>Recommended Storage</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Small</strong> (&lt;100 MB)</td>
+                            <td>&lt;10K records</td>
+                            <td>Embedded in frontend (GeoJSON)</td>
+                            <td>Like your Failed/At-Risk dashboard</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Medium</strong> (100 MB - 1 GB)</td>
+                            <td>10K - 1M records</td>
+                            <td>Manifold + Tupperware API</td>
+                            <td>REST API serves filtered GeoJSON</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Large</strong> (1 GB - 10 GB)</td>
+                            <td>1M - 50M records</td>
+                            <td>Hive tables + Super Map Maker</td>
+                            <td>Vector tiles for visualization</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Very Large</strong> (10+ GB)</td>
+                            <td>50M+ records</td>
+                            <td>Hive + Laser + SMM</td>
+                            <td>Laser for queries, SMM for tiles</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>A. Hive Tables (Primary for Large Data)</h3>
+            <p><strong>Best for:</strong> Structured spatial data with 100M+ records</p>
+
+            <pre><code class="language-sql">-- Example Hive table schema for spatial data
+CREATE TABLE your_namespace.spatial_data (
+    id STRING,
+    name STRING,
+    status STRING,
+    capacity_mw DOUBLE,
+    geometry_wkt STRING,  -- WKT format: 'POINT(-122.4194 37.7749)'
+    h3_index STRING,      -- Optional: H3 hex index for spatial queries
+    created_date TIMESTAMP
+)
+PARTITIONED BY (region STRING)
+STORED AS ORC;</code></pre>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>✅ Handles billions of records</h4>
+                    <p>Scalable storage for enterprise-level spatial datasets</p>
+                </div>
+                <div class="feature-card">
+                    <h4>✅ SQL-queryable</h4>
+                    <p>Query via Presto/Spark with familiar SQL syntax</p>
+                </div>
+                <div class="feature-card">
+                    <h4>✅ Super Map Maker integration</h4>
+                    <p>Direct integration for vector tile generation</p>
+                </div>
+                <div class="feature-card">
+                    <h4>✅ H3 spatial indexing</h4>
+                    <p>Fast spatial queries using Uber's hex library</p>
+                </div>
+            </div>
+
+            <h3>B. Manifold Buckets (File Storage)</h3>
+            <p><strong>Best for:</strong> Raw files, rasters, archives</p>
+
+            <pre><code class="language-bash"># Create a Manifold bucket
+# Visit: https://www.internalfb.com/intern/manifold/
+
+# Mount bucket on devserver
+persistent-storage define gis_data --bucket your-team-gis-bucket
+persistent-storage remount --auto
+
+# Upload large files
+cp large_dataset.geojson ~/persistent/gis_data/</code></pre>
+
+            <h3>C. Laser / LaserKNN (Geospatial Queries)</h3>
+            <p><strong>Best for:</strong> Real-time KNN queries, tile index lookups</p>
+
+            <pre><code class="language-python"># LaserKNN geospatial query example
+embedding = [42.3601, -71.0589]  # lat, lon
+results = laser_knn_client.query(
+    table="your_geo_index",
+    embedding=embedding,
+    k=10
+)</code></pre>
+        </section>
+
+        <!-- Tile Serving -->
+        <section id="tile-serving">
+            <h2><span class="section-number">4</span> Tile Serving & APIs</h2>
+
+            <h3>Super Map Maker (SMM) - Primary Tile Server</h3>
+            <p>Generates vector tiles (MVT format) from any Hive table with WKT geometry.</p>
+
+            <pre><code class="language-bash">phps VectorTileMaker &lt;hive_table&gt; \
+  -b &lt;build_name&gt; \
+  -w &lt;wkt_column&gt; \
+  -g &lt;geo_id_column&gt; \
+  -n &lt;label_column&gt; \
+  -c "data,12,16,full" \
+  --default-heatmap</code></pre>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>-b</code></td><td>Build name (unique identifier)</td></tr>
+                        <tr><td><code>-w</code></td><td>Column containing WKT geometry</td></tr>
+                        <tr><td><code>-g</code></td><td>Unique ID column for each feature</td></tr>
+                        <tr><td><code>-n</code></td><td>Label column for display</td></tr>
+                        <tr><td><code>-c</code></td><td>Tile config (layer_name, min_zoom, max_zoom, detail_level)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">⏱️ Build Time</div>
+                <p>A full global tileset typically takes <strong>3-7 hours</strong> to generate.</p>
+            </div>
+
+            <h3>Tile Serving Architecture</h3>
+                <!-- Visual Tile Serving Flow -->
+                <div class="architecture-layers">
+                    <div class="arch-layer" style="background: linear-gradient(135deg, rgba(79,172,254,0.15), rgba(0,242,254,0.08)); border-color: rgba(79,172,254,0.3);">
+                        <div class="arch-layer-header">
+                            <span class="arch-layer-icon">📱</span>
+                            <span class="arch-layer-title">CLIENT REQUEST</span>
+                        </div>
+                        <div class="arch-layer-content">
+                            <div class="arch-component">
+                                <code style="color: #00f2fe; font-size: 1rem;">GET /tiles/{z}/{x}/{y}.mvt</code>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">▼</div>
+
+                    <div class="arch-layer" style="background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(16,185,129,0.08)); border-color: rgba(52,211,153,0.3);">
+                        <div class="arch-layer-header">
+                            <span class="arch-layer-icon">⚡</span>
+                            <span class="arch-layer-title">EDGE CDN / BIGCACHE</span>
+                        </div>
+                        <div class="arch-layer-content">
+                            <div class="arch-component">
+                                <p style="margin: 0;">Cache layer — <strong>millisecond latency</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">▼</div>
+
+                    <div class="arch-layer" style="background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(139,92,246,0.08)); border-color: rgba(167,139,250,0.3);">
+                        <div class="arch-layer-header">
+                            <span class="arch-layer-icon">🔍</span>
+                            <span class="arch-layer-title">LASER INDEX</span>
+                        </div>
+                        <div class="arch-layer-content">
+                            <div class="arch-component">
+                                <p style="margin: 0;">Tile lookup by <code>z/x/y</code> coordinates</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">▼</div>
+
+                    <div class="arch-layer" style="background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.08)); border-color: rgba(251,191,36,0.3);">
+                        <div class="arch-layer-header">
+                            <span class="arch-layer-icon">💾</span>
+                            <span class="arch-layer-title">EVERSTORE / MANIFOLD</span>
+                        </div>
+                        <div class="arch-layer-content">
+                            <div class="arch-component">
+                                <p style="margin: 0;">Tile blob storage</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </section>
+
+        <!-- Vector Tile Interactivity - NEW SECTION -->
+        <section id="tile-interactivity">
+            <h2><span class="section-number">5</span> Vector Tile Interactivity</h2>
+
+            <div class="info-box important">
+                <div class="info-box-title">🎯 Key Point</div>
+                <p>Vector tiles are <strong>fully interactive</strong> — they are NOT like ESRI Map Image Layers. All geometry and attributes are embedded in the tile, enabling click-to-identify, filtering, and dynamic styling without server round-trips.</p>
+            </div>
+
+            <h3>Vector Tiles vs. Raster/Image Tiles</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Capability</th>
+                            <th>ESRI Map Image Layer</th>
+                            <th>Vector Tiles (SMM)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Format</td>
+                            <td>Raster (PNG/JPEG)</td>
+                            <td>Vector (MVT - geometry + attributes)</td>
+                        </tr>
+                        <tr>
+                            <td>Click to identify</td>
+                            <td class="comparison-no">❌ Requires server roundtrip</td>
+                            <td class="comparison-yes">✅ Instant - data is in the tile</td>
+                        </tr>
+                        <tr>
+                            <td>Client-side filtering</td>
+                            <td class="comparison-no">❌ No</td>
+                            <td class="comparison-yes">✅ Yes - filter by any attribute</td>
+                        </tr>
+                        <tr>
+                            <td>Dynamic styling</td>
+                            <td class="comparison-no">❌ No</td>
+                            <td class="comparison-yes">✅ Yes - change colors on the fly</td>
+                        </tr>
+                        <tr>
+                            <td>Hover effects</td>
+                            <td class="comparison-no">❌ No</td>
+                            <td class="comparison-yes">✅ Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Attribute access</td>
+                            <td class="comparison-no">❌ Needs feature service</td>
+                            <td class="comparison-yes">✅ Embedded in tile</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Interactive Capabilities</h3>
+
+            <h4>1. Click to Identify Feature</h4>
+            <pre><code class="language-javascript">map.on('click', 'your-layer', (e) => {
+  const properties = e.features[0].properties;
+  console.log(properties.name, properties.status, properties.capacity_mw);
+  // Show popup, open detail panel, etc.
+});</code></pre>
+
+            <h4>2. Client-Side Filtering (Instant, No Server Call)</h4>
+            <pre><code class="language-javascript">map.setFilter('your-layer', [
+  'all',
+  ['==', ['get', 'status'], 'DELAYED'],
+  ['>=', ['get', 'capacity_mw'], 500]
+]);</code></pre>
+
+            <h4>3. Dynamic Styling Based on Attributes</h4>
+            <pre><code class="language-javascript">map.setPaintProperty('your-layer', 'circle-color', [
+  'match', ['get', 'status'],
+  'BLOCKED', '#ef4444',
+  'DELAYED', '#f59e0b',
+  'WITHDRAWN', '#6b7280',
+  '#3b82f6'  // default
+]);</code></pre>
+
+            <h4>4. Hover Highlighting</h4>
+            <pre><code class="language-javascript">map.on('mousemove', 'your-layer', (e) => {
+  map.setFeatureState(
+    { source: 'your-source', id: e.features[0].id },
+    { hover: true }
+  );
+});</code></pre>
+
+            <h3>Limitations vs. Feature Services</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Vector Tiles</th>
+                            <th>ESRI Feature Service</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Complex server-side queries</td>
+                            <td class="comparison-no">❌ No SQL on server</td>
+                            <td class="comparison-yes">✅ Full SQL/spatial queries</td>
+                        </tr>
+                        <tr>
+                            <td>Edit features</td>
+                            <td class="comparison-no">❌ Read-only</td>
+                            <td class="comparison-yes">✅ CRUD operations</td>
+                        </tr>
+                        <tr>
+                            <td>Real-time updates</td>
+                            <td class="comparison-no">❌ Requires tile rebuild</td>
+                            <td class="comparison-yes">✅ Instant</td>
+                        </tr>
+                        <tr>
+                            <td>Attribute simplification</td>
+                            <td class="comparison-partial">⚠️ May reduce at low zooms</td>
+                            <td class="comparison-yes">✅ Full attributes always</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">💡 Best Practice for Complex Queries</div>
+                <p>For complex server-side queries on large datasets (150M+ records), use a <strong>hybrid approach</strong>: Vector tiles for visualization + Laser/API backend for complex queries. The API returns matching IDs, and the frontend filters the tiles to show only those features.</p>
+            </div>
+        </section>
+
+        <!-- Frontend Stack -->
+        <section id="frontend-stack">
+            <h2><span class="section-number">6</span> Frontend Stack</h2>
+
+            <h3>Recommended Technologies</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Technology</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Framework</td><td><strong>InternalFB Entrypoints</strong></td><td>React-based, built-in auth</td></tr>
+                        <tr><td>Maps</td><td><strong>FBMap / MapLibre GL JS</strong></td><td>FBMap wraps Mapbox/MapLibre</td></tr>
+                        <tr><td>Visualization</td><td><strong>Deck.gl</strong></td><td>WebGL for large datasets</td></tr>
+                        <tr><td>Charts</td><td><strong>D3.js</strong> or XDS DataViz</td><td>D3 for custom, XDS for standard</td></tr>
+                        <tr><td>Styling</td><td><strong>StyleX + Tailwind CSS</strong></td><td>StyleX is Meta standard</td></tr>
+                        <tr><td>State</td><td><strong>React Hooks + Relay</strong></td><td>Relay if using GraphQL</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Getting Started</h3>
+            <pre><code class="language-javascript">// 1. Add FBMap to your component
+import FBMap from 'FBMap.react';
+import {FBMapStyleURIs} from 'FBMapConstants';
+
+&lt;FBMap
+  style={isDark ? FBMapStyleURIs.DEFAULT : FBMapStyleURIs.GREY}
+  center={[-98.5795, 39.8283]}
+  zoom={4}
+/&gt;
+
+// 2. Add Super Map Maker tiles
+map.addSource('your-data', {
+  type: 'vector',
+  tiles: ['https://tiles.facebook.com/smm/{build_name}/{z}/{x}/{y}.mvt']
+});</code></pre>
+        </section>
+
+        <!-- Entrypoints Customization - NEW SECTION -->
+        <section id="entrypoints-customization">
+            <h2><span class="section-number">7</span> Entrypoints Customization</h2>
+
+            <div class="info-box important">
+                <div class="info-box-title">🎨 Maximum Creative Freedom</div>
+                <p>Entrypoints is <strong>NOT a widget-based dashboard builder</strong> — it's a React framework. You have 100% creative control over every pixel. It only provides routing and authentication; everything else is your code.</p>
+            </div>
+
+            <h3>What Entrypoints Actually Provides</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>✅ Client-side routing</h4>
+                    <p><code>/your-tool/dashboard</code>, <code>/your-tool/settings</code></p>
+                </div>
+                <div class="feature-card">
+                    <h4>✅ Automatic SSO authentication</h4>
+                    <p>Meta employee auth handled automatically</p>
+                </div>
+                <div class="feature-card">
+                    <h4>✅ internalfb.com integration</h4>
+                    <p>Your tool appears at <code>internalfb.com/your-tool</code></p>
+                </div>
+                <div class="feature-card">
+                    <h4>✅ Everything else is YOUR code</h4>
+                    <p>Full control over UI, UX, styling, components</p>
+                </div>
+            </div>
+
+            <h3>Creative Control Comparison</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Creative Control</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ESRI Dashboards</td>
+                            <td class="comparison-no">❌ Limited to pre-built widgets, fixed layouts</td>
+                        </tr>
+                        <tr>
+                            <td>ESRI Experience Builder</td>
+                            <td class="comparison-partial">⚠️ Widget-based, some customization</td>
+                        </tr>
+                        <tr>
+                            <td>Meta XB</td>
+                            <td class="comparison-partial">⚠️ Presumably widget-constrained</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Entrypoints</strong></td>
+                            <td class="comparison-yes">✅ <strong>Full React — build anything</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Raw React (outside Meta)</td>
+                            <td class="comparison-yes">✅ Full control</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>What You Can Build</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Capability</th>
+                            <th>How</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Custom map UIs</td><td>FBMap/MapLibre + your own controls</td></tr>
+                        <tr><td>3D visualizations</td><td>Deck.gl, Three.js, Cesium</td></tr>
+                        <tr><td>Complex charts</td><td>D3.js (fully custom)</td></tr>
+                        <tr><td>Custom animations</td><td>CSS, Framer Motion, GSAP</td></tr>
+                        <tr><td>Drag-and-drop</td><td>react-dnd, dnd-kit</td></tr>
+                        <tr><td>Any UI library</td><td>XDS components OR your own</td></tr>
+                        <tr><td>Pixel-perfect designs</td><td>Full CSS/StyleX control</td></tr>
+                        <tr><td>Mobile-responsive</td><td>Your own breakpoints</td></tr>
+                        <tr><td>Dark/light themes</td><td>Your own theming system</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>XDS Components: Optional, Not Required</h3>
+            <pre><code class="language-javascript">// Option 1: Use XDS components (convenient)
+import XDSButton from 'XDSButton.react';
+&lt;XDSButton label="Click me" /&gt;
+
+// Option 2: Build your own (full control)
+&lt;button className={styles.myCustomButton}&gt;Click me&lt;/button&gt;
+
+// Option 3: Mix both (recommended)
+&lt;XDSCard&gt;
+  &lt;div {...stylex.props(styles.myCustomContent)}&gt;
+    &lt;MyCustomD3Chart data={data} /&gt;
+  &lt;/div&gt;
+&lt;/XDSCard&gt;</code></pre>
+
+            <div class="info-box tip">
+                <div class="info-box-title">💡 Proof: Your Failed/At-Risk Dashboard</div>
+                <p>Your current POC already demonstrates full creative control: custom "Liquid Glass" glassmorphism styling, D3.js charts, immersive map layouts, custom theme switching — none of that is "out of the box." It's all your code.</p>
+            </div>
+        </section>
+
+        <!-- Data Pipelines -->
+        <section id="data-pipelines">
+            <h2><span class="section-number">8</span> Data Processing Pipelines</h2>
+
+            <h3>Bento Notebooks (Interactive Analysis)</h3>
+            <p>Select the <code>spatial</code> kernel when creating a notebook.</p>
+
+            <h4>Pre-installed Libraries</h4>
+            <pre><code class="language-python">from osgeo import gdal, ogr, osr  # GDAL
+import fiona                        # Vector I/O
+import shapely                      # Geometry operations
+from shapely import wkt
+import geopandas as gpd             # Spatial DataFrames
+import folium                       # Leaflet maps
+import pyproj                       # Projections
+import h3                           # Uber's hex library</code></pre>
+
+            <h4>Example: Convert Shapefile to Hive-ready format</h4>
+            <pre><code class="language-python">import geopandas as gpd
+import h3
+
+# Read shapefile from Manifold
+gdf = gpd.read_file('/mnt/manifold/your-bucket/data.shp')
+
+# Convert geometry to WKT for Hive
+gdf['geometry_wkt'] = gdf.geometry.apply(lambda g: g.wkt)
+
+# Add H3 index for spatial queries
+gdf['h3_index'] = gdf.geometry.centroid.apply(
+    lambda p: h3.geo_to_h3(p.y, p.x, resolution=7)
+)
+
+# Export to Parquet for Hive upload
+gdf.drop(columns=['geometry']).to_parquet('output.parquet')</code></pre>
+
+            <h3>Dataswarm Pipelines (Production ETL)</h3>
+            <pre><code class="language-python"># ~/dataswarm/tasks/your_team/spatial_etl.py
+from dataswarm.operators import GlobalDefaults
+from dataswarm.operators.schemaoperator import PrestoInsertOperatorWithSchema
+
+GlobalDefaults.set(
+    schedule="0 9 * * *",  # Daily at 9 AM
+    user="your_username",
+    oncall="your_oncall",
+)
+
+# Step 1: Load data from Manifold to Hive
+load_spatial_data = PrestoInsertOperatorWithSchema(
+    name="load_spatial_data",
+    table="your_namespace.spatial_data",
+    query="""
+        SELECT id, name, ST_AsText(geometry) as geometry_wkt, h3_index
+        FROM manifold_source_table
+    """,
+)
+
+# Step 2: Trigger Super Map Maker tile build
+trigger_tile_build = BashOperator(
+    name="build_vector_tiles",
+    command="phps VectorTileMaker your_namespace.spatial_data -b your_build ...",
+    dep_list=[load_spatial_data],
+)</code></pre>
+        </section>
+
+        <!-- Migration Steps -->
+        <section id="migration-steps">
+            <h2><span class="section-number">9</span> Migration Steps</h2>
+
+            <div class="info-box tip">
+                <div class="info-box-title">💡 Migration Strategy</div>
+                <p>We recommend a <strong>phased approach</strong> starting with read-only visualization use cases. Select one project as a pilot to work out kinks, then apply lessons learned to subsequent migrations. Good pilot candidates: <em>Parcel Query</em>, <em>Site Scout</em>, or <em>H3 Layer Creation</em>.</p>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-title">Phase 1: Assessment (Week 1-2)</div>
+                    <div class="timeline-content">
+                        <h4>1.1 Inventory Spatial Datasets</h4>
+                        <ul>
+                            <li>Catalog all ESRI datasets (feature classes, tables, rasters)</li>
+                            <li>Document sizes, record counts, geometry types</li>
+                            <li>Identify update frequencies (real-time, daily, weekly, static)</li>
+                            <li>Map data lineage and source systems</li>
+                        </ul>
+                        <div class="info-box">
+                            <strong>📋 Output:</strong> Data Dictionary spreadsheet with columns: Dataset Name, Type, Size, Record Count, Geometry Type, Update Frequency, Source, Owner, Notes
+                        </div>
+
+                        <h4>1.2 Identify ESRI-Specific Dependencies</h4>
+                        <ul>
+                            <li>Document usage of ESRI-specific features (geoprocessing tools, domains, subtypes, relationship classes)</li>
+                            <li>Identify access management patterns (sharing levels, groups, named users)</li>
+                            <li>Catalog custom widgets and web app configurations</li>
+                            <li>Note any ESRI licensing dependencies (extensions, credits)</li>
+                        </ul>
+                        <div class="info-box">
+                            <strong>📋 Output:</strong> SOP page documenting dependencies and proposed mitigations for access management, group sharing, etc.
+                        </div>
+
+                        <h4>1.3 Inventory Spatial Pipelines</h4>
+                        <ul>
+                            <li>Document all scheduled tasks (Windows Task Scheduler, ArcGIS Notebook jobs)</li>
+                            <li>Identify spatial calculations and geoprocessing workflows</li>
+                            <li>Map trigger conditions and dependencies between tasks</li>
+                            <li>Note failure handling and notification patterns</li>
+                        </ul>
+                        <div class="info-box">
+                            <strong>📋 Output:</strong> Pipeline and Task Dictionary spreadsheet with columns: Task Name, Schedule, Input Data, Output Data, Tools/Scripts Used, Dependencies, Notification Config
+                        </div>
+
+                        <h4>1.4 Identify Key Widgets & Functionalities</h4>
+                        <ul>
+                            <li>Catalog widgets used in existing web apps (Search, Filter, Query, Charts, etc.)</li>
+                            <li>Document custom widgets and their functionality</li>
+                            <li>Identify critical user workflows and interactions</li>
+                            <li>Prioritize based on usage frequency and business value</li>
+                        </ul>
+                        <div class="info-box">
+                            <strong>📋 Output:</strong> Widget/Functionality inventory with priority rankings and Meta equivalent mappings
+                        </div>
+
+                        <h4>1.5 Develop Mitigations & Alternatives</h4>
+                        <ul>
+                            <li>Map each ESRI dependency to Meta equivalent or workaround</li>
+                            <li>Identify gaps requiring custom development</li>
+                            <li>Estimate effort for each mitigation</li>
+                            <li>Document risks and contingencies</li>
+                        </ul>
+
+                        <h4>1.6 Create POCs for Each Project</h4>
+                        <ul>
+                            <li>Build minimal proof-of-concept for each in-scope project</li>
+                            <li>Validate data migration path works</li>
+                            <li>Test core functionality in new stack</li>
+                            <li>Document lessons learned and blockers</li>
+                        </ul>
+
+                        <div class="info-box tip">
+                            <strong>🎯 Phase 1 Milestone:</strong> Complete inventory lists and POC status for all projects. Go/no-go decision for Phase 2.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-title">Phase 2: Data Migration (Week 3-6)</div>
+                    <div class="timeline-content">
+                        <h4>2.1 Upload Raw Files to Manifold</h4>
+                        <ul>
+                            <li>Export ESRI data to portable formats (Shapefile, GeoJSON, FGDB)</li>
+                            <li>Create Manifold bucket structure (organized by project/dataset)</li>
+                            <li>Upload source files with metadata</li>
+                            <li>Verify upload integrity (checksums, record counts)</li>
+                        </ul>
+
+                        <h4>2.2 Convert to WKT + H3 Format</h4>
+                        <ul>
+                            <li>Create Bento notebook templates for conversion</li>
+                            <li>Reproject to WGS84 (EPSG:4326) as needed</li>
+                            <li>Convert geometry to WKT strings</li>
+                            <li>Generate H3 indexes at appropriate resolutions (typically 6-9)</li>
+                            <li>Handle geometry validation and repair</li>
+                        </ul>
+
+                        <h4>2.3 Load to Hive Tables</h4>
+                        <ul>
+                            <li>Define Hive table schemas with proper data types</li>
+                            <li>Load Parquet files to Hive tables</li>
+                            <li>Validate record counts and data integrity</li>
+                            <li>Set up partitioning strategy (by H3 prefix, date, region)</li>
+                        </ul>
+
+                        <h4>2.4 Test Upload & Retrieval</h4>
+                        <ul>
+                            <li>Query data via Presto to verify accessibility</li>
+                            <li>Test spatial queries using H3 functions</li>
+                            <li>Validate attribute values match source</li>
+                            <li>Performance benchmark large queries</li>
+                        </ul>
+                        <div class="info-box">
+                            <strong>📋 Output:</strong> Test report documenting query performance, data accuracy, and any issues found
+                        </div>
+
+                        <h4>2.5 Test Update Functions</h4>
+                        <ul>
+                            <li>Test incremental data updates (append, upsert)</li>
+                            <li>Validate update triggers and scheduling</li>
+                            <li>Test full refresh workflows</li>
+                            <li>Document update procedures and timing</li>
+                        </ul>
+                        <div class="info-box">
+                            <strong>📋 Output:</strong> Update procedure documentation with timing benchmarks
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-title">Phase 3: Build Tile Infrastructure (Week 5-8)</div>
+                    <div class="timeline-content">
+                        <h4>3.1 Create Hive Namespace</h4>
+                        <ul>
+                            <li>Request team namespace in Hive (e.g., <code>dcre_gis</code>)</li>
+                            <li>Set up access controls and permissions</li>
+                            <li>Create staging and production schemas</li>
+                            <li>Document namespace structure and naming conventions</li>
+                        </ul>
+
+                        <h4>3.2 Generate Vector Tiles via Super Map Maker</h4>
+                        <ul>
+                            <li>Configure SMM tile builds for each dataset</li>
+                            <li>Define zoom level ranges and tile content</li>
+                            <li>Set up feature simplification for lower zoom levels</li>
+                            <li>Configure attribute inclusion/exclusion per zoom</li>
+                        </ul>
+
+                        <h4>3.3 Set Up Scheduled Refresh via Chronos</h4>
+                        <ul>
+                            <li>Create Chronos jobs for data refresh (matching source update frequency)</li>
+                            <li>Configure tile rebuild triggers after data updates</li>
+                            <li>Set up monitoring and alerting for pipeline failures</li>
+                            <li>Document pipeline dependencies and SLAs</li>
+                        </ul>
+
+                        <h4>3.4 Test Pipeline Data Updates</h4>
+                        <ul>
+                            <li>End-to-end test: source change → Hive update → tile rebuild → map display</li>
+                            <li>Measure latency from data change to tile availability</li>
+                            <li>Test failure scenarios and recovery</li>
+                            <li>Validate data consistency across pipeline stages</li>
+                        </ul>
+                        <div class="info-box">
+                            <strong>📋 Output:</strong> Pipeline architecture diagram and operations runbook
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-title">Phase 4: Build Frontends (Week 6-10)</div>
+                    <div class="timeline-content">
+                        <h4>4.1 Bootstrap Entrypoints App</h4>
+                        <ul>
+                            <li>Create app via Tool Creator with appropriate template</li>
+                            <li>Configure authentication and access groups</li>
+                            <li>Set up project structure and routing</li>
+                            <li>Establish code review and deployment workflows</li>
+                        </ul>
+
+                        <h4>4.2 Integrate FBMap with SMM Tile Layers</h4>
+                        <ul>
+                            <li>Add FBMap/MapLibre component to app</li>
+                            <li>Configure SMM tile sources</li>
+                            <li>Implement layer toggling and styling</li>
+                            <li>Add base map options (satellite, streets, terrain)</li>
+                        </ul>
+
+                        <h4>4.3 Add Key Widgets (from Phase 1 inventory)</h4>
+                        <ul>
+                            <li>Implement search functionality</li>
+                            <li>Build attribute filtering controls</li>
+                            <li>Add feature info popups/panels</li>
+                            <li>Create data tables/lists</li>
+                            <li>Add chart/visualization components</li>
+                        </ul>
+
+                        <h4>4.4 Develop Missing Functionalities</h4>
+                        <ul>
+                            <li>Custom develop features not available out-of-box</li>
+                            <li>Implement project-specific workflows</li>
+                            <li>Build integration points with other systems</li>
+                            <li>User testing and iteration</li>
+                        </ul>
+                        <div class="info-box">
+                            <strong>📋 Output:</strong> Working application with documented features and user guide
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-title">Phase 5: Deprecate ESRI (Week 10+)</div>
+                    <div class="timeline-content">
+                        <h4>5.1 Parallel Run</h4>
+                        <ul>
+                            <li>Both ESRI and Meta systems active simultaneously</li>
+                            <li>Direct key users to new system for testing</li>
+                            <li>Collect feedback and address issues</li>
+                            <li>Monitor usage metrics on both systems</li>
+                        </ul>
+
+                        <h4>5.2 Validate Data Parity</h4>
+                        <ul>
+                            <li>Compare data between systems (record counts, attribute values)</li>
+                            <li>Validate spatial accuracy (geometry comparisons)</li>
+                            <li>Verify update synchronization</li>
+                            <li>Document any intentional differences</li>
+                        </ul>
+                        <div class="info-box">
+                            <strong>📋 Output:</strong> Data parity validation report with sign-off
+                        </div>
+
+                        <h4>5.3 Stakeholder Transition</h4>
+                        <ul>
+                            <li>Announce migration timeline to all stakeholders</li>
+                            <li>Conduct training sessions on new system</li>
+                            <li>Provide documentation and support resources</li>
+                            <li>Establish feedback channels for issues</li>
+                        </ul>
+
+                        <h4>5.4 Decommission ESRI</h4>
+                        <ul>
+                            <li>Set read-only mode on ESRI services</li>
+                            <li>Archive final data snapshots</li>
+                            <li>Update bookmarks, links, and documentation</li>
+                            <li>Cancel/reassign ESRI licenses</li>
+                            <li>Delete ESRI services after retention period</li>
+                        </ul>
+                        <div class="info-box tip">
+                            <strong>🎯 Phase 5 Milestone:</strong> ESRI fully decommissioned, all users on Meta infrastructure, licenses returned.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Migration Script Template</h3>
+            <pre><code class="language-python">#!/usr/bin/env python3
+"""migrate_esri_to_hive.py - Converts ESRI geodatabase to Hive-compatible format"""
+
+import geopandas as gpd
+import h3
+
+def migrate_dataset(input_path: str, output_path: str, h3_resolution: int = 7):
+    # Read ESRI data
+    gdf = gpd.read_file(input_path)
+
+    # Reproject to WGS84 if needed
+    if gdf.crs != 'EPSG:4326':
+        gdf = gdf.to_crs('EPSG:4326')
+
+    # Convert geometry to WKT
+    gdf['geometry_wkt'] = gdf.geometry.apply(lambda g: g.wkt if g else None)
+
+    # Add H3 index for spatial queries
+    def get_h3(geom):
+        if geom is None:
+            return None
+        centroid = geom.centroid
+        return h3.geo_to_h3(centroid.y, centroid.x, h3_resolution)
+
+    gdf['h3_index'] = gdf.geometry.apply(get_h3)
+
+    # Write to Parquet for Hive
+    df = gdf.drop(columns=['geometry'])
+    df.to_parquet(output_path, index=False)
+    print(f"Migrated {len(df)} records to {output_path}")
+
+if __name__ == "__main__":
+    migrate_dataset("/mnt/manifold/bucket/source.gdb", "/mnt/manifold/bucket/output.parquet")</code></pre>
+        </section>
+
+        <!-- Deployment Testing Progress -->
+        <section id="deployment-testing">
+            <h2><span class="section-number">10</span> Deployment Testing Progress</h2>
+
+            <p>Current status of platform testing for hosting GIS applications and data services.</p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Status</th>
+                            <th>Use Case</th>
+                            <th>Notes</th>
+                            <th>Last Tested</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Entrypoints</strong></td>
+                            <td class="comparison-yes">✅ Working</td>
+                            <td>Frontend dashboards, React apps</td>
+                            <td>Successfully deployed Infra Intel Dashboard. Full creative control, built-in auth.</td>
+                            <td>Jan 2026</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Manifold</strong></td>
+                            <td class="comparison-no">❌ Failed</td>
+                            <td>File storage, large datasets</td>
+                            <td>Issues encountered during testing. Needs further investigation.</td>
+                            <td>Jan 2026</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vercel</strong></td>
+                            <td class="comparison-partial">⏳ Not Tested</td>
+                            <td>External frontend hosting</td>
+                            <td>Under security review at Meta. May have limitations for internal tools.</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unidash</strong></td>
+                            <td class="comparison-partial">⏳ Not Tested</td>
+                            <td>Monitoring dashboards</td>
+                            <td>Designed for operational dashboards, not custom apps. Lower priority.</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tupperware</strong></td>
+                            <td class="comparison-partial">⏳ Not Tested</td>
+                            <td>Backend APIs, tile servers</td>
+                            <td>Primary choice for Python backends. Test with FastAPI service.</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Super Map Maker</strong></td>
+                            <td class="comparison-partial">⏳ Not Tested</td>
+                            <td>Vector tile serving</td>
+                            <td>Requires Hive table with WKT. Test with sample dataset.</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hive + Laser</strong></td>
+                            <td class="comparison-partial">⏳ Not Tested</td>
+                            <td>Large dataset storage/queries</td>
+                            <td>For 150M+ record datasets. Test with spatial data migration.</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Testing Priorities</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🔴 High Priority</h4>
+                    <ul>
+                        <li><strong>Tupperware</strong> - Backend API hosting</li>
+                        <li><strong>Super Map Maker</strong> - Vector tile serving</li>
+                        <li><strong>Manifold</strong> - Retry with different approach</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>🟡 Medium Priority</h4>
+                    <ul>
+                        <li><strong>Hive + Laser</strong> - Large dataset support</li>
+                        <li><strong>Bento Spatial</strong> - Data processing notebooks</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>🟢 Low Priority</h4>
+                    <ul>
+                        <li><strong>Vercel</strong> - External hosting (security review pending)</li>
+                        <li><strong>Unidash</strong> - Not suited for custom apps</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title">⚠️ Manifold Testing Notes</div>
+                <p><strong>Issue encountered:</strong> [Add details about the failure here]</p>
+                <p><strong>Next steps:</strong> Review Manifold documentation, contact Manifold Users workplace group for guidance.</p>
+            </div>
+        </section>
+
+        <!-- Team Management -->
+        <section id="team-management">
+            <h2><span class="section-number">11</span> Team & Roles</h2>
+
+            <h3>Team Roster</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Team Member(s)</th>
+                            <th>Responsibilities</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Project Lead</strong></td>
+                            <td>Eli Kalb</td>
+                            <td>Overall direction, architecture decisions, stakeholder communication</td>
+                            <td class="comparison-yes">✅ Active</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Frontend Development</strong></td>
+                            <td>Patrick Anderson, Colin Kennedy</td>
+                            <td>React/Entrypoints apps, MapLibre/FBMap integration, UI/UX</td>
+                            <td class="comparison-yes">✅ Active</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Backend/Data Engineering</strong></td>
+                            <td>Drashti Solanki, Janelle Li</td>
+                            <td>Tupperware services, Hive tables, Dataswarm pipelines</td>
+                            <td class="comparison-yes">✅ Active</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spatial Data Processing</strong></td>
+                            <td>John Arnold, Anna Wieczorkowska</td>
+                            <td>Data migration, Bento notebooks, PostGIS/H3 indexing</td>
+                            <td class="comparison-yes">✅ Active</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Communication Channels</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📢 Primary Channels</h4>
+                    <ul>
+                        <li><strong>Workplace Group:</strong> <em>[Create/Link group]</em></li>
+                        <li><strong>Task Tracking:</strong> <a href="https://www.internalfb.com/gsd/859758727120763/list">Team Tasks Board</a></li>
+                        <li><strong>Weekly Sync:</strong> <em>[Day/Time TBD]</em></li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>📚 Documentation</h4>
+                    <ul>
+                        <li><strong>This SOP:</strong> Architecture & procedures</li>
+                        <li><strong>Wiki:</strong> <em>[Link to team wiki]</em></li>
+                        <li><strong>Code:</strong> <code>www/html/intern/js/failed_at_risk/</code></li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>🆘 Support Resources</h4>
+                    <ul>
+                        <li><a href="https://fb.workplace.com/groups/2454084944653060">Display Maps Users</a></li>
+                        <li><a href="https://fb.workplace.com/groups/buildingtools">Internal Tools Platform</a></li>
+                        <li><a href="https://fb.workplace.com/groups/tupperware">Tupperware Users</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Decision Log</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Decision</th>
+                            <th>Rationale</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Jan 23, 2026</td>
+                            <td>Use Entrypoints for frontend</td>
+                            <td>Full creative control, built-in auth, no VPN needed for employees</td>
+                            <td>Patrick</td>
+                        </tr>
+                        <tr>
+                            <td>Jan 23, 2026</td>
+                            <td>D3.js over XDS DataViz</td>
+                            <td>XDS charts didn't expand to fill containers; D3 provides full control</td>
+                            <td>Patrick</td>
+                        </tr>
+                        <tr>
+                            <td>Jan 29, 2026</td>
+                            <td>Rebrand to "Infra Intel"</td>
+                            <td>Better reflects expanded scope beyond failed projects</td>
+                            <td>Patrick</td>
+                        </tr>
+                        <tr>
+                            <td><em>[Date]</em></td>
+                            <td><em>[Add new decisions here]</em></td>
+                            <td><em>[Rationale]</em></td>
+                            <td><em>[Owner]</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Progress Log -->
+        <section id="progress-log">
+            <h2><span class="section-number">12</span> Progress Log</h2>
+
+            <p>Weekly progress updates and milestones for the GIS migration project.</p>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-title">Week of Jan 27, 2026</div>
+                    <div class="timeline-content">
+                        <ul>
+                            <li>✅ Submitted D91779835 - Full rebrand to "Infra Intel Dashboard"</li>
+                            <li>✅ Added interactive US map with status-based coloring</li>
+                            <li>✅ Implemented Google Sheets data integration</li>
+                            <li>✅ Fixed lint errors and reviewer feedback</li>
+                            <li>⏳ Pending: Update tool display name in Tool Hub</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">Week of Jan 20, 2026</div>
+                    <div class="timeline-content">
+                        <ul>
+                            <li>✅ Landed D91360576 - Dataset refresh, chart enhancements</li>
+                            <li>✅ Migrated charts from XDS DataViz to D3.js</li>
+                            <li>✅ Added "Liquid Glass" UI styling</li>
+                            <li>✅ Implemented light/dark theme toggle</li>
+                            <li>✅ Created GIS Migration SOP document</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">Week of Jan 13, 2026</div>
+                    <div class="timeline-content">
+                        <ul>
+                            <li>✅ Stood up POC dashboard on Entrypoints</li>
+                            <li>✅ Initial data table with 76 projects</li>
+                            <li>✅ Basic filter panel implementation</li>
+                            <li>❌ Manifold bucket testing - failed</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Upcoming Milestones</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Target Date</th>
+                            <th>Milestone</th>
+                            <th>Status</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Feb 2026</td>
+                            <td>Test Tupperware backend deployment</td>
+                            <td class="comparison-partial">⏳ Planned</td>
+                            <td>TBD</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 2026</td>
+                            <td>Test Super Map Maker with sample dataset</td>
+                            <td class="comparison-partial">⏳ Planned</td>
+                            <td>TBD</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 2026</td>
+                            <td>Migrate first large dataset to Hive</td>
+                            <td class="comparison-partial">⏳ Planned</td>
+                            <td>TBD</td>
+                        </tr>
+                        <tr>
+                            <td>Mar 2026</td>
+                            <td>Deploy tile-based visualization for 150M dataset</td>
+                            <td class="comparison-partial">⏳ Planned</td>
+                            <td>TBD</td>
+                        </tr>
+                        <tr>
+                            <td>Q2 2026</td>
+                            <td>Full ESRI deprecation</td>
+                            <td class="comparison-partial">⏳ Planned</td>
+                            <td>Team</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">📝 How to Update This Log</div>
+                <p>Add new progress entries at the top of the timeline. Use the following status indicators:</p>
+                <ul>
+                    <li>✅ Completed</li>
+                    <li>⏳ In Progress / Planned</li>
+                    <li>❌ Blocked / Failed</li>
+                    <li>🔄 Ongoing</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Dataset Size Guidelines -->
+        <section id="dataset-guidelines">
+            <h2><span class="section-number">10</span> Dataset Size Guidelines</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🟢 Small (&lt;100 MB)</h4>
+                    <p><strong>&lt;10K records</strong></p>
+                    <p>Embed directly in frontend as GeoJSON. Simple, no backend needed.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔵 Medium (100 MB - 1 GB)</h4>
+                    <p><strong>10K - 1M records</strong></p>
+                    <p>Manifold file + Tupperware API. REST API serves filtered GeoJSON.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🟠 Large (1 - 10 GB)</h4>
+                    <p><strong>1M - 50M records</strong></p>
+                    <p>Hive tables + Super Map Maker. Vector tiles for visualization.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔴 Very Large (10+ GB)</h4>
+                    <p><strong>50M+ records</strong></p>
+                    <p>Hive + Laser + SMM. Laser for queries, SMM for tiles.</p>
+                </div>
+            </div>
+
+            <h3>Very Large Dataset Architecture</h3>
+                <!-- Visual Very Large Dataset Architecture -->
+                <div class="architecture-layers" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <!-- Left Column: Storage & Processing -->
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="arch-layer" style="background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.08)); border-color: rgba(251,191,36,0.3);">
+                            <div class="arch-layer-header">
+                                <span class="arch-layer-icon">💾</span>
+                                <span class="arch-layer-title">HIVE TABLE</span>
+                            </div>
+                            <div class="arch-layer-content">
+                                <div class="arch-component">
+                                    <ul>
+                                        <li>WKT geometry</li>
+                                        <li>H3 spatial index</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">▼</div>
+                        <div class="arch-layer" style="background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(16,185,129,0.08)); border-color: rgba(52,211,153,0.3);">
+                            <div class="arch-layer-header">
+                                <span class="arch-layer-icon">🔄</span>
+                                <span class="arch-layer-title">SUPER MAP MAKER</span>
+                            </div>
+                            <div class="arch-layer-content">
+                                <div class="arch-component">
+                                    <p style="margin: 0;">MVT tile generator</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Query & Serve -->
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="arch-layer" style="background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(139,92,246,0.08)); border-color: rgba(167,139,250,0.3);">
+                            <div class="arch-layer-header">
+                                <span class="arch-layer-icon">🔍</span>
+                                <span class="arch-layer-title">LASER INDEX</span>
+                            </div>
+                            <div class="arch-layer-content">
+                                <div class="arch-component">
+                                    <ul>
+                                        <li>KNN queries</li>
+                                        <li>Tile lookups</li>
+                                    </ul>
+                                    <span class="badge badge-purple" style="margin-top: 8px;">← Real-time queries</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">▼</div>
+                        <div class="arch-layer" style="background: linear-gradient(135deg, rgba(79,172,254,0.15), rgba(0,242,254,0.08)); border-color: rgba(79,172,254,0.3);">
+                            <div class="arch-layer-header">
+                                <span class="arch-layer-icon">🗺️</span>
+                                <span class="arch-layer-title">VECTOR TILES</span>
+                            </div>
+                            <div class="arch-layer-content">
+                                <div class="arch-component">
+                                    <p style="margin: 0;">Edge CDN delivery</p>
+                                    <span class="badge badge-blue" style="margin-top: 8px;">← Visualization</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <h4>H3 Indexing for Performance</h4>
+            <pre><code class="language-sql">-- Create H3 indexed table
+CREATE TABLE your_namespace.large_spatial_data AS
+SELECT *, h3_geo_to_h3(lat, lon, 7) as h3_index
+FROM source_table;
+
+-- Query by H3 cell (fast!)
+SELECT * FROM large_spatial_data
+WHERE h3_index IN (
+    h3_k_ring('87283082bffffff', 2)  -- 2-ring around target cell
+);</code></pre>
+        </section>
+
+        <!-- Tools & Resources -->
+        <section id="tools-resources">
+            <h2><span class="section-number">11</span> Tools & Resources</h2>
+
+            <h3>Workplace Groups</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Group</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Display Maps Users</td><td>Super Map Maker, FBMap, tiles</td></tr>
+                        <tr><td>Dataswarm Users</td><td>Pipeline help</td></tr>
+                        <tr><td>Spark Users</td><td>Large-scale processing</td></tr>
+                        <tr><td>Manifold Users</td><td>File storage</td></tr>
+                        <tr><td>Internal Tools Platform</td><td>Entrypoints</td></tr>
+                        <tr><td>Tupperware Shared Users</td><td>Backend deployment</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Key Documentation</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Resource</th>
+                            <th>URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Super Map Maker</td><td><code>internalfb.com/wiki/Display_Maps/Super_Map_Maker/</code></td></tr>
+                        <tr><td>Display Maps</td><td><code>internalfb.com/wiki/Display_Maps/</code></td></tr>
+                        <tr><td>Dataswarm</td><td><code>internalfb.com/wiki/Dataswarm/</code></td></tr>
+                        <tr><td>Manifold</td><td><code>internalfb.com/intern/manifold/</code></td></tr>
+                        <tr><td>Building Internal Tools</td><td><code>internalfb.com/wiki/Building_Internal_Tools/</code></td></tr>
+    <script>
+        // Syntax highlighting
+        hljs.highlightAll();
+
+        // Collapsible sections (matching Pipeline Diagnostic Report)
+        document.querySelectorAll('.section-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                if (content && content.classList.contains('section-content')) {
+                    header.classList.toggle('collapsed');
+                    content.classList.toggle('collapsed');
+                }
+            });
+        });
+
+        // Active nav link highlighting on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Add hover effects to cards
+        document.querySelectorAll('.card, .feature-card').forEach(card => {
+            card.style.cursor = 'pointer';
+        });
+    </script>
+</body>
+</html>

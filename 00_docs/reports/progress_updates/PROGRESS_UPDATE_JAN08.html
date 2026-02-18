@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Update — January 8, 2026</title>
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-muted: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #a371f7;
+            --accent-cyan: #39c5cf;
+            --accent-orange: #f0883e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(88,166,255,0.1), rgba(163,113,247,0.1));
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .date { color: var(--text-muted); font-size: 1.1rem; }
+        .session-badge {
+            display: inline-block;
+            background: var(--accent-green);
+            color: #000;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h3 {
+            font-size: 1.1rem;
+            margin: 25px 0 15px 0;
+            color: var(--text-primary);
+        }
+
+        .task-list { list-style: none; }
+        .task-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .task-list li:last-child { border-bottom: none; }
+        .task-check {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .task-check::after {
+            content: '✓';
+            color: #000;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .task-content strong { color: var(--accent-cyan); }
+        .task-desc { color: var(--text-muted); font-size: 0.9rem; }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 15px 0;
+            color: var(--accent-cyan);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        td { color: var(--text-primary); }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(88,166,255,0.1));
+            border: 1px solid rgba(63,185,80,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .highlight-box h4 {
+            color: var(--accent-green);
+            margin-bottom: 10px;
+        }
+
+        .file-tree {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid var(--border);
+        }
+        .file-tree .folder { color: var(--accent-blue); }
+        .file-tree .file { color: var(--text-muted); }
+        .file-tree .new { color: var(--accent-green); }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .next-steps {
+            background: linear-gradient(135deg, rgba(163,113,247,0.1), rgba(88,166,255,0.1));
+            border: 1px solid rgba(163,113,247,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .next-steps h4 {
+            color: var(--accent-purple);
+            margin-bottom: 15px;
+        }
+        .next-steps ol {
+            margin-left: 20px;
+            color: var(--text-primary);
+        }
+        .next-steps li {
+            margin: 8px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .badge-new {
+            background: var(--accent-green);
+            color: #000;
+        }
+        .badge-enhanced {
+            background: var(--accent-orange);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+<header>
+            <h1>Progress Update</h1>
+            <div class="date">January 8, 2026</div>
+            <div class="session-badge">Session 14 + 15 + 16 + 17 Complete</div>
+        </header>
+
+        <section>
+            <h2>📋 Summary</h2>
+            <p><strong>Session 14:</strong> Integrated <strong>Essential DC List</strong> (39 campus-level sites / 129 buildings) for strategic site coverage tracking. Created <strong>Composite Consensus Score</strong> combining tier-weighted coverage (80%) with Essential DC coverage (20%).</p>
+
+            <p style="margin-top: 15px;"><strong>Session 15:</strong> Enhanced <strong>Date Field Mapping</strong> from SemiAnalysis (construction_start_date, actual_live_date). <strong>Optimized XB Schema</strong> by removing 9 sparse building-characteristic fields.</p>
+
+            <p style="margin-top: 15px;"><strong>Session 16:</strong> Created <strong>Nightly GDrive Sync Script</strong> for automated documentation and pipeline script migration. Created <strong>Pipeline Folder</strong> with 24 core scripts for dev team SQL/HIVE porting. Created <strong>README.html</strong> developer documentation.</p>
+
+            <p style="margin-top: 15px;"><strong>Session 17:</strong> <strong>XB Schema Reorganized</strong> into 11 logical categories for easier navigation. Added <strong>Geography Enrichment</strong> as Step 2 in pipeline. Fixed <strong>SA UCID issue</strong> (pipeline ordering). Added <strong>market, county, postal_code</strong> to XB schema. <strong>Date field pipeline tracking</strong> verified through campus rollup.</p>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">8</div>
+                    <div class="metric-label">Pipeline Steps</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">45</div>
+                    <div class="metric-label">XB Schema Fields</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">11</div>
+                    <div class="metric-label">Field Categories</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3</div>
+                    <div class="metric-label">Docs Updated</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>✅ Session 17 — XB Schema Reorg & Pipeline Enhancement <span class="badge badge-new">NEW</span></h2>
+
+                    <h3>XB Schema Reorganized by Category</h3>
+                    <ul class="task-list">
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>Reorganized 45 fields into 11 logical categories</strong><br>
+                                <span class="task-desc">Identifiers, Company, Location, Power, Area, Status, Dates, Energy, Campus Aggregates, Source, Notes</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>Added market, county, postal_code fields</strong><br>
+                                <span class="task-desc">Extended location category with additional geography fields</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>Updated create_xb_combined_layer.py with category comments</strong><br>
+                                <span class="task-desc">Fields now grouped for easier navigation in attribute table</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <h3>Geography Enrichment Added to Pipeline</h3>
+                    <ul class="task-list">
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>Added enrich_geography_fields.py as Step 2</strong><br>
+                                <span class="task-desc">Runs immediately after ingestion, before company standardization</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>Pipeline now 8 steps</strong> (was 7)<br>
+                                <span class="task-desc">Ingestion → Geography → Company → UCID → Essential DC → Campus → Cleanup+XB → Validation</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <h3>Date Field Pipeline Tracking</h3>
+                    <ul class="task-list">
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>Fixed construction_start_date aggregation</strong><br>
+                                <span class="task-desc">Now aggregated to campus rollup using MIN (earliest date from buildings)</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>Verified actual_live_date flows through pipeline</strong><br>
+                                <span class="task-desc">buildings → campus → XB (MIN aggregation)</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <h3>SemiAnalysis UCID Fix</h3>
+                    <ul class="task-list">
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>Diagnosed SA records missing UCIDs</strong><br>
+                                <span class="task-desc">Root cause: UCID generation ran before SA ingestion</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>Created diagnose_sa_ucids.py diagnostic script</strong><br>
+                                <span class="task-desc">Checks UCID coverage by source</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>SA records now 100% UCID coverage</strong><br>
+                                <span class="task-desc">After re-running pipeline in correct order</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <h3>Documentation Updated</h3>
+                    <ul class="task-list">
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>run_full_pipeline.py</strong> — Added Step 2: Geography Enrichment<br>
+                                <span class="task-desc">All subsequent steps renumbered (3-8)</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>GDrive README.html</strong> — Updated execution order table<br>
+                                <span class="task-desc">Now shows 8-step pipeline</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>PROJECT_OVERVIEW.html</strong> — Updated workflow diagram + pipeline steps<br>
+                                <span class="task-desc">Pipeline steps section shows all 8 steps</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="task-check"></div>
+                            <div class="task-content">
+                                <strong>generate_pipeline_report.py</strong> — Updated CRITICAL_FIELDS<br>
+                                <span class="task-desc">Added market, county, postal_code to field completeness tracking</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <table>
+<table>
+                        <thead>
+                            <tr>
+                                <th>XB Schema Category</th>
+                                <th>Fields</th>
+                                <th>Examples</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1. Identifiers</td>
+                                <td>3</td>
+                                <td>record_level, ucid, building_ucid</td>
+                            </tr>
+                            <tr>
+                                <td>2. Company/Ownership</td>
+                                <td>9</td>
+                                <td>company_clean, developer, tenant, end_user</td>
+                            </tr>
+                            <tr>
+                                <td>3. Location</td>
+                                <td>13</td>
+                                <td>city, market, county, state, postal_code, lat/lon</td>
+                            </tr>
+                            <tr>
+                                <td>4. Capacity-Power</td>
+                                <td>4</td>
+                                <td>full_capacity_mw, commissioned_power_mw</td>
+                            </tr>
+                            <tr>
+                                <td>5-11. Other</td>
+                                <td>16</td>
+                                <td>facility_status, is_essential, dates, source</td>
+                            </tr>
+                        </tbody>
+                    </table>
+        </section>
+
+        <section>
+            <h2>✅ Session 16 — GDrive Sync & Pipeline Sharing <span class="badge badge-new">NEW</span></h2>
+
+            <h3>Nightly Sync Script Created</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Created sync_to_gdrive.ps1</strong><br>
+                        <span class="task-desc">PowerShell script for automated nightly sync to Google Drive</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Incremental sync logic</strong><br>
+                        <span class="task-desc">Only copies files if source is newer than destination (efficient)</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Syncs 54+ documentation files</strong><br>
+                        <span class="task-desc">8 categories: context, dashboards, progress_updates, schemas, visualizations, workflows, etc.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>30-day log retention</strong><br>
+                        <span class="task-desc">Logs saved to _utils/logs/ with automatic cleanup</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>Pipeline Folder for Dev Team</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Created pipeline/ folder structure on GDrive</strong><br>
+                        <span class="task-desc">Organized by category: ingestion/, processing/, consensus/, utilities/</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Synced 24 core pipeline scripts</strong><br>
+                        <span class="task-desc">All major ingestion, processing, UCID, and validation scripts</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Created PIPELINE_CHANGELOG.md</strong><br>
+                        <span class="task-desc">Tracks all script additions and updates with timestamps</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>README.html Developer Documentation</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Created comprehensive README.html</strong><br>
+                        <span class="task-desc">Overview, folder structure, execution flow, script descriptions</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>SQL/HIVE Porting Notes section</strong><br>
+                        <span class="task-desc">ArcPy dependencies, key transformations, spatial operations to replace</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>UCID format examples and data schema</strong><br>
+                        <span class="task-desc">Documents key fields and naming conventions</span>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="code-block">
+# Manual sync:
+cd "C:\...\scripts\_utils"
+pwsh -File sync_to_gdrive.ps1
+
+# Automated (Task Scheduler):
+# Action: pwsh -File "C:\...\scripts\_utils\sync_to_gdrive.ps1"
+# Trigger: Daily at 11:00 PM
+            </div>
+        </section>
+
+        <section>
+            <h2>✅ Additional Work — Schema Audit & Diagnostics</h2>
+
+            <h3>Field Schema Audit</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Created FIELD_SCHEMA_AUDIT.md</strong><br>
+                        <span class="task-desc">Comprehensive audit of 94 fields across gold_buildings, gold_campus, and XB layers</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Categorized fields into 17 logical groups</strong><br>
+                        <span class="task-desc">Identifiers, Company, Location, Capacity, Status, Dates, Infrastructure, etc.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Identified 4 fields to deprecate</strong><br>
+                        <span class="task-desc">gold_lat/gold_lon (redundant), building_type (overlaps type_category), construction_started (duplicate)</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Proposed field ordering by category</strong><br>
+                        <span class="task-desc">Recommendation: Reorder fields for easier navigation in attribute tables</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>Diagnostic Utilities Created</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>diagnose_sa_ucids.py</strong><br>
+                        <span class="task-desc">Diagnoses UCID assignment status by source, identifies records without UCIDs</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>debug_sa_dates.py</strong><br>
+                        <span class="task-desc">Inspects SemiAnalysis date field values (Field32, Field35) for mapping verification</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>check_building_fields.py</strong><br>
+                        <span class="task-desc">Checks field population rates to determine which fields can be aggregated to campus level</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>PROJECT_OVERVIEW.html Enhanced</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Added Technical Resources section</strong><br>
+                        <span class="task-desc">6 resource cards linking to Pipeline README, UCID Design, Schema Comparison, etc.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Added Key Technical Concepts table</strong><br>
+                        <span class="task-desc">UCID, Essential DC, Company Tiers, Clean Re-ingestion, XB Layer explained</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Added GDrive folder structure diagram</strong><br>
+                        <span class="task-desc">Visual overview of documentation organization in Google Drive</span>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>✅ Session 15 — Date Fields & Schema Optimization</h2>
+
+            <h3>Date Field Mapping from SemiAnalysis</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Added construction_start_date</strong> from Field32 (start_ops)<br>
+                        <span class="task-desc">38.8% population (2,121 records) - US date format M/D/YYYY</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Added actual_live_date</strong> from Field35 (live_assumption)<br>
+                        <span class="task-desc">36.8% population (2,014 records) - US date format M/D/YYYY</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Created date_helpers.py utility module</strong><br>
+                        <span class="task-desc">parse_date_flexible(), parse_quarter_to_date(), safe_parse_* functions</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>XB Schema Optimization</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Removed 9 sparse building-characteristic fields</strong><br>
+                        <span class="task-desc">gross_sqft, shell_sqft, building_sqm, building_type, num_stories, height_*, footprint_*</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>XB schema reduced from 50 to 41 fields</strong><br>
+                        <span class="task-desc">Fields remain in gold_buildings_full for detailed analysis</span>
+                    </div>
+                </li>
+            </ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Source Field</th>
+                        <th>→ Gold Field</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SemiAnalysis</td>
+                        <td>Field32 (start_ops)</td>
+                        <td>construction_start_date</td>
+                        <td>✅ NEW</td>
+                    </tr>
+                    <tr>
+                        <td>SemiAnalysis</td>
+                        <td>Field35 (live_assumption)</td>
+                        <td>actual_live_date</td>
+                        <td>✅ NEW</td>
+                    </tr>
+                    <tr>
+                        <td>DCH Hyper</td>
+                        <td>commissioned_year</td>
+                        <td>actual_live_date</td>
+                        <td>✅ Verified</td>
+                    </tr>
+                    <tr>
+                        <td>DCM</td>
+                        <td>year_operational</td>
+                        <td>actual_live_date</td>
+                        <td>✅ Verified</td>
+                    </tr>
+                    <tr>
+                        <td>NPM</td>
+                        <td>planned_op_date</td>
+                        <td>actual_live_date</td>
+                        <td>✅ Verified</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>✅ Session 14 — Essential DC Integration</h2>
+
+            <h3>Essential Data Center List</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Integrated 129 strategic buildings</strong> (39 campus-level sites)<br>
+                        <span class="task-desc">Curated from SemiAnalysis essential DC GSheet</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Matching by exact Unique_ID (UUID)</strong><br>
+                        <span class="task-desc">127/129 buildings matched (98.4%) → 73 campuses marked</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Added is_essential field</strong> to buildings, campus, and XB layers<br>
+                        <span class="task-desc">SHORT field: 1 = essential, 0 = not essential</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>Composite Consensus Score</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Created weighted composite scoring</strong><br>
+                        <span class="task-desc">Tier-Weighted (80%) + Essential DC Coverage (20%)</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Tier weights: Hyperscaler (60%), Major Colo (30%), Other (10%)</strong><br>
+                        <span class="task-desc">Reflects business priority of different company types</span>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="highlight-box">
+                <h4>Composite Score Formula</h4>
+                <div class="code-block" style="margin: 0;">
+Composite = (Tier-Weighted Score × 0.80) + (Essential DC Score × 0.20)
+
+Tier-Weighted = Σ (tier_multi_source_% × source_density × weight)
+Essential DC = (matched_essential_buildings / total_essential_buildings) × 100
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>📁 New GDrive Structure</h2>
+
+            <div class="file-tree">
+<span class="folder">G:\My Drive\...\Admin Documentation\</span>
+├── <span class="folder">context\</span>                  ← AI_CONTEXT_PROMPT.md
+├── <span class="folder">dashboards\</span>               ← PROJECT_OVERVIEW.html
+├── <span class="folder">pipeline\</span>                 <span class="new">&lt;-- 🆕 Dev team sharing</span>
+│   ├── <span class="folder">ingestion\</span>            ← 6 ingestion scripts
+│   ├── <span class="folder">processing\</span>           ← 5 processing scripts
+│   ├── <span class="folder">consensus\</span>            ← 2 consensus scripts
+│   ├── <span class="folder">utilities\</span>            ← 4 utility scripts
+│   ├── <span class="file new">README.html</span>         <span class="new">&lt;-- Developer docs</span>
+│   └── <span class="file new">PIPELINE_CHANGELOG.md</span> <span class="new">&lt;-- Change tracking</span>
+├── <span class="folder">pipeline_diagnostics\</span>     ← Auto-generated reports
+├── <span class="folder">progress_updates\</span>         ← This file + others
+├── <span class="folder">schemas\</span>                  ← Schema documentation
+├── <span class="folder">visualizations\</span>           ← Folder structure diagrams
+└── <span class="folder">workflows\</span>                ← PIPELINE_DOCUMENTATION.md
+            </div>
+        </section>
+
+        <section>
+            <h2>📊 Current State</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Records</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>gold_buildings_full</td>
+                        <td>22,696</td>
+                        <td>✅ Validated</td>
+                    </tr>
+                    <tr>
+                        <td>gold_campus_full</td>
+                        <td>11,715</td>
+                        <td>✅ Validated</td>
+                    </tr>
+                    <tr>
+                        <td>gold_combined_xb</td>
+                        <td>34,411</td>
+                        <td>✅ Validated</td>
+                    </tr>
+                    <tr>
+                        <td>meta_canonical_buildings</td>
+                        <td>318</td>
+                        <td>✅ Ground Truth</td>
+                    </tr>
+                    <tr>
+                        <td>Essential DC Matched</td>
+                        <td>127/129</td>
+                        <td>✅ 98.4% Coverage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>🔜 Next Steps</h2>
+
+            <div class="next-steps">
+                <h4>Automation Setup</h4>
+                <ol>
+                    <li><strong>Set up Task Scheduler</strong> — Configure nightly sync at 11:00 PM</li>
+                    <li><strong>Share pipeline folder</strong> — Send link to SQL/HIVE dev team</li>
+                    <li><strong>Monitor changelog</strong> — Review PIPELINE_CHANGELOG.md for sync history</li>
+                </ol>
+            </div>
+
+            <div class="next-steps" style="border-color: rgba(88,166,255,0.3); margin-top: 15px;">
+                <h4>Optional Enhancements</h4>
+                <ol>
+                    <li>Add Teams/Slack notification on sync completion</li>
+                    <li>Create script dependency diagram in README.html</li>
+                    <li>Add database schema DDL for SQL/HIVE team</li>
+                </ol>
+            </div>
+        </section>
+
+<footer>
+            <p><strong>Data Center Consensus GIS Model</strong></p>
+            <p>Session 14 + 15 + 16 + 17 — January 8, 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

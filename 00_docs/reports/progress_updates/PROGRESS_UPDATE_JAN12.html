@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Update — January 12, 2026</title>
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-muted: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #a371f7;
+            --accent-cyan: #39c5cf;
+            --accent-orange: #f0883e;
+            --accent-yellow: #d29922;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(88,166,255,0.1), rgba(163,113,247,0.1));
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .date { color: var(--text-muted); font-size: 1.1rem; }
+        .session-badge {
+            display: inline-block;
+            background: var(--accent-green);
+            color: #000;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .session-badge.in-progress {
+            background: var(--accent-yellow);
+        }
+
+        section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h3 {
+            font-size: 1.1rem;
+            margin: 25px 0 15px 0;
+            color: var(--text-primary);
+        }
+
+        .task-list { list-style: none; }
+        .task-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .task-list li:last-child { border-bottom: none; }
+        .task-check {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .task-check::after {
+            content: '✓';
+            color: #000;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .task-pending {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .task-pending::after {
+            content: '⏳';
+            font-size: 10px;
+        }
+        .task-content strong { color: var(--accent-cyan); }
+        .task-desc { color: var(--text-muted); font-size: 0.9rem; }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 15px 0;
+            color: var(--accent-cyan);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        td { color: var(--text-primary); }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(88,166,255,0.1));
+            border: 1px solid rgba(63,185,80,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .highlight-box h4 {
+            color: var(--accent-green);
+            margin-bottom: 10px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, rgba(210,153,34,0.1), rgba(240,136,62,0.1));
+            border: 1px solid rgba(210,153,34,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .warning-box h4 {
+            color: var(--accent-yellow);
+            margin-bottom: 10px;
+        }
+
+        .file-tree {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid var(--border);
+        }
+        .file-tree .folder { color: var(--accent-blue); }
+        .file-tree .file { color: var(--text-muted); }
+        .file-tree .new { color: var(--accent-green); }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        .metric-value.yellow { color: var(--accent-yellow); }
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .next-steps {
+            background: linear-gradient(135deg, rgba(163,113,247,0.1), rgba(88,166,255,0.1));
+            border: 1px solid rgba(163,113,247,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .next-steps h4 {
+            color: var(--accent-purple);
+            margin-bottom: 15px;
+        }
+        .next-steps ol {
+            margin-left: 20px;
+            color: var(--text-primary);
+        }
+        .next-steps li {
+            margin: 8px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .badge-new {
+            background: var(--accent-green);
+            color: #000;
+        }
+        .badge-progress {
+            background: var(--accent-yellow);
+            color: #000;
+        }
+        .badge-complete {
+            background: var(--accent-blue);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Progress Update</h1>
+            <div class="date">January 12, 2026</div>
+            <div class="session-badge">Sessions 17 + 18 + 19</div>
+            <div class="session-badge in-progress" style="margin-left: 10px;">Semianalysis V2 In Progress</div>
+        </header>
+
+        <section>
+            <h2>📋 Executive Summary</h2>
+            <p>Sessions 17-19 delivered significant infrastructure for both the data pipeline and project management. Major focus on integrating Semianalysis V2 data with new AI workload fields.</p>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">8</div>
+                    <div class="metric-label">New Schema Fields</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value yellow">3</div>
+                    <div class="metric-label">Extraction Scripts</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">5,886</div>
+                    <div class="metric-label">SA V2 Records</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3</div>
+                    <div class="metric-label">Sources Planned</div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Deliverable</th>
+                        <th>Status</th>
+                        <th>Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Consensus Layer Script</td>
+                        <td>✅ Code Complete</td>
+                        <td>Pre-computed BAV deduplication ready</td>
+                    </tr>
+                    <tr>
+                        <td>Semianalysis V2 Schema</td>
+                        <td>✅ Complete</td>
+                        <td>8 new fields in Buildings/Campus/XB</td>
+                    </tr>
+                    <tr>
+                        <td>Semianalysis V2 Extraction</td>
+                        <td>🟡 In Progress</td>
+                        <td>Complex Excel structure being parsed</td>
+                    </tr>
+                    <tr>
+                        <td>Web Dashboard</td>
+                        <td>✅ Complete</td>
+                        <td>React + FastAPI + MapLibre stack</td>
+                    </tr>
+                    <tr>
+                        <td>PM Dashboard Generator</td>
+                        <td>✅ Complete</td>
+                        <td>Excel → HTML with 8-week trends</td>
+                    </tr>
+                    <tr>
+                        <td>Source Enhancement Plan</td>
+                        <td>✅ Documented</td>
+                        <td>Synergy & WoodMac integration strategy</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>🟡 Session 19 — Semianalysis V2 Extraction <span class="badge badge-progress">IN PROGRESS</span></h2>
+
+            <h3>Challenge: Complex Excel Structure</h3>
+            <p>The December 29, 2026 Semianalysis Excel file has a complex pivot table structure that required custom extraction logic:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sheet</th>
+                        <th>Header Rows</th>
+                        <th>UUID Start</th>
+                        <th>Data Columns</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>NA Data Center Supply</td>
+                        <td>3-4</td>
+                        <td>Row 19</td>
+                        <td>A, H-AA, BV-CG, CL-CZ</td>
+                    </tr>
+                    <tr>
+                        <td>Overseas Data Center Supply</td>
+                        <td>3-4</td>
+                        <td>Row 21</td>
+                        <td>TBD</td>
+                    </tr>
+                    <tr>
+                        <td>AI Labs</td>
+                        <td>3-4</td>
+                        <td>N/A (no UUIDs)</td>
+                        <td>TBD</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Scripts Created</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>extract_sa_na.py</strong><br>
+                        <span class="task-desc">Direct extraction with exact cell ranges using pandas bulk read</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>diagnose_sa_structure.py</strong><br>
+                        <span class="task-desc">Excel structure diagnostic tool for analyzing row/column layout</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-pending"></div>
+                    <div class="task-content">
+                        <strong>clean_semianalysis_excel.py</strong><br>
+                        <span class="task-desc">General cleaner - needs manual ranges for each sheet</span>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="warning-box">
+                <h4>⚠️ Current Blocker</h4>
+                <p>Need exact row/column coordinates for <strong>Overseas Data Center Supply</strong> and <strong>AI Labs</strong> sheets to complete extraction. User to provide or manually extract flat file.</p>
+            </div>
+
+            <h3>Schema Updates (COMPLETE ✅)</h3>
+            <p>8 new fields added via <code>add_semianalysis_v2_fields.py</code>:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Table</th>
+                        <th>New Fields</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>gold_buildings_full</td>
+                        <td>end_user, tenant, gpu_cloud, workload_type</td>
+                    </tr>
+                    <tr>
+                        <td>gold_campus_full</td>
+                        <td>end_user_list, tenant_list, has_ai_workload</td>
+                    </tr>
+                    <tr>
+                        <td>gold_combined_xb</td>
+                        <td>end_user, tenant, gpu_cloud, workload_type</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="code-block">
+# Run NA extraction:
+exec(open(r"C:\...\scripts\_utils\extract_sa_na.py", encoding='utf-8').read())
+
+# Then run ingestion:
+exec(open(r"C:\...\scripts\01_ingestion\ingest_semianalysis_v2.py", encoding='utf-8').read())
+            </div>
+        </section>
+
+        <section>
+            <h2>✅ Source Enhancement Plan <span class="badge badge-new">NEW</span></h2>
+
+            <p><strong>Key Insight from Supervisor:</strong> Sources should be evaluated for their <em>unique value contributions</em>, not graded equally.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Strategy</th>
+                        <th>Unique Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Synergy</strong></td>
+                        <td>Enrichment lookup (no coords needed)</td>
+                        <td>Owned/leased breakdown, facility counts</td>
+                        <td>📋 Planned</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WoodMac</strong></td>
+                        <td>Pipeline insights layer</td>
+                        <td>Cost data, workloads, energy/cooling, site acres</td>
+                        <td>📋 Planned</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Semianalysis V2</strong></td>
+                        <td>Direct ingestion with new fields</td>
+                        <td>End user, tenant, workload type (Training/Inference)</td>
+                        <td>🟡 In Progress</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <h4>New V2 Fields Purpose</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>end_user</strong> — Ultimate customer (e.g., OpenAI, Anthropic)</li>
+                    <li><strong>tenant</strong> — Primary tenant of facility</li>
+                    <li><strong>gpu_cloud</strong> — GPU cloud provider if applicable</li>
+                    <li><strong>workload_type</strong> — Training vs Inference classification</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>✅ Session 18 — PM Dashboard & Web Dashboard</h2>
+
+            <h3>PM Dashboard Generator</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Created generate_pm_dashboard.py</strong><br>
+                        <span class="task-desc">Reads Patrick's Work Organizer Excel, generates HTML dashboard</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Quick Stats panel</strong><br>
+                        <span class="task-desc">Hours this week, tasks in progress, blockers, scope changes</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>8-week rolling trend chart</strong><br>
+                        <span class="task-desc">SVG line chart showing hour trends over time</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>Web Dashboard (React + FastAPI)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mapping</td>
+                        <td>MapLibre GL JS 4.0</td>
+                        <td>Free, no API key, fast</td>
+                    </tr>
+                    <tr>
+                        <td>Charts</td>
+                        <td>Apache ECharts 5.4</td>
+                        <td>Rich visualization library</td>
+                    </tr>
+                    <tr>
+                        <td>Data Table</td>
+                        <td>TanStack Table 8.11</td>
+                        <td>Best React table library</td>
+                    </tr>
+                    <tr>
+                        <td>Frontend</td>
+                        <td>React 18 + TypeScript</td>
+                        <td>Type-safe, modern</td>
+                    </tr>
+                    <tr>
+                        <td>Styling</td>
+                        <td>Tailwind + Glassmorphism</td>
+                        <td>Apple-inspired design</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>✅ Session 17 — Consensus Layer Script</h2>
+
+            <h3>BAV (Best Available Value) Logic</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Created generate_consensus_layer.py</strong><br>
+                        <span class="task-desc">Pre-computed single layer for Experience Builder</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Field-level source priority</strong><br>
+                        <span class="task-desc">Each field selects from best available source per UCID</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Confidence scoring formula</strong><br>
+                        <span class="task-desc">Source count (20%) + Has Meta (30%) + Freshness (25%) + Coverage (15%) + Agreement (10%)</span>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="code-block">
+FIELD_PRIORITY = {
+    "full_capacity_mw": ["Semianalysis", "DataCenterHawk", "DCH Lease", "NPM", "DataCenterMap"],
+    "commissioned_mw": ["Meta Canonical", "DataCenterHawk", "Semianalysis", "DCH Lease"],
+    "facility_status": ["Meta Canonical", "DataCenterHawk", "DCH Lease", "NPM", "Semianalysis"],
+    "building_count": ["DataCenterHawk", "Meta Canonical", "Semianalysis"],
+    "mw_2025": ["Semianalysis"],  # Forecasts only from Semianalysis
+}
+            </div>
+        </section>
+
+        <section>
+            <h2>📁 New Files Created</h2>
+
+            <div class="file-tree">
+<span class="folder">scripts/</span>
+├── <span class="folder">_utils/</span>
+│   ├── <span class="file new">extract_sa_na.py</span>           <span class="new">&lt;-- Direct NA extraction</span>
+│   ├── <span class="file new">diagnose_sa_structure.py</span>   <span class="new">&lt;-- Excel diagnostic</span>
+│   └── <span class="file">clean_semianalysis_excel.py</span>  (updated)
+├── <span class="folder">01_ingestion/</span>
+│   └── <span class="file new">ingest_semianalysis_v2.py</span>  <span class="new">&lt;-- CSV-based ingestion</span>
+├── <span class="folder">02_processing/</span>
+│   └── <span class="file new">add_semianalysis_v2_fields.py</span> <span class="new">&lt;-- Schema update</span>
+├── <span class="folder">07_consensus/</span>
+│   └── <span class="file new">generate_consensus_layer.py</span> <span class="new">&lt;-- BAV consensus</span>
+├── <span class="folder">00_docs/workflows/</span>
+│   └── <span class="file new">SOURCE_ENHANCEMENT_PLAN.md</span>  <span class="new">&lt;-- Integration strategy</span>
+└── <span class="folder">00_docs/pm/</span>
+    └── <span class="file new">generate_pm_dashboard.py</span>   <span class="new">&lt;-- PM dashboard gen</span>
+            </div>
+        </section>
+
+        <section>
+            <h2>📊 Current Pipeline State</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Records</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>gold_buildings_full</td>
+                        <td>22,696</td>
+                        <td>✅ Validated + V2 Schema</td>
+                    </tr>
+                    <tr>
+                        <td>gold_campus_full</td>
+                        <td>11,715</td>
+                        <td>✅ Validated + V2 Schema</td>
+                    </tr>
+                    <tr>
+                        <td>gold_combined_xb</td>
+                        <td>34,411</td>
+                        <td>✅ Validated + V2 Schema</td>
+                    </tr>
+                    <tr>
+                        <td>consensus_campus</td>
+                        <td>(pending)</td>
+                        <td>🟡 Script ready, not yet run</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>🔜 Next Steps</h2>
+
+            <div class="next-steps">
+                <h4>Immediate (Resume Here)</h4>
+                <ol>
+                    <li><strong>Complete NA extraction</strong> — Run extract_sa_na.py and verify output</li>
+                    <li><strong>Get Overseas/AI Labs ranges</strong> — User to provide row/column coordinates</li>
+                    <li><strong>Run full ingestion</strong> — ingest_semianalysis_v2.py once CSV is ready</li>
+                </ol>
+            </div>
+
+            <div class="next-steps" style="border-color: rgba(88,166,255,0.3); margin-top: 15px;">
+                <h4>Short-Term</h4>
+                <ol>
+                    <li>Test Consensus Layer Script in ArcGIS Pro</li>
+                    <li>Update campus_rollup_new.py — Aggregate V2 fields</li>
+                    <li>Update create_xb_combined_layer.py to include new fields</li>
+                </ol>
+            </div>
+
+            <div class="next-steps" style="border-color: rgba(63,185,80,0.3); margin-top: 15px;">
+                <h4>Medium-Term</h4>
+                <ol>
+                    <li>Create Synergy enrichment script — Match by company+city+state</li>
+                    <li>Create WoodMac integration script — Pipeline insights layer</li>
+                    <li>Portal Publishing — Publish consensus_campus to ESRI Portal</li>
+                </ol>
+            </div>
+        </section>
+
+        <footer>
+            <p><strong>Data Center Consensus GIS Model</strong></p>
+            <p>Sessions 17 + 18 + 19 — January 12, 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema Comparison Visual — Dark Mode</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.7;
+        }
+        h1 { color: #569cd6; border-bottom: 3px solid #569cd6; padding-bottom: 15px; }
+        h2 { color: #4ec9b0; margin-top: 50px; border-bottom: 1px solid #3c3c3c; padding-bottom: 10px; }
+        h3 { color: #ce9178; }
+        hr { border: none; border-top: 1px solid #3c3c3c; margin: 30px 0; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; background: #252526; box-shadow: 0 4px 6px rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid #3c3c3c; padding: 14px 18px; text-align: left; }
+        th { background: #0e639c; color: #fff; font-weight: 600; }
+        tr:nth-child(even) { background: #2d2d2d; }
+        tr:hover { background: #37373d; }
+        .mermaid { background: #252526; padding: 30px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: 1px solid #3c3c3c; }
+        code { background: #3c3c3c; padding: 3px 8px; border-radius: 4px; font-family: Consolas, monospace; color: #ce9178; }
+        .success { background: #2d4a3e; padding: 20px; border-left: 4px solid #4ec9b0; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .warning { background: #4d3c1f; padding: 20px; border-left: 4px solid #dcdcaa; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .info { background: #1e3a5f; padding: 20px; border-left: 4px solid #569cd6; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
+        .badge-high { background: #4d1f1f; color: #f48771; }
+        .badge-new { background: #1f4d3d; color: #4ec9b0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .card { background: #252526; border: 1px solid #3c3c3c; border-radius: 12px; padding: 20px; }
+        .card h4 { color: #569cd6; margin-top: 0; border-bottom: 1px solid #3c3c3c; padding-bottom: 10px; }
+        footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #3c3c3c; color: #808080; }
+    </style>
+</head>
+<body>
+    <h1>📊 Schema Comparison — Data Center Consensus Model</h1>
+    <p><strong>For Supervisor Review</strong> | <strong>Created:</strong> December 29, 2025 | <strong>Theme:</strong> Dark Mode</p>
+    <hr>
+
+    <h2>🔍 4 Schema Sources Compared</h2>
+    <div class="mermaid">
+    %%{init: {'theme': 'dark'}}%%
+    flowchart LR
+        subgraph CURRENT["✅ CURRENT PRODUCTION"]
+            GB["🏢 Gold Buildings<br/>32 fields"]
+            GC["🏘️ Gold Campus<br/>25 fields"]
+        end
+        subgraph REFERENCE["📝 REFERENCE SCHEMAS"]
+            IF["📋 Intake Form<br/>27 fields"]
+            AH["💭 Ad-hoc Brainstorm<br/>19 fields"]
+        end
+        GB --> MERGE["🎯 PROPOSED<br/>CONSENSUS v2.0<br/>48 fields"]
+        GC --> MERGE
+        IF --> MERGE
+        AH --> MERGE
+    </div>
+
+    <h2>📋 Field Coverage by Category</h2>
+    <div class="mermaid">
+    %%{init: {'theme': 'dark'}}%%
+    pie title Field Coverage Across All 4 Schemas
+        "Location (11)" : 11
+        "Capacity - Power (12)" : 12
+        "Capacity - Space (3)" : 3
+        "Identity/Names (5)" : 5
+        "Ownership (5)" : 5
+        "Energy/Infra (4)" : 4
+        "AI/GPU (2)" : 2
+        "Provenance (6)" : 6
+    </div>
+
+    <h2>✅ What Each Schema Does Well</h2>
+    <div class="mermaid">
+    %%{init: {'theme': 'dark'}}%%
+    flowchart TB
+        subgraph GOLD["🏆 Gold Buildings - Production"]
+            G1["✅ Capacity breakdown<br/>commissioned/UC/planned"]
+            G2["✅ Year forecasts mw_2023-2032"]
+            G3["✅ Full location parsing"]
+            G4["✅ Source tracking"]
+        end
+        subgraph INTAKE["📋 Intake Form - Google"]
+            I1["🔥 IT vs Facility Power"]
+            I2["🔥 GPU Type & Count"]
+            I3["🔥 Energy fields"]
+            I4["🔥 Confidence Score"]
+        end
+        subgraph ADHOC["💭 Ad-hoc Brainstorm"]
+            A1["🔥 Developer/Tenant/User"]
+            A2["🆕 Building ID"]
+            A3["🆕 Phase ID"]
+            A4["🆕 Alternate names"]
+        end
+    </div>
+
+    <h2>🔥 HIGH PRIORITY: Fields to Add</h2>
+    <div class="mermaid">
+    %%{init: {'theme': 'dark'}}%%
+    flowchart LR
+        subgraph POWER["⚡ POWER"]
+            P1["it_power_mw"]
+            P2["facility_power_mw"]
+        end
+        subgraph OWNERSHIP["🏢 OWNERSHIP"]
+            O1["developer"]
+            O2["tenant"]
+            O3["end_user"]
+        end
+        subgraph AI["🤖 AI/GPU"]
+            AI1["gpu_type"]
+            AI2["gpu_count"]
+        end
+        subgraph ENERGY["🔌 ENERGY"]
+            E1["utility_company"]
+            E2["fuel_type"]
+        end
+        subgraph QUALITY["📊 QUALITY"]
+            Q1["confidence_score"]
+        end
+        POWER --> ADD["🎯 ADD TO SCHEMA"]
+        OWNERSHIP --> ADD
+        AI --> ADD
+        ENERGY --> ADD
+        QUALITY --> ADD
+    </div>
+
+    <h2>🔄 Ownership Model Explained</h2>
+    <div class="mermaid">
+    %%{init: {'theme': 'dark'}}%%
+    flowchart LR
+        subgraph EXAMPLE["Example: OpenAI in Vantage/Oracle Facility"]
+            DEV["🏗️ Developer<br/>Vantage Data Centers"]
+            TEN["📋 Tenant<br/>Oracle"]
+            USE["👤 End User<br/>OpenAI"]
+        end
+        DEV -->|builds| BUILDING["🏢 Data Center"]
+        TEN -->|leases| BUILDING
+        USE -->|occupies| BUILDING
+        subgraph CURRENT["❌ Current Schema"]
+            CURR["company_clean = ???"]
+        end
+        subgraph NEW["✅ New Schema"]
+            NEW1["developer = Vantage"]
+            NEW2["tenant = Oracle"]
+            NEW3["end_user = OpenAI"]
+        end
+    </div>
+
+    <h2>⚡ IT Power vs Facility Power</h2>
+    <div class="mermaid">
+    %%{init: {'theme': 'dark'}}%%
+    flowchart TB
+        subgraph FACILITY["🏢 FACILITY - Total Site Power"]
+            IT["🖥️ IT POWER<br/>Servers, Storage, Network"]
+            COOL["❄️ Cooling ~30%"]
+            OTHER["💡 Lighting, UPS ~10%"]
+        end
+        IT --> PUE["PUE = Facility / IT<br/>Typically 1.2-1.4"]
+        COOL --> PUE
+        OTHER --> PUE
+        subgraph PROBLEM["❌ Current Problem"]
+            P1["Vendors report different things"]
+            P2["DCH Hyper = Facility Power"]
+            P3["Semianalysis = IT Power"]
+        end
+        subgraph SOLUTION["✅ Solution"]
+            S1["it_power_mw = IT load"]
+            S2["facility_power_mw = Total"]
+            S3["Can calculate PUE"]
+        end
+    </div>
+
+    <h2>❓ Questions for Supervisor</h2>
+    <div class="mermaid">
+    %%{init: {'theme': 'dark'}}%%
+    flowchart TB
+        Q1["🤖 1. GPU Tracking - Priority?"]
+        Q2["🏢 2. Developer/Tenant/User - Critical?"]
+        Q3["🔌 3. Energy Fields - Now or later?"]
+        Q4["📊 4. Confidence Scoring - Scale?"]
+        Q5["📈 5. Phase Tracking - Granularity?"]
+        Q1 --> DECIDE["📋 DECIDE PRIORITIES"]
+        Q2 --> DECIDE
+        Q3 --> DECIDE
+        Q4 --> DECIDE
+        Q5 --> DECIDE
+        DECIDE --> N1["Create migration script"]
+        DECIDE --> N2["Update ingestion"]
+        DECIDE --> N3["Update intake form"]
+    </div>
+
+    <h2>🎯 TL;DR — Key Recommendations</h2>
+    <table>
+        <tr><th>Priority</th><th>Add These Fields</th><th>Why</th></tr>
+        <tr><td><span class="badge badge-high">🔥 HIGH</span></td><td><code>it_power_mw</code>, <code>facility_power_mw</code></td><td>Enable accurate capacity comparison</td></tr>
+        <tr><td><span class="badge badge-high">🔥 HIGH</span></td><td><code>developer</code>, <code>tenant</code>, <code>end_user</code></td><td>Track ownership chain</td></tr>
+        <tr><td><span class="badge badge-high">🔥 HIGH</span></td><td><code>gpu_type</code>, <code>gpu_count</code></td><td>AI datacenter tracking</td></tr>
+        <tr><td><span class="badge badge-high">🔥 HIGH</span></td><td><code>utility_company</code>, <code>fuel_type</code></td><td>Power planning & sustainability</td></tr>
+        <tr><td><span class="badge badge-high">🔥 HIGH</span></td><td><code>confidence_score</code></td><td>Data quality tracking</td></tr>
+        <tr><td><span class="badge badge-new">🆕 MED</span></td><td><code>building_name</code>, <code>building_id</code></td><td>Multi-building campus tracking</td></tr>
+        <tr><td><span class="badge badge-new">🆕 MED</span></td><td><code>project_name</code>, <code>phase_id</code></td><td>Expansion tracking</td></tr>
+    </table>
+
+    <h2>📊 Summary of Changes</h2>
+    <div class="grid">
+        <div class="card">
+            <h4>✅ Fields to ADD (14 new)</h4>
+            <p><code>company_clean_filter</code>, <code>developer</code>, <code>tenant</code>, <code>end_user</code>, <code>it_power_mw</code>, <code>facility_power_mw</code>, <code>utility_company</code>, <code>fuel_type</code>, <code>power_strategy</code>, <code>cooling_type</code>, <code>gpu_type</code>, <code>gpu_count</code>, <code>confidence_score</code>, <code>notes</code></p>
+        </div>
+        <div class="card">
+            <h4>❌ Fields to REMOVE (9 total)</h4>
+            <p><code>gold_lat</code>, <code>gold_lon</code>, <code>feed_config</code>, <code>ecosystem_ixps</code>, <code>ecosystem_cloud</code>, <code>ecosystem_children</code>, <code>ecosystem_networkproviders</code>, <code>ecosystem_networkpresence</code>, <code>ecosystem_serviceproviders</code></p>
+        </div>
+    </div>
+    <div class="info">
+        <h3>⚙️ Fields to MODIFY (1)</h3>
+        <p><code>company_clean</code> — Move "Colo - All Other" logic to new <code>company_clean_filter</code> field</p>
+    </div>
+
+    <footer>
+        <p><em>Visual guide created December 29, 2025 — Data Center Consensus GIS Model</em></p>
+        <p>Print to PDF: Ctrl+P → Save as PDF</p>
+    </footer>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'dark', flowchart: { useMaxWidth: true, htmlLabels: true } });
+    </script>
+</body>
+</html>

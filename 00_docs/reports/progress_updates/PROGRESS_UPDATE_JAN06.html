@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Update — January 6, 2026</title>
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-muted: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #a371f7;
+            --accent-cyan: #39c5cf;
+            --accent-gold: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(88,166,255,0.1));
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .date { color: var(--text-muted); font-size: 1.1rem; }
+        .session-badge {
+            display: inline-block;
+            background: var(--accent-gold);
+            color: #000;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h3 {
+            font-size: 1.1rem;
+            margin: 25px 0 15px 0;
+            color: var(--text-primary);
+        }
+
+        .task-list { list-style: none; }
+        .task-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .task-list li:last-child { border-bottom: none; }
+        .task-check {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .task-check::after {
+            content: '✓';
+            color: #000;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .task-content strong { color: var(--accent-cyan); }
+        .task-desc { color: var(--text-muted); font-size: 0.9rem; }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 15px 0;
+            color: var(--accent-cyan);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        td { color: var(--text-primary); }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(88,166,255,0.1));
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .highlight-box h4 {
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        .metric-value.gold { color: var(--accent-gold); }
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .next-steps {
+            background: linear-gradient(135deg, rgba(163,113,247,0.1), rgba(88,166,255,0.1));
+            border: 1px solid rgba(163,113,247,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .next-steps h4 {
+            color: var(--accent-purple);
+            margin-bottom: 15px;
+        }
+        .next-steps ol {
+            margin-left: 20px;
+            color: var(--text-primary);
+        }
+        .next-steps li {
+            margin: 8px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(0,0,0,0.2));
+            border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .feature-card h4 {
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .feature-card p {
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .feature-card ul {
+            margin-left: 20px;
+            color: var(--text-primary);
+        }
+        .feature-card li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Progress Update</h1>
+            <div class="date">January 6-7, 2026</div>
+            <div class="session-badge">Sessions 9-11 Complete — Capacity Accuracy + Source Health Matrix + Consensus Strength</div>
+        </header>
+
+        <!-- Session 11 Section -->
+        <section style="border-left: 4px solid #34d399;">
+            <h2>🆕 Session 11: Executive Report Card + Consensus Strength</h2>
+            <p>This session focused on creating a <strong>3-pillar Executive Report Card</strong> at the top of the Pipeline Diagnostic Report, implementing <strong>Consensus Strength metrics</strong>, and adding <strong>natural language question subheaders</strong> to improve report readability.</p>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" style="color: #34d399;">3</div>
+                    <div class="metric-label">Report Card Pillars</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">v37.0</div>
+                    <div class="metric-label">AI Context Version</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color: #34d399;">8</div>
+                    <div class="metric-label">Sections with Questions</div>
+                </div>
+            </div>
+
+            <h3>Executive Report Card (3 Pillars)</h3>
+            <p>Created a new summary section at the very top of the Pipeline Diagnostic Report showing three key metrics at a glance:</p>
+
+            <table>
+                <thead><tr><th>Pillar</th><th>Measures</th><th>Key Question</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>📈 Source Quality</strong></td><td>Avg score across input sources</td><td>"How good are our inputs?"</td></tr>
+                    <tr><td><strong>🏆 Pipeline Health</strong></td><td>Data completeness grade</td><td>"Is our output complete?"</td></tr>
+                    <tr><td><strong>🤝 Consensus Strength</strong></td><td>Source agreement level</td><td>"Can we trust this data?"</td></tr>
+                </tbody>
+            </table>
+
+            <div class="feature-card">
+                <h4>🤝 Consensus Strength Section (NEW)</h4>
+                <p>Measures source agreement — the unique value proposition of a consensus dataset:</p>
+                <ul>
+                    <li><strong>Multi-source validation:</strong> % of campuses with 2+ sources</li>
+                    <li><strong>Average sources per campus:</strong> How many sources contribute to each campus</li>
+                    <li><strong>Coefficient of variation:</strong> MW variance across sources</li>
+                    <li><strong>Confidence distribution:</strong> High/Medium/Low breakdown</li>
+                </ul>
+            </div>
+
+            <h3>Consensus Grading Scale</h3>
+            <table>
+                <thead><tr><th>Grade</th><th>Criteria</th></tr></thead>
+                <tbody>
+                    <tr><td style="color: #34d399;"><strong>A</strong></td><td>>50% multi-source, avg 2.5+ sources</td></tr>
+                    <tr><td style="color: #60a5fa;"><strong>B</strong></td><td>>30% multi-source, avg 2.0+ sources</td></tr>
+                    <tr><td style="color: #fbbf24;"><strong>C</strong></td><td>>20% multi-source, avg 1.5+ sources</td></tr>
+                    <tr><td style="color: #fb923c;"><strong>D</strong></td><td>>10% multi-source</td></tr>
+                    <tr><td style="color: #f87171;"><strong>F</strong></td><td><10% multi-source</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Natural Language Question Subheaders</h3>
+            <p>Added italicized "Key Question" subheaders to all major report sections to help readers understand what each section answers:</p>
+
+            <table>
+                <thead><tr><th>Section</th><th>Question Added</th></tr></thead>
+                <tbody>
+                    <tr><td>Spatial Accuracy</td><td>"Can I trust the coordinates?"</td></tr>
+                    <tr><td>Temporal Freshness</td><td>"When was this data last touched?"</td></tr>
+                    <tr><td>Consensus Strength</td><td>"How much agreement exists between sources?"</td></tr>
+                    <tr><td>Field Completeness</td><td>"Does this dataset have what I need?"</td></tr>
+                    <tr><td>Data Quality</td><td>"Are there data integrity issues?"</td></tr>
+                    <tr><td>Data Distribution</td><td>"Where is the data concentrated?"</td></tr>
+                    <tr><td>Recommendations</td><td>"Which sources should I trust most?"</td></tr>
+                    <tr><td>Source Health Matrix</td><td>"How does each source perform?"</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Report Structure Reorganization</h3>
+            <div class="code-block">
+Executive Summary
+├── Report Card (NEW)
+└── Recommendations
+
+Input Source Quality
+├── Source Analysis
+├── Spatial Accuracy
+├── Temporal Freshness
+└── Consensus Strength (NEW)
+
+Output Dataset Quality
+├── Pipeline Health (moved here)
+├── Field Completeness
+├── Data Distribution
+└── Quality Checks
+
+Synthesis
+└── Site Comparison
+            </div>
+        </section>
+
+        <!-- Session 10 Section -->
+        <section style="border-left: 4px solid var(--accent-gold);">
+            <h2>🔧 Session 10: Source Health Matrix Enhancements</h2>
+            <p>This session focused on <strong>refining the Source Health Matrix</strong> with verified capacity accuracy values, adding excluded sources, auto-sorting, and proper ground truth handling.</p>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value gold">7</div>
+                    <div class="metric-label">Sources in Health Matrix</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">v36.0</div>
+                    <div class="metric-label">AI Context Version</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">2</div>
+                    <div class="metric-label">Excluded Sources Added</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">4</div>
+                    <div class="metric-label">Enhancements Made</div>
+                </div>
+            </div>
+
+            <h3>Key Enhancements</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Capacity Accuracy Values Fixed</strong><br>
+                        <span class="task-desc">Updated to use verified static MAPE values from executive report (Semi: 11.9% → A, DCH: 17.6% → B)</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Excluded Sources Added</strong><br>
+                        <span class="task-desc">Synergy and WoodMac now appear in health matrix with visual distinction (70% opacity, "EXCLUDED" badge)</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Meta Canonical Ground Truth Handling</strong><br>
+                        <span class="task-desc">Spatial and Capacity columns now show "—" with "Ground Truth" label for Meta Canonical</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Auto-Sorted by Overall Score</strong><br>
+                        <span class="task-desc">Sources now display from highest to lowest score (DCH → Semi → Meta → NPM → DCM → Excluded)</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>Verified Capacity Accuracy Values</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>MAPE</th>
+                        <th>Grade</th>
+                        <th>Field Used</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Semianalysis</td><td style="color:#34d399;">11.9%</td><td style="color:#34d399;">A</td><td>mw_2023</td></tr>
+                    <tr><td>DataCenterHawk</td><td style="color:#60a5fa;">17.6%</td><td style="color:#60a5fa;">B</td><td>commissioned_power_mw</td></tr>
+                    <tr><td>DataCenterMap</td><td style="color:#f87171;">N/A</td><td style="color:#f87171;">F</td><td>Insufficient coverage (1.5%)</td></tr>
+                    <tr><td>NewProjectMedia</td><td style="color:#fb923c;">N/A</td><td style="color:#fb923c;">D</td><td>Sparse coverage (24%)</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Workflow Diagram Improvements</h3>
+            <p>Updated PROJECT_OVERVIEW.html workflow diagram styling:</p>
+            <ul style="margin-left: 20px; margin-top: 10px; color: var(--text-muted);">
+                <li>Source boxes now use <code>flex: 1</code> and <code>justify-content: space-between</code></li>
+                <li>Processing steps (Steps 2-5) have matching wider layout</li>
+                <li>Better alignment between connecting arrows and boxes</li>
+            </ul>
+        </section>
+
+        <!-- Session 9 Section -->
+        <section>
+            <h2>📋 Session 9: Live Capacity Accuracy</h2>
+            <p>This session focused on <strong>integrating live capacity accuracy calculation</strong> into the Pipeline Diagnostic Report. The Source Health Matrix now includes a <strong>Capacity column</strong> that shows MAPE (Mean Absolute Percentage Error) for each source compared against Meta's canonical IT load data.</p>
+
+            <p style="margin-top: 15px;">Additionally, the <strong>PROJECT_OVERVIEW.html</strong> was enhanced with comprehensive capacity accuracy methodology documentation from the earlier analysis work.</p>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value gold">5</div>
+                    <div class="metric-label">Health Matrix Dimensions</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">~230</div>
+                    <div class="metric-label">Lines of New Code</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3</div>
+                    <div class="metric-label">Files Updated</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">v35.0</div>
+                    <div class="metric-label">AI Context Version</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>⚡ Live Capacity Accuracy Calculation</h2>
+
+            <div class="feature-card">
+                <h4>New Function: calculate_capacity_accuracy_stats()</h4>
+                <p>Calculates capacity accuracy metrics for each source at report generation time, enabling live tracking as input data refreshes.</p>
+                <ul>
+                    <li>Compares source capacity values against Meta Canonical IT Load (ground truth)</li>
+                    <li>Uses spatial matching to link source records to Meta buildings</li>
+                    <li>Optimal field selection per source (mw_2023 for Semi, commissioned_power_mw for DCH)</li>
+                    <li>Deduplicates to closest match per Meta building</li>
+                    <li>Calculates MAPE and bias percentage per source</li>
+                </ul>
+            </div>
+
+            <h3>Capacity Grade Thresholds</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Grade</th>
+                        <th>MAPE Range</th>
+                        <th>Interpretation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="color:#34d399;">A</td><td>&lt; 15%</td><td>Excellent — vendor closely aligned with Meta</td></tr>
+                    <tr><td style="color:#60a5fa;">B</td><td>15-25%</td><td>Good — minor differences, likely timing variance</td></tr>
+                    <tr><td style="color:#fbbf24;">C</td><td>25-40%</td><td>Moderate — may indicate definition differences</td></tr>
+                    <tr><td style="color:#fb923c;">D</td><td>40-60%</td><td>Poor — significant accuracy concerns</td></tr>
+                    <tr><td style="color:#f87171;">F</td><td>&gt; 60%</td><td>Unreliable — likely comparing different metrics</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Integration Points</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>collect_report_data()</strong><br>
+                        <span class="task-desc">Calls calculate_capacity_accuracy_stats() and stores results in data["capacity_accuracy"]</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>generate_recommendations_section()</strong><br>
+                        <span class="task-desc">Updated to accept capacity_accuracy_data parameter and render Capacity column</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Recommendation logic</strong><br>
+                        <span class="task-desc">Capacity grades now factor into composite assessment and specific action items</span>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>📊 Source Health Matrix Enhanced</h2>
+
+            <p>The Source Health Matrix in the Recommendations section now shows <strong>5 assessment dimensions</strong>:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Measures</th>
+                        <th>New?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Overall</td><td>Composite weighted score (volume, core, capacity, location, spatial, richness)</td><td></td></tr>
+                    <tr><td>Spatial</td><td>Location accuracy (recall % + median distance vs Meta)</td><td></td></tr>
+                    <tr><td style="color:var(--accent-gold);"><strong>Capacity</strong></td><td style="color:var(--accent-gold);"><strong>MW estimation accuracy (MAPE vs Meta IT load)</strong></td><td style="color:var(--accent-gold);"><strong>✓ NEW</strong></td></tr>
+                    <tr><td>Freshness</td><td>Data currency (days since update)</td><td></td></tr>
+                    <tr><td>Recommendation</td><td>Action guidance (Continue, Monitor, Needs Attention, Evaluate ROI)</td><td></td></tr>
+                </tbody>
+            </table>
+
+            <h3>Updated Recommendation Logic</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Capacity grade included in composite assessment</strong><br>
+                        <span class="task-desc">Poor capacity accuracy (D or F) now counts toward "poor grades" threshold</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Specific action item generation</strong><br>
+                        <span class="task-desc">"Address capacity accuracy issues" when Capacity grade is D or F</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Meta Canonical special handling</strong><br>
+                        <span class="task-desc">Shows "Ground Truth" instead of grade (since it IS the reference)</span>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>📖 PROJECT_OVERVIEW.html Enhanced</h2>
+
+            <h3>Capacity Accuracy Section Expanded</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Executive Summary table</strong><br>
+                        <span class="task-desc">All sources with MAPE values, sample sizes, best fields, and letter grades</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Methodology section</strong><br>
+                        <span class="task-desc">Explains apples-to-apples approach: granularity matching, definition alignment, deduplication</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>PUE Adjustment Analysis table</strong><br>
+                        <span class="task-desc">Documents testing that confirmed DCH reports IT capacity (no adjustment needed)</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Variance by Build Status table</strong><br>
+                        <span class="task-desc">Complete Builds (11-18% MAPE) vs Active Builds (~55-60% MAPE)</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Outlier Analysis table</strong><br>
+                        <span class="task-desc">4 buildings that skew MAPE; excluding them drops Semi MAPE to 3.7%</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Capacity Data Coverage table</strong><br>
+                        <span class="task-desc">Coverage % and primary field for each source</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Recommended Configuration code block</strong><br>
+                        <span class="task-desc">Python dict showing optimal field/PUE settings per source</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Scripts & Documentation reference table</strong><br>
+                        <span class="task-desc">Links to capacity_accuracy_analysis_v2.py, variance experiments, audit scripts</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>Navigation Sidebar Updated</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Added section headers</strong><br>
+                        <span class="task-desc">Overview, Data Pipeline, Accuracy Analysis, Documentation groupings</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Matching pipeline report pattern</strong><br>
+                        <span class="task-desc">Muted gray text, uppercase, letter spacing for section headers</span>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>📁 Files Modified</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Changes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>generate_pipeline_report.py</code></td>
+                        <td>Added calculate_capacity_accuracy_stats(), updated generate_recommendations_section(), added Capacity column to Source Health Matrix</td>
+                    </tr>
+                    <tr>
+                        <td><code>PROJECT_OVERVIEW.html</code></td>
+                        <td>Expanded Capacity Accuracy section with methodology, tables, code blocks; added nav section headers</td>
+                    </tr>
+                    <tr>
+                        <td><code>AI_CONTEXT_PROMPT.md</code></td>
+                        <td>Updated to v35.0 with Session 9 progress</td>
+                    </tr>
+                    <tr>
+                        <td><code>PROGRESS_UPDATE_JAN06.html</code></td>
+                        <td>Created (this file)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>📊 Current State</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Records</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>gold_buildings_full</td>
+                        <td>22,696</td>
+                        <td>✅ Validated</td>
+                    </tr>
+                    <tr>
+                        <td>gold_campus_full</td>
+                        <td>11,715</td>
+                        <td>✅ Validated</td>
+                    </tr>
+                    <tr>
+                        <td>gold_combined_xb</td>
+                        <td>34,411</td>
+                        <td>✅ Validated</td>
+                    </tr>
+                    <tr>
+                        <td>meta_canonical_buildings</td>
+                        <td>318</td>
+                        <td>✅ Ground Truth</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <h4>Capacity Accuracy Summary (from prior analysis)</h4>
+                <table style="margin: 10px 0 0 0;">
+                    <thead>
+                        <tr><th>Source</th><th>MAPE</th><th>Sample</th><th>Best Field</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Semianalysis</td><td style="color:#34d399;"><strong>11.9%</strong> 🏆</td><td>92</td><td>mw_2023</td></tr>
+                        <tr><td>DataCenterHawk</td><td style="color:#60a5fa;">17.6%</td><td>115</td><td>commissioned_power_mw</td></tr>
+                        <tr><td>Others</td><td style="color:#8b949e;">Insufficient data</td><td>&lt;10</td><td>—</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2>🔜 Next Steps</h2>
+
+            <div class="next-steps">
+                <h4>Potential Enhancements</h4>
+                <ol>
+                    <li><strong>Add capacity accuracy to weighted source scoring formula</strong> — Currently used for display only; could factor into final_score</li>
+                    <li><strong>Create standalone Capacity Accuracy section</strong> in Pipeline Diagnostic Report with detailed per-source breakdown</li>
+                    <li><strong>Add trend tracking</strong> — Compare capacity accuracy across pipeline runs over time</li>
+                    <li><strong>Investigate outliers</strong> — The 4 buildings skewing MAPE deserve deeper analysis</li>
+                </ol>
+            </div>
+
+            <div class="next-steps" style="border-color: rgba(88,166,255,0.3); margin-top: 15px;">
+                <h4>Regenerate Reports</h4>
+                <ol>
+                    <li>Run <code>generate_pipeline_report.py</code> to see the new Capacity column in Source Health Matrix</li>
+                    <li>Review <code>PROJECT_OVERVIEW.html</code> with the enhanced Capacity Accuracy section</li>
+                </ol>
+            </div>
+        </section>
+
+        <footer>
+            <p><strong>Data Center Consensus GIS Model</strong></p>
+            <p>Sessions 9-11 — January 6-7, 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Update - January 30, 2026</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #34a853;
+            --warning: #fbbc04;
+            --danger: #ea4335;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), #4285f4);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-complete {
+            background: var(--success);
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 1.2em;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .metric-value.success { color: var(--success); }
+        .metric-value.warning { color: var(--warning); }
+        .metric-value.danger { color: var(--danger); }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .highlight {
+            background: #e8f0fe;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            margin: 16px 0;
+        }
+
+        .highlight h4 {
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+
+        .interpretation {
+            background: linear-gradient(135deg, #fff8e1, #ffecb3);
+            border-left: 4px solid #ffc107;
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+        }
+
+        .interpretation h4 {
+            color: #ff8f00;
+            margin-bottom: 8px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .tag-new { background: #e8f5e9; color: #2e7d32; }
+        .tag-updated { background: #e3f2fd; color: #1565c0; }
+        .tag-fixed { background: #fff3e0; color: #ef6c00; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Progress Update - January 30, 2026</h1>
+            <p>Session 28: SA vs DCH V2 Comparison + Net New Sites Analysis</p>
+            <span class="status-badge status-complete">✅ COMPLETE</span>
+        </header>
+
+        <!-- Key Metrics -->
+        <div class="grid">
+            <div class="card">
+                <h2>📈 SA vs DCH Comparison Results</h2>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <div class="metric-value">85.8%</div>
+                        <div class="metric-label">Match Rate</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value warning">29.1%</div>
+                        <div class="metric-label">MAPE (Grade C)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value danger">+35.2%</div>
+                        <div class="metric-label">Bias (SA Higher)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0.64</div>
+                        <div class="metric-label">Pearson r</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🚧 Net New Sites Analysis</h2>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <div class="metric-value">2,437</div>
+                        <div class="metric-label">SA Net New Sites</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">2,905</div>
+                        <div class="metric-label">DCH Net New Sites</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value success">22.2%</div>
+                        <div class="metric-label">Net New MAPE</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">1,424</div>
+                        <div class="metric-label">Matched Both</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Findings -->
+        <div class="card">
+            <h2>💡 Key Findings</h2>
+
+            <div class="interpretation">
+                <h4>What the Results Mean</h4>
+                <ul>
+                    <li><strong>MAPE 29.1% (Grade C)</strong> indicates moderate agreement between SA and DCH capacity values - some facilities differ significantly</li>
+                    <li><strong>Bias +35.2%</strong> means SemiAnalysis consistently reports higher capacity - this may reflect different methodologies or data vintages</li>
+                    <li><strong>CV 391.9%</strong> suggests disagreements are extremely variable - sources may use fundamentally different measurement approaches</li>
+                    <li><strong>Net New MAPE 22.2%</strong> - Sources agree better on future/announced projects than operational facilities</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <h4>Coverage Rates (Net New Sites)</h4>
+                <ul>
+                    <li><strong>81.6%</strong> of SA's net new sites appear in DCH - high coverage</li>
+                    <li><strong>54.7%</strong> of DCH's net new sites appear in SA - DCH has broader reach for smaller projects</li>
+                    <li><strong>SA-only net new:</strong> 449 sites (134,380 MW) - potential early detection advantage</li>
+                    <li><strong>DCH-only net new:</strong> 1,317 sites (121,465 MW) - broader colo/regional coverage</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Work Completed -->
+        <div class="card">
+            <h2>✅ Work Completed Today</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Type</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>compare_sa_vs_dch_v2.py</code></td>
+                        <td><span class="tag tag-updated">Enhanced</span></td>
+                        <td>Added Net New Sites Analysis, tooltips, interpretation boxes</td>
+                    </tr>
+                    <tr>
+                        <td><code>analyze_net_new_sites()</code></td>
+                        <td><span class="tag tag-new">New Function</span></td>
+                        <td>Analyzes Under Construction/Announced facilities with coverage rates</td>
+                    </tr>
+                    <tr>
+                        <td>HTML Report Tooltips</td>
+                        <td><span class="tag tag-new">New Feature</span></td>
+                        <td>Hover tooltips on all metric boxes explaining each statistic</td>
+                    </tr>
+                    <tr>
+                        <td>Interpretation Box</td>
+                        <td><span class="tag tag-new">New Feature</span></td>
+                        <td>Natural language explanations based on actual metric values</td>
+                    </tr>
+                    <tr>
+                        <td>"Planned" Status Note</td>
+                        <td><span class="tag tag-fixed">Clarification</span></td>
+                        <td>Added note explaining neither source uses "Planned" status</td>
+                    </tr>
+                    <tr>
+                        <td><code>SA_VS_DCH_COMPARISON_WORKFLOW.md</code></td>
+                        <td><span class="tag tag-updated">Updated</span></td>
+                        <td>Added Net New Sites Analysis documentation section</td>
+                    </tr>
+                    <tr>
+                        <td><code>PROJECT_OVERVIEW.html</code></td>
+                        <td><span class="tag tag-updated">Updated</span></td>
+                        <td>Added Jan 29-30 timeline entries for DCH refresh and V2 comparison</td>
+                    </tr>
+                    <tr>
+                        <td><code>AI_CONTEXT_PROMPT.md</code></td>
+                        <td><span class="tag tag-updated">Updated</span></td>
+                        <td>Version 51.0 with Session 28 details</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Net New Breakdown -->
+        <div class="card">
+            <h2>📋 Net New Sites Breakdown by Status</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>SA Total</th>
+                        <th>DCH Total</th>
+                        <th>SA Only</th>
+                        <th>DCH Only</th>
+                        <th>Matched</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Under Construction</strong></td>
+                        <td>~800</td>
+                        <td>~900</td>
+                        <td>~150</td>
+                        <td>~400</td>
+                        <td>~650</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Announced</strong></td>
+                        <td>~1,637</td>
+                        <td>~2,005</td>
+                        <td>~299</td>
+                        <td>~917</td>
+                        <td>~774</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Planned</strong></td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 12px; color: var(--text-secondary); font-size: 0.9em;">
+                <em>Note: "Planned" shows zeros because neither source uses this status - all future projects are classified as "Announced" or "Under Construction".</em>
+            </p>
+        </div>
+
+        <!-- Output Files -->
+        <div class="card">
+            <h2>📁 Output Files Generated</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Location</th>
+                        <th>Records</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>SA_vs_DCH_Comparison_V2_20260130_164200.html</code></td>
+                        <td>reports/accuracy_reports/</td>
+                        <td>Full HTML report with tooltips</td>
+                    </tr>
+                    <tr>
+                        <td><code>SA_DCH_Matched_Pairs_20260130_164200.csv</code></td>
+                        <td>reports/accuracy_reports/</td>
+                        <td>4,951 matched pairs</td>
+                    </tr>
+                    <tr>
+                        <td><code>SA_Only_Records_20260130_164200.csv</code></td>
+                        <td>reports/accuracy_reports/</td>
+                        <td>821 SA-exclusive records</td>
+                    </tr>
+                    <tr>
+                        <td><code>DCH_Only_Records_20260130_164200.csv</code></td>
+                        <td>reports/accuracy_reports/</td>
+                        <td>2,101 DCH-exclusive records</td>
+                    </tr>
+                    <tr>
+                        <td><code>SA_vs_DCH_Comparison_20260130_164200.xlsx</code></td>
+                        <td>reports/accuracy_reports/</td>
+                        <td>Combined Excel workbook</td>
+                    </tr>
+                    <tr>
+                        <td><code>sa_dch_conflicts_20260130_164200</code></td>
+                        <td>Default.gdb</td>
+                        <td>3,844 conflict records</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Quick Commands -->
+        <div class="card">
+            <h2>🔧 Quick Commands</h2>
+            <div class="highlight">
+                <h4>Run V2 Comparison (with Net New Analysis)</h4>
+                <pre><code>exec(open(r"C:\Users\ptanderson\Documents\ArcGIS\Projects\Lean Consensus DC Model\scripts\05_accuracy\compare_sa_vs_dch_v2.py", encoding='utf-8').read())
+run_comparison()</code></pre>
+            </div>
+        </div>
+
+        <footer>
+            <p>Generated: January 30, 2026 | Session 28 | Data Center Consensus GIS Model</p>
+        </footer>
+    </div>
+</body>
+</html>

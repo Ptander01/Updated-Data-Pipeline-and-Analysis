@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Update — January 7, 2026</title>
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-muted: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #a371f7;
+            --accent-cyan: #39c5cf;
+            --accent-gold: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(163,113,247,0.15), rgba(88,166,255,0.1));
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .date { color: var(--text-muted); font-size: 1.1rem; }
+        .session-badge {
+            display: inline-block;
+            background: var(--accent-purple);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h3 {
+            font-size: 1.1rem;
+            margin: 25px 0 15px 0;
+            color: var(--text-primary);
+        }
+
+        .task-list { list-style: none; }
+        .task-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .task-list li:last-child { border-bottom: none; }
+        .task-check {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .task-check::after {
+            content: '✓';
+            color: #000;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .task-content strong { color: var(--accent-cyan); }
+        .task-desc { color: var(--text-muted); font-size: 0.9rem; }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 15px 0;
+            color: var(--accent-cyan);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        td { color: var(--text-primary); }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(163,113,247,0.1), rgba(88,166,255,0.1));
+            border: 1px solid rgba(163,113,247,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .highlight-box h4 {
+            color: var(--accent-purple);
+            margin-bottom: 10px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        .metric-value.gold { color: var(--accent-gold); }
+        .metric-value.green { color: var(--accent-green); }
+        .metric-value.purple { color: var(--accent-purple); }
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .next-steps {
+            background: linear-gradient(135deg, rgba(163,113,247,0.1), rgba(88,166,255,0.1));
+            border: 1px solid rgba(163,113,247,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .next-steps h4 {
+            color: var(--accent-purple);
+            margin-bottom: 15px;
+        }
+        .next-steps ol {
+            margin-left: 20px;
+            color: var(--text-primary);
+        }
+        .next-steps li {
+            margin: 8px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(163,113,247,0.08), rgba(0,0,0,0.2));
+            border: 1px solid rgba(163,113,247,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .feature-card h4 {
+            color: var(--accent-purple);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .feature-card p {
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .feature-card ul {
+            margin-left: 20px;
+            color: var(--text-primary);
+        }
+        .feature-card li {
+            margin: 5px 0;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        .tier-hyperscaler { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .tier-colo { background: rgba(88,166,255,0.2); color: #58a6ff; }
+        .tier-other { background: rgba(139,148,158,0.2); color: #8b949e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Progress Update</h1>
+            <div class="date">January 7-8, 2026</div>
+            <div class="session-badge">Sessions 12-14 Complete — Weighted Consensus + Essential DC Integration</div>
+        </header>
+
+        <!-- Session 14 Section -->
+        <section style="border-left: 4px solid var(--accent-cyan);">
+            <h2>⭐ Session 14: Essential DC List Integration</h2>
+            <p>This session integrated a curated <strong>Essential Data Center</strong> list (39 strategic campus-level sites / 129 buildings from Semianalysis) into the pipeline for weighted consensus scoring and strategic tracking.</p>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value gold">129</div>
+                    <div class="metric-label">Essential IDs Provided</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value green">127</div>
+                    <div class="metric-label">Buildings Matched</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value purple">73</div>
+                    <div class="metric-label">Campuses Marked</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">39</div>
+                    <div class="metric-label">Original SA Sites</div>
+                </div>
+            </div>
+
+            <h3>1. Matching Strategy Evolution</h3>
+            <p>Multiple approaches were explored to ensure precise matching of Essential sites:</p>
+
+            <table>
+                <thead>
+                    <tr><th>Approach</th><th>Method</th><th>Result</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>❌ Spatial Join</td>
+                        <td>5km radius matching</td>
+                        <td>Risk of matching wrong campus in same city</td>
+                    </tr>
+                    <tr>
+                        <td>❌ Company + City</td>
+                        <td>Attribute match on company slug</td>
+                        <td>Too many false positives (e.g., all AWS Atlanta)</td>
+                    </tr>
+                    <tr>
+                        <td>❌ Cluster ID</td>
+                        <td>Match on SA cluster format</td>
+                        <td>Format mismatch: AWS_Atlanta_1 vs aws|atlanta|1</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#3fb950;">✅ SA Unique_ID (UUID)</td>
+                        <td>Exact match on source_unique_id</td>
+                        <td><strong>127/129 matched (98.4%)</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="feature-card">
+                <h4>Why UUID Matching?</h4>
+                <p>The user provided exact SA Unique_IDs from a GSheet containing all 129 building-level records. This ensures:</p>
+                <ul>
+                    <li><strong>No false positives:</strong> Exact UUID match, not heuristic</li>
+                    <li><strong>Building-level precision:</strong> Matches individual buildings, not just campuses</li>
+                    <li><strong>Pipeline rollup:</strong> Essential flag automatically aggregates to campus level</li>
+                </ul>
+            </div>
+
+            <h3>2. Pipeline Integration</h3>
+            <p>The <code>is_essential</code> flag is set at building level and automatically rolls up through the pipeline:</p>
+
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>integrate_essential_by_uid.py Created</strong><br>
+                        <span class="task-desc">Matches 129 SA Unique_IDs to gold_buildings_full, sets is_essential=1</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>campus_rollup_new.py Updated</strong><br>
+                        <span class="task-desc">Added is_essential aggregation: MAX = if ANY building is essential, campus is essential</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>create_xb_combined_layer.py Updated</strong><br>
+                        <span class="task-desc">Added is_essential to UNIFIED_SCHEMA for buildings and campuses</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>3. UCID Rollup Behavior</h3>
+            <div class="highlight-box">
+                <h4>127 Buildings → 73 Campuses</h4>
+                <p>Essential buildings roll up to fewer campuses because UCID grouping is source-agnostic. Multiple buildings at the same physical location (potentially from different sources) share the same UCID and aggregate to a single campus record.</p>
+            </div>
+
+            <h3>4. Verification Results</h3>
+            <div class="code-block">Essential in XB: {'Building': 127, 'Campus': 73}</div>
+        </section>
+
+        <!-- Session 13 Section -->
+        <section style="border-left: 4px solid #34d399;">
+            <h2>🔧 Session 13: Campus Aggregation & Accuracy Scoring Fixes</h2>
+            <p>This session focused on <strong>fixing campus data_vintage aggregation</strong> from buildings (MAX = most recent) and <strong>excluding Meta Canonical from accuracy scoring</strong> (circular logic fix).</p>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value green">100%</div>
+                    <div class="metric-label">data_vintage in Buildings</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value green">MAX</div>
+                    <div class="metric-label">Aggregation Method</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">v38.0</div>
+                    <div class="metric-label">AI Context Version</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">4</div>
+                    <div class="metric-label">External Sources Scored</div>
+                </div>
+            </div>
+
+            <h3>1. Campus data_vintage Aggregation</h3>
+            <p>Updated <code>campus_rollup_new.py</code> to aggregate <code>data_vintage</code> from building records:</p>
+
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Aggregation Method: MAX (most recent)</strong><br>
+                        <span class="task-desc">Campus-level freshness now reflects the most recent source data from child buildings</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Added to dissolve statistics</strong><br>
+                        <span class="task-desc">stats_fields.append(['data_vintage', 'MAX'])</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Added to insert field mapping</strong><br>
+                        <span class="task-desc">Campus records now receive the aggregated vintage value</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>2. Meta Canonical Excluded from Accuracy Scoring</h3>
+            <p>Fixed circular logic in diagnostic report where Meta Canonical appeared in accuracy rankings scored against itself:</p>
+
+            <div class="feature-card">
+                <h4>Problem: Ground Truth Scoring Itself</h4>
+                <p>Meta Canonical was showing up in spatial accuracy rankings, but it's the <strong>reference dataset</strong> — you can't evaluate ground truth against itself.</p>
+                <ul>
+                    <li>Created <code>SOURCES_FOR_ACCURACY_SCORING</code> constant (DCH, DCM, SA, NPM only)</li>
+                    <li>Updated spatial accuracy calculation loop</li>
+                    <li>Updated threshold performance table display</li>
+                    <li>Updated source detail cards display</li>
+                </ul>
+            </div>
+
+            <h3>3. Campus Field Population Analysis</h3>
+            <p>Created diagnostic script to analyze which campus fields are actually populated vs. schema placeholders:</p>
+
+            <table>
+                <thead>
+                    <tr><th>Field</th><th>Building Population</th><th>Campus Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>data_vintage</code></td><td style="color:#34d399;">100% ✓</td><td style="color:#34d399;"><strong>Now aggregated (MAX)</strong></td></tr>
+                    <tr><td><code>notes</code></td><td>66.2%</td><td>Skipped (available in buildings)</td></tr>
+                    <tr><td><code>energy_source</code>, <code>ai_gpu_indicator</code></td><td style="color:#f87171;">0%</td><td>Schema placeholder</td></tr>
+                    <tr><td><code>developer</code>, <code>tenant</code>, <code>end_user</code></td><td style="color:#f87171;">0%</td><td>Schema placeholder</td></tr>
+                    <tr><td><code>construction_*</code>, <code>lease_*</code> dates</td><td style="color:#f87171;">0%</td><td>Schema placeholder</td></tr>
+                    <tr><td><code>*_list</code> fields</td><td>Not in buildings</td><td>Campus-only placeholder</td></tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <h4>Key Decision</h4>
+                <p>Many campus fields are <strong>schema placeholders for future enhancement</strong>. The only actionable gap was <code>data_vintage</code>, which is now fixed. Other 0% fields will be populated when vendors provide that data.</p>
+            </div>
+        </section>
+
+        <!-- Session 12 Section -->
+        <section style="border-left: 4px solid var(--accent-gold);">
+            <h2>📊 Session 12: Weighted Consensus Scoring</h2>
+            <p>This session enhanced the <strong>Consensus Strength calculation</strong> to weight multi-source coverage by company tier, added category dividers to the report, removed emojis from navigation/headers, and cleaned up documentation.</p>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value gold">60%</div>
+                    <div class="metric-label">Hyperscaler Weight</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color:#58a6ff;">30%</div>
+                    <div class="metric-label">Major Colo Weight</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color:#8b949e;">10%</div>
+                    <div class="metric-label">Other Weight</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3</div>
+                    <div class="metric-label">Company Tiers</div>
+                </div>
+            </div>
+
+            <h3>Weighted Consensus Scoring by Business Value</h3>
+            <p>Not all multi-source coverage is equally valuable. Hyperscaler sites matter more for Meta's strategic planning:</p>
+
+            <table>
+                <thead>
+                    <tr><th>Tier</th><th>Companies</th><th>Weight</th><th>Rationale</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tier-badge tier-hyperscaler">🚀 Hyperscaler</span></td>
+                        <td>AWS, Microsoft, Google, Meta, Apple, Oracle, xAI, Alibaba</td>
+                        <td style="color:#f59e0b;"><strong>60%</strong></td>
+                        <td>What leadership cares about most</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-colo">🏢 Major Colo</span></td>
+                        <td>Equinix, Digital Realty, CyrusOne, QTS, CoreSite, Vantage...</td>
+                        <td style="color:#58a6ff;"><strong>30%</strong></td>
+                        <td>Strategic context</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-other">📍 Other</span></td>
+                        <td>Small operators, unknown companies</td>
+                        <td style="color:#8b949e;"><strong>10%</strong></td>
+                        <td>Geographic coverage</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="feature-card">
+                <h4>New Scoring Formula</h4>
+                <div class="code-block">Weighted Score = Σ (tier_multi_source_% × source_density_factor × tier_weight)</div>
+                <p><strong>Impact:</strong> A dataset with 45% hyperscaler multi-source coverage but only 8% overall now grades as <strong>C</strong> instead of <strong>F</strong>.</p>
+            </div>
+
+            <h3>Report UI Improvements</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Category Dividers Added</strong><br>
+                        <span class="task-desc">Gradient line dividers between INPUT SOURCE QUALITY, OUTPUT DATASET QUALITY, and SYNTHESIS sections</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Emojis Removed from Navigation/Headers</strong><br>
+                        <span class="task-desc">Professional appearance — emojis remain in tables and content but removed from nav pane and section titles</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Temporal Freshness Scoped to Buildings</strong><br>
+                        <span class="task-desc">Now measures source-level freshness (n=~22k buildings) instead of combined layer (n=~34k)</span>
+                    </div>
+                </li>
+            </ul>
+
+            <h3>Documentation Cleanup</h3>
+            <ul class="task-list">
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>PIPELINE_EXECUTION_ORDER.md Rewritten</strong><br>
+                        <span class="task-desc">Removed session progress logs, kept only execution-focused content (pipeline order, commands, key points)</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-check"></div>
+                    <div class="task-content">
+                        <strong>Future Enhancements Section Added</strong><br>
+                        <span class="task-desc">Documented multi-layer temporal tracking concept (record vintage, dataset delivery, ingestion date) for later implementation</span>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Files Modified Section -->
+        <section>
+            <h2>📁 Files Modified</h2>
+
+            <table>
+                <thead>
+                    <tr><th>File</th><th>Changes</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>campus_rollup_new.py</code></td>
+                        <td>Added data_vintage aggregation (MAX from buildings)</td>
+                    </tr>
+                    <tr>
+                        <td><code>generate_pipeline_report.py</code></td>
+                        <td>Excluded Meta Canonical from accuracy scoring, added weighted consensus, category dividers, removed emojis</td>
+                    </tr>
+                    <tr>
+                        <td><code>authority_config.py</code></td>
+                        <td>Added MAJOR_COLO_COMPANIES list, COMPANY_TIER_WEIGHTS, get_company_tier() function</td>
+                    </tr>
+                    <tr>
+                        <td><code>neomorphism_dark_theme.css</code></td>
+                        <td>Added category divider styles</td>
+                    </tr>
+                    <tr>
+                        <td><code>PIPELINE_EXECUTION_ORDER.md</code></td>
+                        <td>Complete rewrite — execution-focused only</td>
+                    </tr>
+                    <tr>
+                        <td><code>PIPELINE_DOCUMENTATION.md</code></td>
+                        <td>Added Session 12-13 updates, Future Enhancements section</td>
+                    </tr>
+                    <tr>
+                        <td><code>AI_CONTEXT_PROMPT.md</code></td>
+                        <td>Updated to v38.0</td>
+                    </tr>
+                    <tr>
+                        <td><code>SESSION_LOG.md</code></td>
+                        <td>Added Session 12-13 entries</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Files Created</h3>
+            <table>
+                <thead>
+                    <tr><th>File</th><th>Purpose</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>_utils/check_building_fields.py</code></td>
+                        <td>Diagnostic script to analyze field population in buildings vs campus</td>
+                    </tr>
+                    <tr>
+                        <td><code>PROGRESS_UPDATE_JAN07.html</code></td>
+                        <td>This progress update file</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Current State Section -->
+        <section>
+            <h2>📊 Current State</h2>
+
+            <table>
+                <thead>
+                    <tr><th>Layer</th><th>Records</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>gold_buildings_full</td>
+                        <td>22,696</td>
+                        <td>✅ Validated</td>
+                    </tr>
+                    <tr>
+                        <td>gold_campus_full</td>
+                        <td>11,715</td>
+                        <td>✅ Validated + data_vintage fixed</td>
+                    </tr>
+                    <tr>
+                        <td>gold_combined_xb</td>
+                        <td>34,411</td>
+                        <td>✅ Validated</td>
+                    </tr>
+                    <tr>
+                        <td>meta_canonical_buildings</td>
+                        <td>318</td>
+                        <td>✅ Ground Truth (excluded from scoring)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <h4>Key Decisions Made This Session</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>data_vintage aggregation:</strong> Use MAX (most recent) for campus level</li>
+                    <li><strong>Temporal freshness scope:</strong> Keep buildings-only for diagnostic scoring</li>
+                    <li><strong>Campus notes:</strong> Skip aggregation — available in buildings for downstream use</li>
+                    <li><strong>Meta Canonical:</strong> Exclude from accuracy rankings (it's the reference, not a source)</li>
+                    <li><strong>Schema placeholders:</strong> Leave 0% fields as-is for future enhancement</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Next Steps Section -->
+        <section>
+            <h2>🔜 Next Steps</h2>
+
+            <div class="highlight-box" style="border-color: rgba(63,185,80,0.3); margin-bottom: 20px;">
+                <h4 style="color: var(--accent-green);">✅ Completed This Session</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Essential DC List Integration</strong> — 127/129 buildings matched via SA Unique_ID</li>
+                    <li><strong>Pipeline Rollup Enhanced</strong> — is_essential automatically aggregates to campus level</li>
+                    <li><strong>XB Schema Updated</strong> — is_essential field available for buildings and campuses</li>
+                </ul>
+            </div>
+
+            <div class="next-steps">
+                <h4>Ready for Implementation</h4>
+                <ol>
+                    <li><strong>Run Diagnostic Report</strong> — Verify weighted consensus scoring with Essential DC sites highlighted</li>
+                    <li><strong>Design Consensus Dedupe Logic</strong> — Algorithm to create single "best" record per UCID using authority hierarchy</li>
+                    <li><strong>Implement Consensus Layer Generation</strong> — Use is_essential flag to boost Essential site confidence</li>
+                    <li><strong>Publish to Portal</strong> — Deploy consensus layer to ArcGIS Portal/Online</li>
+                </ol>
+            </div>
+
+            <div class="next-steps" style="border-color: rgba(57,197,207,0.3); margin-top: 15px;">
+                <h4>Essential DC Integration Commands</h4>
+                <div class="code-block"># Step 1: Flag Essential buildings (run after gold_buildings_full exists)
+exec(open(r"C:\Users\ptanderson\Documents\ArcGIS\Projects\Lean Consensus DC Model\scripts\02_processing\integrate_essential_by_uid.py", encoding='utf-8').read())
+
+# Step 2: Rollup to campus (aggregates is_essential via MAX)
+exec(open(r"C:\Users\ptanderson\Documents\ArcGIS\Projects\Lean Consensus DC Model\scripts\02_processing\campus_rollup_new.py", encoding='utf-8').read())
+
+# Step 3: Create combined XB layer (includes is_essential)
+exec(open(r"C:\Users\ptanderson\Documents\ArcGIS\Projects\Lean Consensus DC Model\scripts\06_visualization\create_xb_combined_layer.py", encoding='utf-8').read())</div>
+            </div>
+
+            <div class="next-steps" style="border-color: rgba(245,158,11,0.3); margin-top: 15px;">
+                <h4>Regenerate Reports</h4>
+                <div class="code-block">exec(open(r"C:\Users\ptanderson\Documents\ArcGIS\Projects\Lean Consensus DC Model\scripts\04_validation\reports\generate_pipeline_report.py", encoding='utf-8').read())</div>
+            </div>
+        </section>
+
+        <footer>
+            <p><strong>Data Center Consensus GIS Model</strong></p>
+            <p>Sessions 12-14 — January 7-8, 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

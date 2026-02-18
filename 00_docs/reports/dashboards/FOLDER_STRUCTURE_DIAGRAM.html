@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📁 Scripts Folder Structure — Data Center Consensus GIS Model</title>
+    <style>
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --accent-blue: #0f3460;
+            --accent-purple: #533483;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --folder-color: #ffd700;
+            --python-color: #4ec9b0;
+            --md-color: #9cdcfe;
+            --html-color: #ce9178;
+            --css-color: #c586c0;
+            --csv-color: #6a9955;
+            --gdrive-color: #4285f4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0f0f23 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border-radius: 8px;
+        }
+
+        .legend-icon {
+            font-size: 1.2em;
+        }
+
+        .tree-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .tree-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tree-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent-purple);
+        }
+
+        .card-header h2 {
+            font-size: 1.3em;
+            color: var(--folder-color);
+        }
+
+        .card-header .badge {
+            background: var(--accent-purple);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .tree {
+            font-size: 0.95em;
+            line-height: 1.8;
+        }
+
+        .tree-line {
+            display: flex;
+            align-items: center;
+            padding: 2px 0;
+        }
+
+        .tree-line:hover {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+
+        .indent {
+            color: #444;
+            white-space: pre;
+        }
+
+        .folder {
+            color: var(--folder-color);
+        }
+
+        .python {
+            color: var(--python-color);
+        }
+
+        .markdown {
+            color: var(--md-color);
+        }
+
+        .html {
+            color: var(--html-color);
+        }
+
+        .css {
+            color: var(--css-color);
+        }
+
+        .csv {
+            color: var(--csv-color);
+        }
+
+        .desc {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+
+        .pipeline-step {
+            background: linear-gradient(90deg, rgba(83,52,131,0.3) 0%, transparent 100%);
+            border-left: 3px solid var(--accent-purple);
+            padding-left: 8px;
+            margin-left: -11px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: var(--accent-blue);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--folder-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📁 Scripts Folder Structure</h1>
+            <p class="subtitle">Data Center Consensus GIS Model — Reorganized January 5, 2026</p>
+        </header>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-icon">📁</span>
+                <span class="folder">Local Folder</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon">☁️</span>
+                <span style="color: var(--gdrive-color);">Google Drive</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon">🐍</span>
+                <span class="python">Python Script</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon">📄</span>
+                <span class="markdown">Markdown</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon">🌐</span>
+                <span class="html">HTML Report</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon">⭐</span>
+                <span style="color: #fff;">Pipeline Step</span>
+            </div>
+        </div>
+
+        <!-- ========== GOOGLE DRIVE SECTION ========== -->
+        <h2 style="text-align: center; margin: 40px 0 20px 0; color: var(--gdrive-color);">☁️ Google Drive — Team Access (Auto-Syncs)</h2>
+
+        <div style="background: linear-gradient(135deg, rgba(66,133,244,0.1) 0%, rgba(66,133,244,0.05) 100%); border: 1px solid rgba(66,133,244,0.3); border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: center;">
+            <p style="color: var(--text-secondary); margin-bottom: 15px;"><strong>Workflow:</strong></p>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <span style="background: var(--bg-card); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--accent-purple);">Edit locally in scripts/</span>
+                <span style="color: var(--gdrive-color); font-size: 1.5em;">→</span>
+                <span style="background: var(--bg-card); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--gdrive-color);">Copy to G:\My Drive\...</span>
+                <span style="color: var(--gdrive-color); font-size: 1.5em;">→</span>
+                <span style="background: var(--bg-card); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--gdrive-color);">Auto-syncs to cloud</span>
+                <span style="color: var(--gdrive-color); font-size: 1.5em;">→</span>
+                <span style="background: var(--bg-card); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--gdrive-color);">Team views via link</span>
+            </div>
+        </div>
+
+        <div class="tree-card full-width" style="border-color: rgba(66,133,244,0.3); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(66,133,244,0.05) 100%);">
+            <div class="card-header" style="border-bottom-color: var(--gdrive-color);">
+                <h2 style="color: var(--gdrive-color);">☁️ G:\My Drive\Consensus GIS Model Cleaned Inputs\Admin Documentation\</h2>
+                <span class="badge" style="background: var(--gdrive-color);">Google Drive</span>
+            </div>
+            <div class="tree">
+                <div class="tree-line"><span class="indent">├── </span><span style="color: var(--gdrive-color);">📁 _archive/</span><span class="desc">Dated backups of old script versions</span></div>
+                <div class="tree-line"><span class="indent">│   └── </span><span style="color: var(--gdrive-color);">📁 2026-01-05/PTA_Python_Scripts_12_15_25/</span></div>
+                <div class="tree-line"><span class="indent">├── </span><span style="color: var(--gdrive-color);">📁 context/</span><span class="desc">AI prompts, project context</span></div>
+                <div class="tree-line"><span class="indent">│   └── </span><span class="markdown">📄 AI_CONTEXT_PROMPT.md</span></div>
+                <div class="tree-line"><span class="indent">├── </span><span style="color: var(--gdrive-color);">📁 dashboards/</span><span class="desc">Executive dashboards only</span></div>
+                <div class="tree-line"><span class="indent">│   └── </span><span class="html">🌐 PROJECT_OVERVIEW.html</span></div>
+                <div class="tree-line"><span class="indent">├── </span><span style="color: var(--gdrive-color);">📁 pipeline_diagnostics/</span><span class="desc">Auto-generated reports</span></div>
+                <div class="tree-line"><span class="indent">│   └── </span><span class="html">🌐 PIPELINE_DIAGNOSTIC_*.html</span><span style="background: var(--gdrive-color); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.75em; margin-left: 10px;">Auto-writes</span></div>
+                <div class="tree-line"><span class="indent">├── </span><span style="color: var(--gdrive-color);">📁 progress_updates/</span><span class="desc">Personal progress tracking</span></div>
+                <div class="tree-line"><span class="indent">│   ├── </span><span class="html">🌐 WEEKLY_STATUS_DASHBOARD.html</span></div>
+                <div class="tree-line"><span class="indent">│   └── </span><span class="html">🌐 PROGRESS_UPDATE_*.html</span><span class="desc">(3 files)</span></div>
+                <div class="tree-line"><span class="indent">├── </span><span style="color: var(--gdrive-color);">📁 schemas/</span><span class="desc">Schema documentation (8 files)</span></div>
+                <div class="tree-line"><span class="indent">├── </span><span style="color: var(--gdrive-color);">📁 visualizations/</span><span class="desc">Folder structure diagrams</span></div>
+                <div class="tree-line"><span class="indent">│   ├── </span><span class="html">🌐 FOLDER_STRUCTURE_DIAGRAM.html</span></div>
+                <div class="tree-line"><span class="indent">│   └── </span><span class="html">🌐 FOLDER_STRUCTURE_INTERACTIVE.html</span></div>
+                <div class="tree-line"><span class="indent">└── </span><span style="color: var(--gdrive-color);">📁 workflows/</span><span class="desc">Pipeline docs, SOPs (7 files)</span></div>
+                <div class="tree-line"><span class="indent">    ├── </span><span class="markdown">📄 PIPELINE_DOCUMENTATION.md</span></div>
+                <div class="tree-line"><span class="indent">    ├── </span><span class="markdown">📄 REPORT_OUTPUT_SOP.md</span></div>
+                <div class="tree-line"><span class="indent">    └── </span><span class="markdown">📄 ...</span><span class="desc">+5 more</span></div>
+            </div>
+        </div>
+
+        <!-- ========== LOCAL SCRIPTS SECTION ========== -->
+        <h2 style="text-align: center; margin: 40px 0 20px 0; color: var(--folder-color);">💻 Local Scripts Folder</h2>
+
+        <div class="tree-container">
+
+            <!-- 00_docs -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 00_docs/</h2>
+                    <span class="badge">Documentation</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 context/</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="markdown">📄 AI_CONTEXT_PROMPT.md</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="markdown">📄 SCRIPT_AUDIT_AND_REORG.md</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="markdown">📄 SCRIPT_REORGANIZATION_PLAN.md</span></div>
+                    <div class="tree-line"><span class="indent">│   └── </span><span class="markdown">📄 SESSION_LOG.md</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 reports/</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="folder">📁 dashboards/</span><span class="desc">(3 files)</span></div>
+                    <div class="tree-line"><span class="indent">│   │   ├── </span><span class="html">🌐 FOLDER_STRUCTURE_*.html</span></div>
+                    <div class="tree-line"><span class="indent">│   │   └── </span><span class="html">🌐 PROJECT_OVERVIEW.html</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="folder">📁 pipeline_diagnostics/</span><span class="desc">(8 files)</span></div>
+                    <div class="tree-line"><span class="indent">│   │   └── </span><span class="html">🌐 PIPELINE_DIAGNOSTIC_*.html</span></div>
+                    <div class="tree-line"><span class="indent">│   └── </span><span class="folder">📁 progress_updates/</span><span class="desc">(4 files)</span></div>
+                    <div class="tree-line"><span class="indent">│       ├── </span><span class="html">🌐 WEEKLY_STATUS_DASHBOARD.html</span></div>
+                    <div class="tree-line"><span class="indent">│       └── </span><span class="html">🌐 PROGRESS_UPDATE_*.html</span><span class="desc">(3 files)</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 schemas/</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="markdown">📄 CAPACITY_*.md</span><span class="desc">(2 files)</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="markdown">📄 SCHEMA_*.md</span><span class="desc">(3 files)</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="html">🌐 SCHEMA_*_DARK.html</span><span class="desc">(2 files)</span></div>
+                    <div class="tree-line"><span class="indent">│   └── </span><span class="markdown">📄 UCID_VISUAL_SUMMARY.md</span></div>
+                    <div class="tree-line"><span class="indent">└── </span><span class="folder">📁 workflows/</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="markdown">📄 GRANULARITY_STRATEGY.md</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="markdown">📄 META_CANONICAL_WORKFLOW.md</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="markdown">📄 PIPELINE_DOCUMENTATION.md</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="markdown">📄 PIPELINE_EXECUTION_ORDER.md</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="markdown">📄 UCID_DESIGN.md</span></div>
+                    <div class="tree-line"><span class="indent">    └── </span><span class="markdown">📄 V2_INGESTION_AUDIT_TASKS.md</span></div>
+                </div>
+            </div>
+
+            <!-- 01_ingestion -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 01_ingestion/</h2>
+                    <span class="badge">Step 1: Data Ingestion</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 ingest_dch.py</span><span class="desc">DCH Hyper (~1,876)</span></div>
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 ingest_dch_lease.py</span><span class="desc">DCH Lease (~5,176)</span></div>
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 ingest_semianalysis.py</span><span class="desc">Semianalysis (~5,472)</span></div>
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 ingest_dcm.py</span><span class="desc">DataCenterMap (~8,453)</span></div>
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 ingest_npm.py</span><span class="desc">NewProjectMedia (~1,399)</span></div>
+                    <div class="tree-line pipeline-step"><span class="indent">└── </span><span class="python">🐍 ingest_meta_canonical.py</span><span class="desc">Meta (~318)</span></div>
+                </div>
+            </div>
+
+            <!-- 02_processing -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 02_processing/</h2>
+                    <span class="badge">Transform & Aggregate</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 migrate_company_fields_v2.py</span><span class="desc">⭐ Step 2</span></div>
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 campus_rollup_new.py</span><span class="desc">⭐ Step 4</span></div>
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 cleanup_gold_campus.py</span><span class="desc">⭐ Step 5</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 meta_deduplicate.py</span><span class="desc">Suite→Building</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 enrich_geography_fields.py</span><span class="desc">Utility</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 populate_latlon_from_geometry.py</span><span class="desc">Utility</span></div>
+                    <div class="tree-line"><span class="indent">└── </span><span class="python">🐍 recreate_gold_buildings.py</span><span class="desc">Recovery</span></div>
+                </div>
+            </div>
+
+            <!-- 03_ucid -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 03_ucid/</h2>
+                    <span class="badge">Step 3: UCID Generation</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 generate_text_ucid.py</span><span class="desc">⭐ Main UCID script</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 analyze_ucid_confidence.py</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 assign_ucid_to_gold.py</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 generate_ucid_clusters.py</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 ucid_intake_matcher.py</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 validate_ucid_comparison.py</span></div>
+                    <div class="tree-line"><span class="indent">└── </span><span class="markdown">📄 README.md</span></div>
+                </div>
+            </div>
+
+            <!-- 04_validation -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 04_validation/</h2>
+                    <span class="badge">Validation & QA</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 core/</span><span class="desc">Core validation (6 scripts)</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="python">🐍 validate_granularity.py</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="python">🐍 validate_canonical_integrity.py</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="python">🐍 torture_test_gold_datasets.py</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="python">🐍 validate_gold_buildings_data.py</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="python">🐍 validate_gold_build_schema.py</span></div>
+                    <div class="tree-line"><span class="indent">│   └── </span><span class="python">🐍 validate_coordinate_independence.py</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 diagnostics/</span><span class="desc">Ad-hoc checks (14 scripts)</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 reports/</span><span class="desc">Report generators</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="python">🐍 generate_pipeline_report.py</span><span class="desc">⭐ Dashboard</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="python">🐍 full_data_source_audit.py</span></div>
+                    <div class="tree-line"><span class="indent">│   ├── </span><span class="python">🐍 analyze_capacity_coverage.py</span></div>
+                    <div class="tree-line"><span class="indent">│   └── </span><span class="css">🎨 apple_dark_theme.css</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 fixes/</span><span class="desc">Data quality fixes (5 scripts)</span></div>
+                    <div class="tree-line"><span class="indent">└── </span><span class="markdown">📄 README.md</span></div>
+                </div>
+            </div>
+
+            <!-- 05_accuracy -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 05_accuracy/</h2>
+                    <span class="badge">Accuracy Analysis</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 capacity_accuracy_analysis_v2.py</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 capacity_variance_experiments.py</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 capacity_variance_experiments_all_sources.py</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 comprehensive_spatial_accuracy_report.py</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 multi_source_spatial_accuracy.py</span><span class="desc">Merged from 03_</span></div>
+                    <div class="tree-line"><span class="indent">└── </span><span class="folder">📁 _diagnostics/</span><span class="desc">Source-specific (9 scripts)</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="python">🐍 analyze_dch_source.py</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="python">🐍 audit_capacity_by_source.py</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="python">🐍 compare_semi_vs_dch_campus.py</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="python">🐍 dch_building_level_accuracy.py</span></div>
+                    <div class="tree-line"><span class="indent">    ├── </span><span class="python">🐍 investigate_dch_granularity_v2.py</span></div>
+                    <div class="tree-line"><span class="indent">    └── </span><span class="python">🐍 ...</span><span class="desc">+4 more</span></div>
+                </div>
+            </div>
+
+            <!-- 06_visualization -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 06_visualization/</h2>
+                    <span class="badge">Step 6: Charts & Layers</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 create_xb_combined_layer.py</span><span class="desc">⭐ XB Layer</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 generate_capacity_presentation_charts.py</span></div>
+                    <div class="tree-line"><span class="indent">└── </span><span class="python">🐍 plot_spatial_accuracy_LIGHT_THEME.py</span></div>
+                </div>
+            </div>
+
+            <!-- _utils -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 _utils/</h2>
+                    <span class="badge">Utilities</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 config.py</span><span class="desc">⚠️ CRITICAL</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 helper_scripts.py</span><span class="desc">Shared functions</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 load_helpers.py</span><span class="desc">Interactive console</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="python">🐍 test_scripts.py</span><span class="desc">Dev tool</span></div>
+                    <div class="tree-line"><span class="indent">└── </span><span style="color:#ce9178;">⚡ copy_to_fbsource.ps1</span><span class="desc">Deployment</span></div>
+                </div>
+            </div>
+
+            <!-- _archive -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 _archive/</h2>
+                    <span class="badge">24 Archived Scripts</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 consensus/</span><span class="desc">3 scripts — Superseded by UCID</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 ingestion/</span><span class="desc">5 scripts — Deprecated sources</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 migrations/</span><span class="desc">4 scripts — Schema migrations</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 processing/</span><span class="desc">7 scripts — Superseded workflows</span></div>
+                    <div class="tree-line"><span class="indent">├── </span><span class="folder">📁 validation/</span><span class="desc">5 scripts — One-time audits</span></div>
+                    <div class="tree-line"><span class="indent">└── </span><span class="markdown">📄 README.md</span><span class="desc">Archive documentation</span></div>
+                </div>
+            </div>
+
+            <!-- Root files -->
+            <div class="tree-card">
+                <div class="card-header">
+                    <h2>📁 scripts/ (root)</h2>
+                    <span class="badge">Entry Points</span>
+                </div>
+                <div class="tree">
+                    <div class="tree-line pipeline-step"><span class="indent">├── </span><span class="python">🐍 run_full_pipeline.py</span><span class="desc">⭐ MASTER SCRIPT</span></div>
+                    <div class="tree-line"><span class="indent">└── </span><span class="folder">📁 outputs/</span><span class="desc">9 CSV outputs</span></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">65</div>
+                <div class="stat-label">Active Scripts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24</div>
+                <div class="stat-label">Archived Scripts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div class="stat-label">Main Folders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Pipeline Steps</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">28</div>
+                <div class="stat-label">Documentation Files</div>
+            </div>
+        </div>
+
+        <footer>
+            <p>📁 Data Center Consensus GIS Model — Scripts Folder Structure</p>
+            <p>Updated January 5, 2026 | Session 7: Google Drive Integration</p>
+        </footer>
+    </div>
+</body>
+</html>

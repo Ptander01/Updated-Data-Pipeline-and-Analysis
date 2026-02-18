@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema Comparison Analysis — Dark Mode</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.7;
+        }
+        h1 { color: #569cd6; border-bottom: 3px solid #569cd6; padding-bottom: 15px; font-size: 2em; }
+        h2 { color: #4ec9b0; margin-top: 50px; border-bottom: 1px solid #3c3c3c; padding-bottom: 10px; font-size: 1.4em; }
+        h3 { color: #ce9178; margin-top: 25px; }
+        hr { border: none; border-top: 1px solid #3c3c3c; margin: 30px 0; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; background: #252526; box-shadow: 0 4px 6px rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; font-size: 0.9em; }
+        th, td { border: 1px solid #3c3c3c; padding: 10px 14px; text-align: left; }
+        th { background: #0e639c; color: #fff; font-weight: 600; }
+        tr:nth-child(even) { background: #2d2d2d; }
+        tr:hover { background: #37373d; }
+        code { background: #3c3c3c; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; color: #ce9178; font-size: 0.9em; }
+        pre { background: #252526; border: 1px solid #3c3c3c; border-radius: 8px; padding: 15px; overflow-x: auto; font-family: Consolas, monospace; color: #d4d4d4; }
+        .success { background: #2d4a3e; padding: 15px 20px; border-left: 4px solid #4ec9b0; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .warning { background: #4d3c1f; padding: 15px 20px; border-left: 4px solid #dcdcaa; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .info { background: #1e3a5f; padding: 15px 20px; border-left: 4px solid #569cd6; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .error { background: #4d1f1f; padding: 15px 20px; border-left: 4px solid #f48771; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        ul, ol { padding-left: 25px; }
+        li { margin: 6px 0; }
+        footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #3c3c3c; color: #808080; font-size: 0.9em; }
+        .toc { background: #252526; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .toc a { color: #569cd6; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>📊 Schema Comparison Analysis — Data Center Consensus Model</h1>
+    <p><strong>Created:</strong> December 29, 2025 | <strong>Purpose:</strong> Compare 4 schema versions to determine optimal consensus schema</p>
+    <hr>
+
+    <div class="toc">
+        <strong>📋 Table of Contents</strong>
+        <ol>
+            <li><a href="#sources">Schema Sources Compared</a></li>
+            <li><a href="#identifiers">Identifiers & Keys</a></li>
+            <li><a href="#naming">Naming & Identity</a></li>
+            <li><a href="#location">Location Fields</a></li>
+            <li><a href="#capacity-power">Capacity Fields — Power</a></li>
+            <li><a href="#capacity-space">Capacity Fields — Space</a></li>
+            <li><a href="#status">Status & Lifecycle</a></li>
+            <li><a href="#ownership">Ownership & Relationships</a></li>
+            <li><a href="#energy">Energy & Infrastructure</a></li>
+            <li><a href="#ai-gpu">AI/GPU Tracking</a></li>
+            <li><a href="#provenance">Data Quality & Provenance</a></li>
+            <li><a href="#recommendations">Recommendations Summary</a></li>
+        </ol>
+    </div>
+
+    <h2 id="sources">📋 Schema Sources Compared</h2>
+    <table>
+        <tr><th>#</th><th>Schema</th><th>Origin</th><th>Fields</th><th>Status</th></tr>
+        <tr><td>1</td><td><strong>Gold Buildings</strong></td><td>Production pipeline</td><td>32</td><td>✅ Active</td></tr>
+        <tr><td>2</td><td><strong>Gold Campus</strong></td><td>Production pipeline</td><td>25</td><td>✅ Active</td></tr>
+        <tr><td>3</td><td><strong>Google Form Intake</strong></td><td>Manual data collection</td><td>27</td><td>📝 Reference</td></tr>
+        <tr><td>4</td><td><strong>Ad-hoc Brainstorm</strong></td><td>Recent whiteboard session</td><td>19</td><td>📝 Draft</td></tr>
+    </table>
+
+    <h2 id="identifiers">🔑 Identifiers & Keys</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td>Record UUID</td><td><code>unique_id</code></td><td>—</td><td>—</td><td><code>UID</code></td><td>✅ <strong>Keep unique_id</strong></td></tr>
+        <tr><td>Building ID</td><td>—</td><td>—</td><td>—</td><td><code>UID_Building</code></td><td>🆕 <strong>Add</strong> - useful for multi-building campuses</td></tr>
+        <tr><td>Campus ID</td><td><code>campus_id</code></td><td><code>campus_id</code></td><td>—</td><td><code>UID_Campus</code></td><td>✅ <strong>Keep campus_id</strong></td></tr>
+        <tr><td>Phase ID</td><td>—</td><td>—</td><td>—</td><td><code>UID_Phase</code></td><td>🆕 <strong>Consider</strong> - tracks expansion phases</td></tr>
+        <tr><td>Source record ID</td><td><code>source_unique_id</code></td><td>—</td><td>—</td><td>—</td><td>✅ Keep for traceability</td></tr>
+    </table>
+
+    <h2 id="naming">📛 Naming & Identity</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td>Building name</td><td>—</td><td>—</td><td>—</td><td><code>Build_Name</code></td><td>🆕 <strong>Add building_name</strong></td></tr>
+        <tr><td>Campus name</td><td><code>campus_name</code></td><td><code>campus_name</code></td><td>—</td><td><code>Campus_Name_1</code></td><td>✅ Keep</td></tr>
+        <tr><td>Alternate name</td><td>—</td><td>—</td><td>—</td><td><code>Campus_Name_2</code></td><td>🆕 <strong>Add campus_name_alt</strong></td></tr>
+        <tr><td>Project name</td><td>—</td><td>—</td><td><code>Project Name</code></td><td><code>Project_Name</code></td><td>🆕 <strong>Add project_name</strong></td></tr>
+        <tr><td>Company (clean)</td><td><code>company_clean</code></td><td><code>company_clean</code></td><td><code>Company</code></td><td><code>Company_Name</code></td><td>✅ Keep company_clean</td></tr>
+    </table>
+
+    <h2 id="location">📍 Location Fields</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td>Full address</td><td><code>address</code></td><td><code>address</code></td><td><code>Facility Location</code></td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>City</td><td><code>city</code></td><td><code>city</code></td><td>(parsed)</td><td><code>Loc_City</code></td><td>✅ Keep</td></tr>
+        <tr><td>State</td><td><code>state</code></td><td><code>state</code></td><td>(parsed)</td><td><code>Loc_State</code></td><td>✅ Keep</td></tr>
+        <tr><td>State abbr</td><td><code>state_abbr</code></td><td><code>state_abbr</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>County</td><td><code>county</code></td><td><code>county</code></td><td>—</td><td><code>Loc_County</code></td><td>✅ Keep</td></tr>
+        <tr><td>Country</td><td><code>country</code></td><td><code>country</code></td><td>(parsed)</td><td><code>Loc_Country</code></td><td>✅ Keep</td></tr>
+        <tr><td>Region</td><td><code>region</code></td><td><code>region</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Market</td><td><code>market</code></td><td><code>market</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Postal code</td><td><code>postal_code</code></td><td><code>postal_code</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Latitude</td><td><code>latitude</code></td><td><code>latitude</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Longitude</td><td><code>longitude</code></td><td><code>longitude</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+    </table>
+
+    <h2 id="capacity-power">⚡ Capacity Fields — Power</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td><strong>IT Power (MW)</strong></td><td>—</td><td>—</td><td><code>IT (MW)</code></td><td>—</td><td>🔥 <strong>ADD it_power_mw</strong></td></tr>
+        <tr><td><strong>Facility Power (MW)</strong></td><td>—</td><td>—</td><td><code>Total Site Power</code></td><td>—</td><td>🔥 <strong>ADD facility_power_mw</strong></td></tr>
+        <tr><td>Commissioned MW</td><td><code>commissioned_power_mw</code></td><td><code>commissioned_power_mw</code></td><td>—</td><td><code>MW_Operational</code></td><td>✅ Keep</td></tr>
+        <tr><td>Under Construction MW</td><td><code>uc_power_mw</code></td><td><code>uc_power_mw</code></td><td>—</td><td><code>MW_Construction</code></td><td>✅ Keep</td></tr>
+        <tr><td>Planned MW</td><td><code>planned_power_mw</code></td><td><code>planned_power_mw</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Full Capacity MW</td><td><code>full_capacity_mw</code></td><td><code>full_capacity_mw</code></td><td>—</td><td><code>MW_Full_Capacity</code></td><td>✅ Keep</td></tr>
+        <tr><td>Year forecasts</td><td><code>mw_2023-mw_2032</code></td><td><code>mw_2023-mw_2032</code></td><td>—</td><td>—</td><td>✅ Keep (Semianalysis)</td></tr>
+    </table>
+
+    <h2 id="capacity-space">📐 Capacity Fields — Space</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td>Building sqft</td><td><code>facility_sqft</code></td><td><code>facility_sqft_sum</code></td><td><code>Building Size</code></td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Whitespace sqft</td><td><code>whitespace_sqft</code></td><td><code>whitespace_sqft_sum</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Land acres</td><td>—</td><td>—</td><td><code>Land Size (Acres)</code></td><td>—</td><td>🆕 <strong>Add total_site_acres</strong></td></tr>
+    </table>
+
+    <h2 id="status">🔄 Status & Lifecycle</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td>Facility status</td><td><code>facility_status</code></td><td><code>facility_status_agg</code></td><td><code>Development Stage</code></td><td>—</td><td>✅ Keep (domain values)</td></tr>
+        <tr><td>Cancelled flag</td><td><code>cancelled</code></td><td><code>cancelled</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Actual live date</td><td><code>actual_live_date</code></td><td><code>first_live_date</code></td><td><code>Date of Operation</code></td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Building type</td><td>—</td><td>—</td><td>—</td><td><code>Build_type</code></td><td>🤔 Optional - may overlap with company_clean_filter</td></tr>
+    </table>
+
+    <h2 id="ownership">🏢 Ownership & Relationships</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td>Owned/Leased</td><td><code>owned_leased</code></td><td>—</td><td><code>Development Model</code></td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td><strong>Developer</strong></td><td>—</td><td>—</td><td><code>Developer of record</code></td><td><code>Site_Developer</code></td><td>🔥 <strong>ADD developer</strong></td></tr>
+        <tr><td><strong>Tenant</strong></td><td>—</td><td>—</td><td><code>Company (Tenant)</code></td><td><code>Site_Tennant</code></td><td>🔥 <strong>ADD tenant</strong></td></tr>
+        <tr><td><strong>End User</strong></td><td>—</td><td>—</td><td>—</td><td><code>Site_User</code></td><td>🔥 <strong>ADD end_user</strong></td></tr>
+    </table>
+
+    <h2 id="energy">🔌 Energy & Infrastructure</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td><strong>Power Strategy</strong></td><td>—</td><td>—</td><td><code>Energy: Power Strategy</code></td><td>—</td><td>🔥 <strong>ADD power_strategy</strong></td></tr>
+        <tr><td><strong>Utility Company</strong></td><td>—</td><td>—</td><td><code>Energy: Utility Company</code></td><td>—</td><td>🔥 <strong>ADD utility_company</strong></td></tr>
+        <tr><td><strong>Fuel Type</strong></td><td>—</td><td>—</td><td><code>Energy: Fuel Type</code></td><td>—</td><td>🔥 <strong>ADD fuel_type</strong></td></tr>
+        <tr><td>Cooling Type</td><td>—</td><td>—</td><td><code>Cooling System Type</code></td><td>—</td><td>🆕 ADD cooling_type</td></tr>
+    </table>
+
+    <h2 id="ai-gpu">🤖 AI/GPU Tracking</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td><strong>GPU Type</strong></td><td>—</td><td>—</td><td><code>Hardware: GPU Type</code></td><td>—</td><td>🔥 <strong>ADD gpu_type</strong></td></tr>
+        <tr><td><strong>GPU Count</strong></td><td>—</td><td>—</td><td><code>Hardware: GPU Count</code></td><td>—</td><td>🔥 <strong>ADD gpu_count</strong></td></tr>
+    </table>
+
+    <h2 id="provenance">📊 Data Quality & Provenance</h2>
+    <table>
+        <tr><th>Concept</th><th>Gold Buildings</th><th>Gold Campus</th><th>Intake Form</th><th>Ad-hoc</th><th>Recommendation</th></tr>
+        <tr><td>Source</td><td><code>source</code></td><td><code>source</code></td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Date reported</td><td><code>date_reported</code></td><td>—</td><td><code>Timestamp</code></td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td>Ingest date</td><td><code>ingest_date</code></td><td>—</td><td>—</td><td>—</td><td>✅ Keep</td></tr>
+        <tr><td><strong>Confidence score</strong></td><td>—</td><td>—</td><td><code>Confidence Score</code></td><td>—</td><td>🔥 <strong>ADD confidence_score</strong></td></tr>
+        <tr><td>Notes</td><td>—</td><td>—</td><td><code>Notes</code></td><td>—</td><td>🆕 <strong>Add notes</strong></td></tr>
+        <tr><td>News link</td><td>—</td><td>—</td><td><code>News Article Link</code></td><td>—</td><td>🆕 Consider</td></tr>
+    </table>
+
+    <hr>
+    <h2 id="recommendations">🎯 Recommendations Summary</h2>
+
+    <div class="success">
+        <h3>✅ Fields to ADD (14 new)</h3>
+        <p><code>company_clean_filter</code>, <code>developer</code>, <code>tenant</code>, <code>end_user</code>, <code>it_power_mw</code>, <code>facility_power_mw</code>, <code>utility_company</code>, <code>fuel_type</code>, <code>power_strategy</code>, <code>cooling_type</code>, <code>gpu_type</code>, <code>gpu_count</code>, <code>confidence_score</code>, <code>notes</code></p>
+    </div>
+
+    <div class="error">
+        <h3>❌ Fields to REMOVE (9 total)</h3>
+        <p><code>gold_lat</code>, <code>gold_lon</code>, <code>feed_config</code>, <code>ecosystem_ixps</code>, <code>ecosystem_cloud</code>, <code>ecosystem_children</code>, <code>ecosystem_networkproviders</code>, <code>ecosystem_networkpresence</code>, <code>ecosystem_serviceproviders</code></p>
+    </div>
+
+    <div class="info">
+        <h3>⚙️ Fields to MODIFY (1)</h3>
+        <p><code>company_clean</code> — Stop doing "Colo - All Other" replacement here; move that logic to new <code>company_clean_filter</code> field</p>
+    </div>
+
+    <h3>📊 Field Count Comparison</h3>
+    <table>
+        <tr><th>Schema Version</th><th>Field Count</th><th>Coverage</th></tr>
+        <tr><td>Current Gold Buildings</td><td>32</td><td>Core pipeline</td></tr>
+        <tr><td>Current Gold Campus</td><td>25</td><td>Core pipeline</td></tr>
+        <tr><td>Google Form Intake</td><td>27</td><td>Manual collection</td></tr>
+        <tr><td>Ad-hoc Brainstorm</td><td>19</td><td>Conceptual</td></tr>
+        <tr><td><strong>Proposed v2.0 Buildings</strong></td><td><strong>48</strong></td><td>Comprehensive</td></tr>
+    </table>
+
+    <h3>🚀 Next Steps</h3>
+    <ol>
+        <li><strong>Review this document</strong> with supervisor</li>
+        <li><strong>Prioritize additions</strong> — Decide which HIGH/MEDIUM priority fields to add</li>
+        <li><strong>Create migration script</strong> — Add new fields to existing gold_buildings/gold_campus</li>
+        <li><strong>Update ingestion scripts</strong> — Map new fields from source data</li>
+        <li><strong>Update intake form</strong> — Align Google Form with new schema</li>
+    </ol>
+
+    <h3>❓ Questions for Supervisor</h3>
+    <ol>
+        <li><strong>GPU tracking:</strong> Is this a priority for the current phase?</li>
+        <li><strong>Developer/Tenant/User split:</strong> Critical for the business use case?</li>
+        <li><strong>Energy fields:</strong> Needed now or future phase?</li>
+        <li><strong>Confidence scoring:</strong> Who assigns scores, what's the scale?</li>
+        <li><strong>Phase tracking:</strong> How granular should expansion phase tracking be?</li>
+    </ol>
+
+    <footer>
+        <p><em>Schema Comparison Analysis — December 29, 2025 — Data Center Consensus GIS Model</em></p>
+        <p>Print to PDF: Ctrl+P → Save as PDF</p>
+    </footer>
+</body>
+</html>

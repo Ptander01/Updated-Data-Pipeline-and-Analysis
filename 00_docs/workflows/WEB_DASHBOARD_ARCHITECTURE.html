@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Dashboard Architecture — Data Center Consensus Model</title>
+    <style>
+        :root {
+            --navy-900: #0a0f1c;
+            --navy-800: #111827;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --blue-400: #60a5fa;
+            --purple-400: #a78bfa;
+            --cyan-400: #22d3ee;
+            --green-400: #4ade80;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--navy-900) 0%, #0f172a 50%, #1e1b4b 100%);
+            color: #e5e7eb;
+            min-height: 100vh;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--blue-400), var(--purple-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            background: linear-gradient(135deg, var(--green-400), var(--cyan-400));
+            color: var(--navy-900);
+            font-weight: 600;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+        .section {
+            margin-bottom: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--blue-400);
+        }
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .flow-step {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            position: relative;
+        }
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--blue-400);
+            font-size: 1.5rem;
+        }
+        .flow-step:last-child::after { display: none; }
+        .flow-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .flow-title { font-weight: 600; font-size: 0.9rem; }
+        .flow-desc { font-size: 0.75rem; color: #9ca3af; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        .card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .card-title { font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .card-desc { font-size: 0.85rem; color: #9ca3af; }
+        .vs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .vs-card { padding: 1rem; border-radius: 12px; background: rgba(0,0,0,0.3); }
+        .vs-card.old { border: 1px solid rgba(248, 113, 113, 0.3); }
+        .vs-card.new { border: 1px solid rgba(74, 222, 128, 0.3); }
+        .vs-card h4 { margin-bottom: 0.75rem; }
+        .vs-card ul { list-style: none; font-size: 0.9rem; }
+        .vs-card li { padding: 0.35rem 0; display: flex; align-items: center; gap: 0.5rem; }
+        .cmd-block {
+            background: rgba(0,0,0,0.4);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'SF Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--green-400);
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+        .layer {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--blue-400);
+        }
+        .layer.green { border-left-color: var(--green-400); }
+        .layer.purple { border-left-color: var(--purple-400); }
+        .layer.cyan { border-left-color: var(--cyan-400); }
+        .layer-title { font-weight: 600; margin-bottom: 0.5rem; }
+        .layer-files { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+        .file-tag {
+            padding: 0.25rem 0.5rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: var(--cyan-400);
+        }
+        .endpoint { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--glass-border); }
+        .endpoint:last-child { border-bottom: none; }
+        .endpoint-path { font-family: monospace; color: var(--green-400); }
+        .endpoint-desc { color: #9ca3af; font-size: 0.9rem; }
+        @media (max-width: 768px) {
+            .flow-container { flex-direction: column; }
+            .flow-step::after { display: none; }
+            .vs-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗺️ Web Dashboard Architecture</h1>
+            <p style="color: #9ca3af;">Data Center Consensus GIS Model — Custom MapLibre Dashboard</p>
+            <span class="badge">✓ Replaces ESRI Experience Builder</span>
+        </header>
+
+        <!-- Why Custom -->
+        <section class="section">
+            <h2 class="section-title">💡 Why a Custom Dashboard?</h2>
+            <div class="vs-grid">
+                <div class="vs-card old">
+                    <h4>❌ ESRI Experience Builder</h4>
+                    <ul>
+                        <li>🔒 Requires ArcGIS Online license</li>
+                        <li>💰 Per-seat licensing costs</li>
+                        <li>🌐 External hosting</li>
+                        <li>⚡ Slow for large datasets</li>
+                        <li>🎨 Limited customization</li>
+                    </ul>
+                </div>
+                <div class="vs-card new">
+                    <h4>✅ Custom MapLibre Dashboard</h4>
+                    <ul>
+                        <li>🆓 Completely free (open source)</li>
+                        <li>👥 Unlimited users</li>
+                        <li>🏠 Self-hosted locally</li>
+                        <li>⚡ Fast — optimized GeoJSON</li>
+                        <li>🎨 Full UI/UX control</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Flow -->
+        <section class="section">
+            <h2 class="section-title">🔄 High-Level Data Flow</h2>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="flow-icon">🗄️</div>
+                    <div class="flow-title">ArcGIS GDB</div>
+                    <div class="flow-desc">Gold feature classes<br/>~34K records</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">🐍</div>
+                    <div class="flow-title">Export Script</div>
+                    <div class="flow-desc">Python + arcpy</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">📄</div>
+                    <div class="flow-title">GeoJSON</div>
+                    <div class="flow-desc">Web-optimized</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">⚡</div>
+                    <div class="flow-title">FastAPI</div>
+                    <div class="flow-desc">REST API</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-icon">🖥️</div>
+                    <div class="flow-title">React UI</div>
+                    <div class="flow-desc">MapLibre + Charts</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Layers -->
+        <section class="section">
+            <h2 class="section-title">🏗️ Architecture Layers</h2>
+
+            <div class="layer">
+                <div class="layer-title">🗄️ Data Layer — ArcGIS Geodatabase</div>
+                <p style="font-size: 0.9rem; color: #9ca3af;">Authoritative source of truth managed in ArcGIS Pro</p>
+                <div class="layer-files">
+                    <span class="file-tag">gold_buildings_full (22,696)</span>
+                    <span class="file-tag">gold_campus_full (11,561)</span>
+                    <span class="file-tag">gold_combined_xb (34,257)</span>
+                </div>
+            </div>
+
+            <div class="layer purple">
+                <div class="layer-title">🔄 Export Layer — GeoJSON Conversion</div>
+                <p style="font-size: 0.9rem; color: #9ca3af;">Transforms GDB to web-optimized JSON (runs in ArcGIS Pro)</p>
+                <div class="layer-files">
+                    <span class="file-tag">export_to_geojson.py</span>
+                    <span class="file-tag">buildings.geojson</span>
+                    <span class="file-tag">campuses.geojson</span>
+                    <span class="file-tag">combined.geojson</span>
+                    <span class="file-tag">lookups.json</span>
+                    <span class="file-tag">statistics.json</span>
+                </div>
+            </div>
+
+            <div class="layer green">
+                <div class="layer-title">⚡ Backend Layer — FastAPI Server</div>
+                <p style="font-size: 0.9rem; color: #9ca3af;">REST API for data access, filtering, and exports (port 8000)</p>
+                <div class="layer-files">
+                    <span class="file-tag">main.py</span>
+                    <span class="file-tag">requirements.txt</span>
+                </div>
+            </div>
+
+            <div class="layer cyan">
+                <div class="layer-title">🖥️ Frontend Layer — React + MapLibre</div>
+                <p style="font-size: 0.9rem; color: #9ca3af;">Interactive dashboard with map, table, charts, popup panel (port 5173)</p>
+                <div class="layer-files">
+                    <span class="file-tag">App.tsx</span>
+                    <span class="file-tag">MapContainer.tsx</span>
+                    <span class="file-tag">FilterPanel.tsx</span>
+                    <span class="file-tag">DataTable.tsx</span>
+                    <span class="file-tag">Charts.tsx</span>
+                    <span class="file-tag">KPICards.tsx</span>
+                    <span class="file-tag">FeaturePopup.tsx</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Features -->
+        <section class="section">
+            <h2 class="section-title">🗺️ Map Symbology</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">🎨 Company Colors</div>
+                    <div class="card-desc">Solid dots with brand colors: AWS orange, Microsoft green, Google red, Meta blue, Apple gray, Oracle red, Alibaba orange, xAI black.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">⭕ Status Arc Indicators</div>
+                    <div class="card-desc">Progress arc visualization: Active=100%, Under Construction=75%, Announced=50%, Planned=25%, Land Acq.=10%.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🔍 Zoom-Based Visibility</div>
+                    <div class="card-desc">Campus points at all zooms, Building points at zoom level 14+.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📋 Feature Popup</div>
+                    <div class="card-desc">Slide-in panel with executive summary, 10-year capacity trend chart, and drill-down sections.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Endpoints -->
+        <section class="section">
+            <h2 class="section-title">📡 API Endpoints</h2>
+            <div class="endpoint">
+                <span class="endpoint-path">GET /api/features/{layer}</span>
+                <span class="endpoint-desc">GeoJSON with filters (company, source, status, region, etc.)</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-path">GET /api/statistics</span>
+                <span class="endpoint-desc">Pre-computed KPIs and aggregates</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-path">GET /api/lookups</span>
+                <span class="endpoint-desc">Unique values for filter dropdowns</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-path">GET /api/export/csv/{layer}</span>
+                <span class="endpoint-desc">Download filtered data as CSV</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-path">GET /api/reload</span>
+                <span class="endpoint-desc">Refresh cache after re-exporting GeoJSON</span>
+            </div>
+        </section>
+
+        <!-- Tech Stack -->
+        <section class="section">
+            <h2 class="section-title">🛠️ Technology Stack</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">🗺️ MapLibre GL JS 4.0</div>
+                    <div class="card-desc">Open-source map library, no API key. Renders 34K+ points.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">⚛️ React 18 + TypeScript</div>
+                    <div class="card-desc">Modern component UI with Vite build tooling.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">⚡ FastAPI + Uvicorn</div>
+                    <div class="card-desc">Python API server with auto-docs at /docs.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📊 Apache ECharts</div>
+                    <div class="card-desc">Interactive charts for capacity visualization.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📋 TanStack Table</div>
+                    <div class="card-desc">Sortable, filterable data table with pagination.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🎨 Tailwind + Glassmorphism</div>
+                    <div class="card-desc">Apple-inspired UI with frosted glass effects.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Commands -->
+        <section class="section">
+            <h2 class="section-title">⚙️ Key Commands</h2>
+
+            <p style="margin-bottom: 0.5rem; font-weight: 600;">1. Export GeoJSON (in ArcGIS Pro Python window):</p>
+            <div class="cmd-block">exec(open(r"C:\...\web_dashboard\08_web_export\export_to_geojson.py", encoding='utf-8').read())</div>
+
+            <p style="margin-bottom: 0.5rem; font-weight: 600; margin-top: 1rem;">2. Start Dashboard:</p>
+            <div class="cmd-block">cd "C:\...\web_dashboard"<br/>.\start_dashboard.ps1</div>
+
+            <p style="margin-bottom: 0.5rem; font-weight: 600; margin-top: 1rem;">3. Reload Cache (after re-export):</p>
+            <div class="cmd-block">http://localhost:8000/api/reload</div>
+
+            <p style="margin-bottom: 0.5rem; font-weight: 600; margin-top: 1rem;">4. Access Points:</p>
+            <div class="cmd-block">Frontend: http://localhost:5173<br/>API Docs: http://localhost:8000/docs</div>
+        </section>
+
+        <!-- Workflow -->
+        <section class="section">
+            <h2 class="section-title">📋 Data Refresh Workflow</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">1️⃣ Update Pipeline</div>
+                    <div class="card-desc">Run <code>run_full_pipeline.py</code> in ArcGIS Pro to refresh gold tables from vendor sources.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">2️⃣ Export GeoJSON</div>
+                    <div class="card-desc">Run <code>export_to_geojson.py</code> to convert feature classes to web format.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">3️⃣ Reload Cache</div>
+                    <div class="card-desc">Visit <code>/api/reload</code> endpoint OR restart backend server.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">4️⃣ View Dashboard</div>
+                    <div class="card-desc">Refresh browser to see updated data. Share LAN URL with team.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Folder Structure -->
+        <section class="section">
+            <h2 class="section-title">📁 Folder Structure</h2>
+            <div class="cmd-block" style="color: #e5e7eb;">
+web_dashboard/
+├── backend/                 # FastAPI server
+│   ├── main.py             # API endpoints
+│   └── requirements.txt    # Python deps
+├── frontend/               # React + Vite
+│   ├── src/
+│   │   ├── components/     # Map, Table, Charts, Filters
+│   │   ├── types/          # TypeScript interfaces
+│   │   └── App.tsx         # Main app
+│   └── package.json
+├── data/                   # GeoJSON files (generated)
+│   ├── buildings.geojson
+│   ├── campuses.geojson
+│   ├── combined.geojson
+│   ├── lookups.json
+│   └── statistics.json
+├── 08_web_export/
+│   └── export_to_geojson.py
+└── start_dashboard.ps1     # One-click startup
+            </div>
+        </section>
+
+<footer style="text-align: center; color: #6b7280; font-size: 0.85rem; margin-top: 2rem;">
+            Generated January 2026 — Data Center Consensus GIS Model
+        </footer>
+
+        <!-- Deployment Section -->
+        <section class="section" style="margin-top: 2rem;">
+            <h2 class="section-title">🚀 Server Deployment</h2>
+
+            <p style="margin-bottom: 1rem;">When migrating to a shared network server, copy essential files and regenerate dependencies locally.</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="vs-card new">
+                    <h4>✅ COPY These (~50-60 MB)</h4>
+                    <ul>
+                        <li>📁 <code>backend/main.py</code> — API server</li>
+                        <li>📁 <code>backend/requirements.txt</code> — Python deps</li>
+                        <li>📁 <code>frontend/src/</code> — React source</li>
+                        <li>📁 <code>frontend/package.json</code> — Node deps</li>
+                        <li>📁 <code>frontend/*.config.*</code> — Config files</li>
+                        <li>📁 <code>data/*.geojson</code> — Data files</li>
+                        <li>📁 <code>data/*.json</code> — Lookups/stats</li>
+                        <li>📁 <code>start_dashboard.ps1</code> — Startup</li>
+                    </ul>
+                </div>
+                <div class="vs-card old">
+                    <h4>❌ DO NOT Copy (~300 MB)</h4>
+                    <ul>
+                        <li>📁 <code>node_modules/</code> → <code>npm install</code></li>
+                        <li>📁 <code>dist/</code> → <code>npm run build</code></li>
+                        <li>📁 <code>.vite/</code> → Auto-generated</li>
+                        <li>📁 <code>__pycache__/</code> → Auto-generated</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: #9ca3af;">These contain platform-specific binaries that must be regenerated on the target machine.</p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem;">Migration Command</h3>
+            <div class="cmd-block">
+# Copy using robocopy (excludes large generated folders)
+robocopy "C:\path\to\web_dashboard" "\\server\share\Dashboard" /E /XD node_modules __pycache__ .vite dist
+            </div>
+
+            <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem;">Server Setup</h3>
+            <div class="cmd-block">
+# 1. Install Node dependencies
+cd \\server\share\Dashboard\frontend
+npm install
+
+# 2. Install Python dependencies
+cd \\server\share\Dashboard\backend
+pip install -r requirements.txt
+
+# 3. Start dashboard (binds to all interfaces for network access)
+cd \\server\share\Dashboard
+.\start_dashboard.ps1
+            </div>
+
+            <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem;">Update Data on Server</h3>
+            <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="card">
+                    <div class="card-title">1️⃣ Export Locally</div>
+                    <div class="card-desc">Run <code>export_to_geojson.py</code> in ArcGIS Pro on your machine</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">2️⃣ Copy Data Files</div>
+                    <div class="card-desc">Copy <code>data/*.geojson</code> and <code>data/*.json</code> to server</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">3️⃣ Reload Cache</div>
+                    <div class="card-desc">Visit <code>http://server:8000/api/reload</code></div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

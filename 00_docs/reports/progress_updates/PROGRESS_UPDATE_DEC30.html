@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DC Consensus Model - Progress Update (Dec 29-30, 2025)</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: #0f3460;
+            --text-primary: #eee;
+            --text-secondary: #aaa;
+            --accent: #e94560;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --info: #60a5fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border-left: 4px solid var(--accent);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--accent), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .date-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--success);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--bg-secondary);
+        }
+
+        h3 {
+            color: var(--info);
+            margin: 1.5rem 0 1rem;
+        }
+
+        .achievement {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-icon {
+            font-size: 1.5rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .achievement-content h4 {
+            color: var(--success);
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--bg-secondary);
+        }
+
+        th {
+            background: var(--bg-secondary);
+            color: var(--accent);
+        }
+
+        tr:hover {
+            background: rgba(233, 69, 96, 0.1);
+        }
+
+        .code-block {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .code-block code {
+            color: #79c0ff;
+        }
+
+        .ucid-example {
+            display: inline-block;
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--success);
+            margin: 0.25rem;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-number {
+            background: var(--accent);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-script {
+            color: var(--info);
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .comparison-box {
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .old-way {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+        }
+
+        .new-way {
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid #4ade80;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+
+        .tag-new { background: var(--success); color: #000; }
+        .tag-fix { background: var(--warning); color: #000; }
+        .tag-improve { background: var(--info); color: #000; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏢 Data Center Consensus GIS Model</h1>
+            <p class="subtitle">Progress Update - Infrastructure Planning Team</p>
+            <span class="date-badge">December 29-30, 2025</span>
+        </header>
+
+        <!-- Key Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">22,694</div>
+                <div class="stat-label">Building Records</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">11,560</div>
+                <div class="stat-label">Campus Records</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Data Sources</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">99.6%</div>
+                <div class="stat-label">Semianalysis Match Rate</div>
+            </div>
+        </div>
+
+        <!-- Major Achievements -->
+        <div class="section">
+            <h2>🎯 Major Achievements (Dec 29-30)</h2>
+
+            <div class="achievement">
+                <div class="achievement-icon">🔖</div>
+                <div class="achievement-content">
+                    <h4>Text-Based UCID System</h4>
+                    <p>Replaced opaque numeric IDs (UCID-AMER-00142) with human-readable Universal Campus IDs that are instantly recognizable:</p>
+                    <div style="margin-top: 1rem;">
+                        <span class="ucid-example">META-ALTOONA</span>
+                        <span class="ucid-example">AWS-ASHBURN-EAST</span>
+                        <span class="ucid-example">GOOG-COUNCILBLUFFS</span>
+                        <span class="ucid-example">OAI-STARGATE</span>
+                        <span class="ucid-example">EQIX-CHICAGO</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="achievement">
+                <div class="achievement-icon">🔄</div>
+                <div class="achievement-content">
+                    <h4>Source-Agnostic Campus Rollup</h4>
+                    <p>Campus rollup now groups by UCID instead of source-specific IDs. This creates <strong>one campus record per physical location</strong>, merging data from all sources.</p>
+                    <div class="comparison-grid">
+                        <div class="comparison-box old-way">
+                            <strong>❌ Old Way</strong><br>
+                            ~16,000 campus records<br>
+                            Multiple records per location<br>
+                            Grouped by source-specific ID
+                        </div>
+                        <div class="comparison-box new-way">
+                            <strong>✅ New Way</strong><br>
+                            11,560 campus records<br>
+                            One record per location<br>
+                            Grouped by UCID
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="achievement">
+                <div class="achievement-icon">🏢</div>
+                <div class="achievement-content">
+                    <h4>3-Field Company Structure</h4>
+                    <p>Created separate fields for different use cases to prevent false matches in spatial clustering:</p>
+                    <table>
+                        <tr>
+                            <th>Field</th>
+                            <th>Purpose</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr>
+                            <td><code>company_source</code></td>
+                            <td>Raw vendor value</td>
+                            <td>"Amazon Web Services, Inc."</td>
+                        </tr>
+                        <tr>
+                            <td><code>company_clean</code></td>
+                            <td>Distinct canonical names (UCID clustering)</td>
+                            <td>"AWS", "Equinix", "Digital Realty"</td>
+                        </tr>
+                        <tr>
+                            <td><code>company_clean_filter</code></td>
+                            <td>XB filtering (hyperscalers only)</td>
+                            <td>"AWS" or "Colo - All Other"</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="achievement">
+                <div class="achievement-icon">🐛</div>
+                <div class="achievement-content">
+                    <h4>Semianalysis ETL Bug Fixed</h4>
+                    <p>Discovered and fixed a bug where <code>planned_plus_uc_mw</code> wasn't being written to gold tables. Match rate improved from 57.2% to <strong>99.6%</strong>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- UCID Format -->
+        <div class="section">
+            <h2>🔖 UCID Format Design</h2>
+            <p style="margin-bottom: 1rem;">Universal Campus IDs follow a consistent, human-readable format:</p>
+
+            <table>
+                <tr>
+                    <th>Level</th>
+                    <th>Format</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td>Campus</td>
+                    <td><code>{COMPANY}-{CITY}</code></td>
+                    <td><span class="ucid-example">META-ALTOONA</span></td>
+                </tr>
+                <tr>
+                    <td>Campus (disambiguated)</td>
+                    <td><code>{COMPANY}-{CITY}-{SUFFIX}</code></td>
+                    <td><span class="ucid-example">AWS-ASHBURN-EAST</span></td>
+                </tr>
+                <tr>
+                    <td>Building</td>
+                    <td><code>{COMPANY}-{CITY}-{NUM}</code></td>
+                    <td><span class="ucid-example">META-ALTOONA-01</span></td>
+                </tr>
+            </table>
+
+            <h3>Company Codes (60+)</h3>
+            <p>
+                <span class="tag tag-new">Hyperscalers</span> META, AWS, MSFT, GOOG, ORCL, AAPL, OAI, XAI, ANTH
+            </p>
+            <p style="margin-top: 0.5rem;">
+                <span class="tag tag-improve">Major Colos</span> EQIX, DLR, CONE, QTS, VDC, COR, SWCH, FLEX, STACK
+            </p>
+            <p style="margin-top: 0.5rem;">
+                <span class="tag tag-fix">Telecom</span> ATT, VZ, LUMN, NTT, COLT, ZAYO
+            </p>
+        </div>
+
+        <!-- Pipeline Order -->
+        <div class="section">
+            <h2>⚙️ Updated Pipeline Execution Order</h2>
+
+            <div class="pipeline-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <strong>Ingest Raw Data</strong>
+                    <div class="step-script">ingest_dch.py, ingest_semianalysis.py, ingest_dcm.py, ...</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <strong>Company Standardization</strong>
+                    <div class="step-script">migrate_company_fields_v2.py</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <strong>UCID Generation</strong> <span class="tag tag-new">NEW ORDER</span>
+                    <div class="step-script">generate_text_ucid.py (on buildings first!)</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <strong>Campus Rollup</strong> <span class="tag tag-improve">IMPROVED</span>
+                    <div class="step-script">campus_rollup_new.py (now groups by UCID)</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <strong>Combined XB Layer</strong> <span class="tag tag-new">NEW</span>
+                    <div class="step-script">create_xb_combined_layer.py</div>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-number">6</div>
+                <div class="step-content">
+                    <strong>Validation</strong>
+                    <div class="step-script">validate_granularity.py</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schema v2.0 -->
+        <div class="section">
+            <h2>📋 Schema v2.0 - New Fields</h2>
+            <p style="margin-bottom: 1rem;">New fields added to support richer data capture:</p>
+
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Fields</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td>Capacity</td>
+                    <td><code>it_power_mw</code>, <code>facility_power_mw</code></td>
+                    <td>Distinguish IT load vs total facility power</td>
+                </tr>
+                <tr>
+                    <td>Energy</td>
+                    <td><code>energy_source</code></td>
+                    <td>Renewable, Grid, Hybrid, Nuclear</td>
+                </tr>
+                <tr>
+                    <td>AI/GPU</td>
+                    <td><code>ai_gpu_indicator</code></td>
+                    <td>Flag AI-focused facilities</td>
+                </tr>
+                <tr>
+                    <td>Ownership</td>
+                    <td><code>developer</code>, <code>tenant</code>, <code>end_user</code></td>
+                    <td>Track who built, leases, and operates</td>
+                </tr>
+                <tr>
+                    <td>Timeline</td>
+                    <td><code>construction_start/end</code>, <code>lease_start/end</code></td>
+                    <td>Project timeline tracking</td>
+                </tr>
+                <tr>
+                    <td>Data Quality</td>
+                    <td><code>data_vintage</code>, <code>notes</code></td>
+                    <td>Source freshness and comments</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Scripts Created -->
+        <div class="section">
+            <h2>📁 Scripts Created/Updated</h2>
+
+            <table>
+                <tr>
+                    <th>Script</th>
+                    <th>Purpose</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td><code>generate_text_ucid.py</code></td>
+                    <td>Human-readable UCID generation</td>
+                    <td><span class="tag tag-new">NEW</span></td>
+                </tr>
+                <tr>
+                    <td><code>campus_rollup_new.py</code></td>
+                    <td>Groups by UCID (source-agnostic)</td>
+                    <td><span class="tag tag-improve">UPDATED</span></td>
+                </tr>
+                <tr>
+                    <td><code>migrate_company_fields_v2.py</code></td>
+                    <td>3-field company structure</td>
+                    <td><span class="tag tag-new">NEW</span></td>
+                </tr>
+                <tr>
+                    <td><code>create_xb_combined_layer.py</code></td>
+                    <td>Combined XB layer for Experience Builder</td>
+                    <td><span class="tag tag-new">NEW</span></td>
+                </tr>
+                <tr>
+                    <td><code>migrate_schema_v2.py</code></td>
+                    <td>Add v2.0 fields to feature classes</td>
+                    <td><span class="tag tag-new">NEW</span></td>
+                </tr>
+                <tr>
+                    <td><code>cleanup_gold_campus.py</code></td>
+                    <td>Fix lat/lon, remove legacy fields</td>
+                    <td><span class="tag tag-new">NEW</span></td>
+                </tr>
+                <tr>
+                    <td><code>patch_semianalysis_planned_plus_uc.py</code></td>
+                    <td>Fix ETL bug in existing data</td>
+                    <td><span class="tag tag-fix">FIX</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="section">
+            <h2>📋 Next Steps</h2>
+            <ul style="list-style: none; padding: 0;">
+                <li style="padding: 0.5rem 0;">✅ UCID generation complete (11,560 campuses)</li>
+                <li style="padding: 0.5rem 0;">✅ Campus rollup complete (grouped by UCID)</li>
+                <li style="padding: 0.5rem 0;">⏳ Run schema v2.0 migration</li>
+                <li style="padding: 0.5rem 0;">⏳ Run gold campus cleanup (lat/lon, legacy fields)</li>
+                <li style="padding: 0.5rem 0;">⏳ Create combined XB layer</li>
+                <li style="padding: 0.5rem 0;">⏳ Fix NPM city/state data quality (112 records)</li>
+                <li style="padding: 0.5rem 0;">📋 Supervisor review (after Jan 7)</li>
+            </ul>
+        </div>
+
+        <footer class="footer">
+            <p>Data Center Consensus GIS Model — Meta Infrastructure Planning</p>
+            <p style="margin-top: 0.5rem;">Generated: December 30, 2025</p>
+        </footer>
+    </div>
+</body>
+</html>

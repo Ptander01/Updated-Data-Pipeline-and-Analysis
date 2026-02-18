@@ -1,0 +1,792 @@
+"""
+PM Dashboard Generator
+Reads Patrick's Excel Work Organizer and generates a unified HTML dashboard.
+
+Usage:
+    python generate_pm_dashboard.py
+
+Output:
+    - PM_DASHBOARD.html (current dashboard)
+    - archive/PM_DASHBOARD_YYYYMMDD.html (dated backup)
+
+Author: Patrick Anderson / AI Assistant
+Created: January 12, 2026
+"""
+
+import pandas as pd
+from datetime import datetime, timedelta
+from pathlib import Path
+import shutil
+import warnings
+
+warnings.filterwarnings('ignore', category=UserWarning)
+
+# CONFIGURATION
+
+EXCEL_PATH = Path(r"C:\Users\ptanderson\Downloads\Patrick_Work_Organizer_Hierarchy (version 1).xlsb.xlsx")
+OUTPUT_DIR = Path(__file__).parent
+ARCHIVE_DIR = OUTPUT_DIR / "archive"
+GDRIVE_OUTPUT = Path(r"G:\My Drive\Consensus GIS Model Cleaned Inputs\Admin Documentation\dashboards")
+
+# Project display configuration
+PROJECT_CONFIG = {
+    "SatelliteImagery": {
+        "display_name": "Satellite Imagery",
+        "icon": "🛰️",
+        "color": "#9b59b6",  # Purple
+        "priority": "P2"
+    },
+    "GlobalDataCenter": {
+        "display_name": "Global Data Center & Infra Model",
+        "icon": "🏢",
+        "color": "#4facfe",  # Blue
+        "priority": "P1"
+    },
+    "AdHoc": {
+        "display_name": "Ad Hoc / To Dos",
+        "icon": "📋",
+        "color": "#00d68f",  # Green
+        "priority": "P2"
+    }
+}
+
+# Status colors
+STATUS_CONFIG = {
+    "Backlog": {"class": "status-backlog", "color": "#8892b0"},
+    "Planned": {"class": "status-planned", "color": "#8892b0"},
+    "In Progress": {"class": "status-in-progress", "color": "#4facfe"},
+    "Blocked": {"class": "status-blocked", "color": "#ff6b6b"},
+    "Complete": {"class": "status-complete", "color": "#00d68f"},
+    "Cancelled": {"class": "status-cancelled", "color": "#666"}
+}
+
+PRIORITY_CONFIG = {
+    "P1 - Critical": {"class": "priority-p1", "color": "#ff6b6b"},
+    "P2 - High": {"class": "priority-p2", "color": "#ffaa00"},
+    "P3 - Medium": {"class": "priority-p3", "color": "#4facfe"},
+    "P4 - Low": {"class": "priority-p4", "color": "#8892b0"}
+}
+
+# DATA LOADING
+
+def load_excel_data():
+    """Load all sheets from the Excel workbook."""
+    xl = pd.ExcelFile(EXCEL_PATH)
+
+    data = {
+        'tasks': pd.read_excel(xl, sheet_name='Tasks'),
+        'time_log': pd.read_excel(xl, sheet_name='Time Log'),
+        'reference': pd.read_excel(xl, sheet_name='Reference Lists'),
+    }
+
+    # Clean up tasks - only rows with Task ID
+    data['tasks'] = data['tasks'][data['tasks']['Task ID'].notna()].copy()
+
+    # Clean up time log - only rows with Date
+    data['time_log'] = data['time_log'][data['time_log']['Date'].notna()].copy()
+    data['time_log']['Date'] = pd.to_datetime(data['time_log']['Date'])
+
+    return data
+
+def calculate_week_dates():
+    """Calculate current and previous week date ranges."""
+    today = datetime.now()
+    # Find Monday of current week
+    days_since_monday = today.weekday()
+    current_week_start = today - timedelta(days=days_since_monday)
+    current_week_start = current_week_start.replace(hour=0, minute=0, second=0, microsecond=0)
+    current_week_end = current_week_start + timedelta(days=6)
+
+    prev_week_start = current_week_start - timedelta(days=7)
+    prev_week_end = prev_week_start + timedelta(days=6)
+
+    return {
+        'current': (current_week_start, current_week_end),
+        'previous': (prev_week_start, prev_week_end),
+        'today': today
+    }
+
+# METRICS CALCULATION
+
+def calculate_metrics(data, week_dates):
+    """Calculate all dashboard metrics."""
+    tasks = data['tasks']
+    time_log = data['time_log']
+
+    current_start, current_end = week_dates['current']
+    prev_start, prev_end = week_dates['previous']
+
+    # Filter time log for current and previous weeks
+    current_week_time = time_log[
+        (time_log['Date'] >= current_start) &
+        (time_log['Date'] <= current_end)
+    ]
+    prev_week_time = time_log[
+        (time_log['Date'] >= prev_start) &
+        (time_log['Date'] <= prev_end)
+    ]
+
+    metrics = {
+        'total_tasks': len(tasks),
+        'tasks_in_progress': len(tasks[tasks['Status'] == 'In Progress']),
+        'tasks_blocked': len(tasks[tasks['Status'] == 'Blocked']),
+        'tasks_complete': len(tasks[tasks['Status'] == 'Complete']),
+        'scope_changes': len(tasks[tasks['Scope Change'].isin(['Added', 'Reduced'])]),
+
+        # Time metrics
+        'current_week_hours': current_week_time['Hours'].sum() if len(current_week_time) > 0 else 0,
+        'prev_week_hours': prev_week_time['Hours'].sum() if len(prev_week_time) > 0 else 0,
+        'total_hours_logged': time_log['Hours'].sum(),
+
+        # By project
+        'hours_by_project': {},
+        'tasks_by_project': {},
+
+        # Daily breakdown for current week
+        'daily_hours': {}
+    }
+
+    # Hours by project (current week)
+    for parent_code, config in PROJECT_CONFIG.items():
+        project_time = current_week_time[current_week_time['Parent (auto)'] == config['display_name']]
+        metrics['hours_by_project'][parent_code] = project_time['Hours'].sum() if len(project_time) > 0 else 0
+
+        project_tasks = tasks[tasks['Parent Category'] == config['display_name']]
+        metrics['tasks_by_project'][parent_code] = {
+            'total': len(project_tasks),
+            'in_progress': len(project_tasks[project_tasks['Status'] == 'In Progress']),
+            'complete': len(project_tasks[project_tasks['Status'] == 'Complete']),
+            'blocked': len(project_tasks[project_tasks['Status'] == 'Blocked'])
+        }
+
+    # Daily hours breakdown
+    for i in range(7):
+        day_date = current_start + timedelta(days=i)
+        day_name = day_date.strftime('%a')
+        day_time = current_week_time[current_week_time['Date'].dt.date == day_date.date()]
+        metrics['daily_hours'][day_name] = {
+            'date': day_date.strftime('%Y-%m-%d'),
+            'total': day_time['Hours'].sum() if len(day_time) > 0 else 0,
+            'by_project': {}
+        }
+        for parent_code, config in PROJECT_CONFIG.items():
+            project_time = day_time[day_time['Parent (auto)'] == config['display_name']]
+            metrics['daily_hours'][day_name]['by_project'][parent_code] = project_time['Hours'].sum() if len(project_time) > 0 else 0
+
+    return metrics
+
+def calculate_subcategory_hours(data, week_dates):
+    """Calculate hours by subcategory for current week."""
+    time_log = data['time_log']
+    current_start, current_end = week_dates['current']
+
+    current_week_time = time_log[
+        (time_log['Date'] >= current_start) &
+        (time_log['Date'] <= current_end)
+    ]
+
+    subcategory_hours = {}
+    for parent_code, config in PROJECT_CONFIG.items():
+        project_time = current_week_time[current_week_time['Parent (auto)'] == config['display_name']]
+        if len(project_time) > 0:
+            subcategory_hours[parent_code] = project_time.groupby('Subcategory (auto)')['Hours'].sum().to_dict()
+        else:
+            subcategory_hours[parent_code] = {}
+
+    return subcategory_hours
+
+def get_recent_tasks(data, limit=10):
+    """Get recently updated/active tasks."""
+    tasks = data['tasks']
+
+    # Filter to in-progress or recently updated
+    active = tasks[tasks['Status'].isin(['In Progress', 'Blocked', 'Planned'])].copy()
+
+    # Sort by priority then status
+    priority_order = {'P1 - Critical': 0, 'P2 - High': 1, 'P3 - Medium': 2, 'P4 - Low': 3}
+    status_order = {'Blocked': 0, 'In Progress': 1, 'Planned': 2}
+
+    if len(active) > 0:
+        active['priority_sort'] = active['Priority'].map(priority_order).fillna(4)
+        active['status_sort'] = active['Status'].map(status_order).fillna(3)
+        active = active.sort_values(['status_sort', 'priority_sort'])
+
+    return active.head(limit)
+
+def get_blocked_tasks(data):
+    """Get all blocked tasks."""
+    tasks = data['tasks']
+    return tasks[tasks['Status'] == 'Blocked']
+
+def get_scope_changes(data):
+    """Get tasks with scope changes."""
+    tasks = data['tasks']
+    return tasks[tasks['Scope Change'].isin(['Added', 'Reduced'])]
+
+# HTML GENERATION
+
+def generate_html(data, metrics, week_dates, subcategory_hours):
+    """Generate the complete HTML dashboard."""
+
+    current_start, current_end = week_dates['current']
+    week_range = f"{current_start.strftime('%B %d')} – {current_end.strftime('%d, %Y')}"
+
+    blocked_tasks = get_blocked_tasks(data)
+    scope_changes = get_scope_changes(data)
+    recent_tasks = get_recent_tasks(data, limit=15)
+
+    html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PM Dashboard — Patrick Anderson</title>
+    <style>
+{generate_css()}
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <header>
+            <h1>📊 Project Management Dashboard</h1>
+            <p class="subtitle">Patrick Anderson — Infrastructure Intelligence / Geospatial Analytics</p>
+            <p class="week-range">Week of {week_range}</p>
+            <p class="generated">Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+        </header>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="quick-stat">
+                <div class="quick-stat-value">{metrics['current_week_hours']:.1f}</div>
+                <div class="quick-stat-label">Hours This Week</div>
+                <div class="quick-stat-delta {'positive' if metrics['current_week_hours'] >= metrics['prev_week_hours'] else 'negative'}">
+                    {'↑' if metrics['current_week_hours'] >= metrics['prev_week_hours'] else '↓'}
+                    {abs(metrics['current_week_hours'] - metrics['prev_week_hours']):.1f} vs last week
+                </div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-value">{metrics['tasks_in_progress']}</div>
+                <div class="quick-stat-label">Tasks In Progress</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-value">{len(blocked_tasks)}</div>
+                <div class="quick-stat-label">Blockers</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-value">{len(scope_changes)}</div>
+                <div class="quick-stat-label">Scope Changes</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-value">{metrics['total_hours_logged']:.0f}</div>
+                <div class="quick-stat-label">Total Hours (All Time)</div>
+            </div>
+        </div>
+
+{generate_blockers_section(blocked_tasks) if len(blocked_tasks) > 0 else ''}
+
+{generate_scope_changes_section(scope_changes) if len(scope_changes) > 0 else ''}
+
+        <!-- Project Cards -->
+        <section>
+            <h2>📁 Project Status</h2>
+            <div class="projects-grid">
+{generate_project_cards(data, metrics, subcategory_hours)}
+            </div>
+        </section>
+
+        <!-- Time Heatmap -->
+        <section>
+            <h2>⏱️ Time Allocation — This Week</h2>
+{generate_time_heatmap(metrics)}
+        </section>
+
+        <!-- Active Tasks -->
+        <section>
+            <h2>📋 Active Tasks</h2>
+{generate_task_list(recent_tasks)}
+        </section>
+
+        <!-- Weekly Highlights -->
+        <section>
+            <h2>📊 Weekly Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Hours by Project</h3>
+                    <div class="summary-bars">
+{generate_project_hour_bars(metrics)}
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <h3>Task Status</h3>
+                    <div class="task-status-summary">
+                        <div class="status-item">
+                            <span class="status-dot complete"></span>
+                            <span>Complete: {metrics['tasks_complete']}</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-dot in-progress"></span>
+                            <span>In Progress: {metrics['tasks_in_progress']}</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-dot blocked"></span>
+                            <span>Blocked: {metrics['tasks_blocked']}</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-dot backlog"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Infrastructure Intelligence — Geospatial Analytics</p>
+            <p>Data source: Patrick_Work_Organizer_Hierarchy.xlsx</p>
+        </footer>
+    </div>
+</body>
+</html>'''
+
+    return html
+
+def generate_css():
+    """Generate the CSS styles (glassmorphism theme)."""
+    return '''
+:root {
+    --gradient-start: #1a1a2e;
+    --gradient-mid: #16213e;
+    --gradient-end: #0f3460;
+    --accent-primary: #4facfe;
+    --accent-secondary: #00f2fe;
+    --text-primary: #e8e8e8;
+    --text-secondary: #8892b0;
+    --card-bg: rgba(255,255,255,0.05);
+    --card-border: rgba(255,255,255,0.1);
+    --success: #00d68f;
+    --warning: #ffaa00;
+    --danger: #ff6b6b;
+    --info: #4facfe;
+    --purple: #9b59b6;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 50%, var(--gradient-end) 100%);
+    min-height: 100vh;
+    color: var(--text-primary);
+    padding: 40px 20px;
+    line-height: 1.6;
+}
+
+.container { max-width: 1400px; margin: 0 auto; }
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+}
+
+h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+}
+
+.subtitle { color: var(--text-secondary); font-size: 1.1rem; }
+.week-range {
+    margin-top: 10px;
+    font-size: 1.3rem;
+    color: var(--accent-primary);
+    font-weight: 600;
+}
+.generated { color: var(--text-secondary); font-size: 0.85rem; margin-top: 5px; }
+
+/* Quick Stats */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.quick-stat {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid var(--card-border);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.quick-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(79, 172, 254, 0.15);
+}
+
+.quick-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.quick-stat-label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.quick-stat-delta {
+    font-size: 0.75rem;
+    margin-top: 6px;
+}
+.quick-stat-delta.positive { color: var(--success); }
+.quick-stat-delta.negative { color: var(--danger); }
+
+/* Sections */
+section {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+}
+
+h2 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    color: var(--accent-primary);
+}
+
+h3 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+/* Project Cards */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.project-card {
+    background: rgba(255,255,255,0.03);
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid var(--card-border);
+    transition: all 0.3s ease;
+}
+
+.project-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 20px rgba(79, 172, 254, 0.1);
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.project-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.project-icon { font-size: 1.3rem; }
+
+.project-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.project-hours {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+
+.project-hours-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Progress bars */
+.progress-container { margin: 12px 0; }
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+}
+.progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Subcategory list */
+.subcategory-list {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--card-border);
+}
+
+.subcategory-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.subcategory-item:last-child { border-bottom: none; }
+
+.subcategory-name { color: var(--text-secondary); }
+.subcategory-hours {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+.subcategory-hours.has-hours { color: var(--accent-primary); }
+
+/* Badges */
+.badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-backlog { background: rgba(136, 146, 176, 0.2); color: #8892b0; }
+.status-planned { background: rgba(136, 146, 176, 0.2); color: #8892b0; }
+.status-in-progress { background: rgba(79, 172, 254, 0.2); color: #4facfe; }
+.status-blocked { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+.status-complete { background: rgba(0, 214, 143, 0.2); color: #00d68f; }
+
+.priority-p1 { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+.priority-p2 { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
+.priority-p3 { background: rgba(79, 172, 254, 0.2); color: #4facfe; }
+.priority-p4 { background: rgba(136, 146, 176, 0.2); color: #8892b0; }
+
+/* Blockers section */
+.blockers-section {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.05));
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+.blockers-section h2 { color: var(--danger); }
+
+.scope-section {
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.1), rgba(255, 170, 0, 0.05));
+    border: 1px solid rgba(255, 170, 0, 0.3);
+}
+.scope-section h2 { color: var(--warning); }
+
+/* Task list */
+.task-list { list-style: none; }
+
+.task-list li {
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-left: 4px solid transparent;
+}
+
+.task-list li:hover { background: rgba(255,255,255,0.04); }
+.task-list li.blocked { border-left-color: var(--danger); background: rgba(255, 107, 107, 0.05); }
+.task-list li.in-progress { border-left-color: var(--accent-primary); }
+.task-list li.planned { border-left-color: var(--text-secondary); }
+.task-list li.scope-change { border-left-color: var(--warning); background: rgba(255, 170, 0, 0.05); }
+
+.task-icon { font-size: 1.1rem; flex-shrink: 0; }
+.task-content { flex: 1; }
+
+.task-id {
+    font-size: 0.75rem;
+    color: var(--accent-primary);
+    font-family: monospace;
+    margin-bottom: 2px;
+}
+
+.task-title { font-weight: 600; color: var(--text-primary); }
+
+.task-project {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.task-badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+/* Time Heatmap */
+.heatmap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.heatmap-table th {
+    background: rgba(255,255,255,0.05);
+    padding: 12px 8px;
+    text-align: center;
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+    color: var(--accent-primary);
+    font-weight: 600;
+}
+
+.heatmap-table th:first-child { text-align: left; width: 35%; }
+
+.heatmap-table td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.heatmap-table td:first-child { text-align: left; font-weight: 500; }
+
+.heatmap-table tr:hover { background: rgba(255,255,255,0.02); }
+
+.row-project { font-weight: 600; background: rgba(255,255,255,0.03); }
+.row-total {
+    font-weight: 700;
+    background: rgba(79, 172, 254, 0.1);
+    border-top: 2px solid rgba(79, 172, 254, 0.3);
+}
+
+/* Heatmap colors */
+.heat-0 { background: transparent; color: var(--text-secondary); }
+.heat-1 { background: rgba(79, 172, 254, 0.15); }
+.heat-2 { background: rgba(79, 172, 254, 0.3); }
+.heat-3 { background: rgba(0, 242, 254, 0.3); }
+.heat-4 { background: rgba(255, 170, 0, 0.3); }
+.heat-5 { background: rgba(255, 107, 107, 0.4); font-weight: 600; }
+
+.week-col { min-width: 70px; background: rgba(79, 172, 254, 0.05); }
+
+/* Summary */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.summary-card {
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--card-border);
+}
+
+.summary-bars { margin-top: 12px; }
+
+.summary-bar-item {
+    margin-bottom: 12px;
+}
+
+.summary-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+.summary-bar-track {
+    height: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.summary-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gradient-start);
+    min-width: 30px;
+}
+
+.task-status-summary { margin-top: 12px; }
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.status-item:last-child { border-bottom: none; }
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.status-dot.complete { background: var(--success); }
+.status-dot.in-progress { background: var(--accent-primary); }
+.status-dot.blocked { background: var(--danger); }
+.status-dot.backlog { background: var(--text-secondary); }
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .projects-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 1.8rem; }
+}
+
+@media print {
+    body { background: white; color: #333; padding: 20px; }
+    section { border: 1px solid #ddd; background: white; break-inside: avoid; }
+    h1, h2, .quick-stat-value {
+        -webkit-text

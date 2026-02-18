@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📁 Interactive Folder Structure — Data Center Consensus GIS Model</title>
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+
+            /* Folder color palette - each folder gets a unique hue */
+            --color-docs: #58a6ff;
+            --color-ingestion: #3fb950;
+            --color-processing: #f0883e;
+            --color-ucid: #a371f7;
+            --color-validation: #f778ba;
+            --color-accuracy: #79c0ff;
+            --color-visualization: #ffd700;
+            --color-utils: #8b949e;
+            --color-archive: #6e7681;
+            --color-outputs: #7ee787;
+            --color-root: #ff7b72;
+            --color-gdrive: #4285f4;
+
+            /* File type colors */
+            --python-color: #4ec9b0;
+            --md-color: #9cdcfe;
+            --html-color: #ce9178;
+            --css-color: #c586c0;
+            --csv-color: #6a9955;
+            --ps1-color: #569cd6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #1f6feb 0%, #8957e5 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #21262d;
+            border-color: #58a6ff;
+        }
+
+        .btn.active {
+            background: #1f6feb;
+            border-color: #1f6feb;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85em;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .tree-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+
+        .tree-wrapper {
+            position: relative;
+            padding-left: 10px;
+        }
+
+        /* Tree node styles */
+        .tree-node {
+            position: relative;
+            margin: 2px 0;
+        }
+
+        .node-content {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            user-select: none;
+        }
+
+        .node-content:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .node-content.folder-node:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .toggle-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 4px;
+            font-size: 10px;
+            color: var(--text-secondary);
+            transition: transform 0.2s ease;
+        }
+
+        .toggle-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .toggle-icon.hidden {
+            visibility: hidden;
+        }
+
+        .node-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .node-label {
+            flex: 1;
+            font-size: 0.95em;
+        }
+
+        .node-badge {
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+            opacity: 0.9;
+        }
+
+        .node-count {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+
+        .node-desc {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-left: 10px;
+            font-style: italic;
+        }
+
+        /* Children container */
+        .node-children {
+            margin-left: 24px;
+            padding-left: 16px;
+            border-left: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.2s ease;
+        }
+
+        .node-children.collapsed {
+            max-height: 0 !important;
+            opacity: 0;
+        }
+
+        /* Folder-specific colors */
+        .folder-00_docs .node-label { color: var(--color-docs); }
+        .folder-01_ingestion .node-label { color: var(--color-ingestion); }
+        .folder-02_processing .node-label { color: var(--color-processing); }
+        .folder-03_ucid .node-label { color: var(--color-ucid); }
+        .folder-04_validation .node-label { color: var(--color-validation); }
+        .folder-05_accuracy .node-label { color: var(--color-accuracy); }
+        .folder-06_visualization .node-label { color: var(--color-visualization); }
+        .folder-_utils .node-label { color: var(--color-utils); }
+        .folder-_archive .node-label { color: var(--color-archive); }
+        .folder-outputs .node-label { color: var(--color-outputs); }
+        .folder-root .node-label { color: var(--color-root); }
+
+        /* File type colors for files */
+        .file-py .node-label { color: var(--python-color); }
+        .file-md .node-label { color: var(--md-color); }
+        .file-html .node-label { color: var(--html-color); }
+        .file-css .node-label { color: var(--css-color); }
+        .file-csv .node-label { color: var(--csv-color); }
+        .file-ps1 .node-label { color: var(--ps1-color); }
+
+        /* Pipeline step highlight */
+        .pipeline-step .node-content {
+            background: linear-gradient(90deg, rgba(136,87,229,0.15) 0%, transparent 100%);
+            border-left: 3px solid #8957e5;
+            padding-left: 7px;
+        }
+
+        /* Badge colors */
+        .badge-docs { background: var(--color-docs); color: #000; }
+        .badge-ingestion { background: var(--color-ingestion); color: #000; }
+        .badge-processing { background: var(--color-processing); color: #000; }
+        .badge-ucid { background: var(--color-ucid); color: #fff; }
+        .badge-validation { background: var(--color-validation); color: #000; }
+        .badge-accuracy { background: var(--color-accuracy); color: #000; }
+        .badge-visualization { background: var(--color-visualization); color: #000; }
+        .badge-utils { background: var(--color-utils); color: #000; }
+        .badge-archive { background: var(--color-archive); color: #fff; }
+        .badge-pipeline { background: #8957e5; color: #fff; }
+
+        /* Stats section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 600;
+            background: linear-gradient(135deg, #58a6ff, #a371f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        /* Animations */
+        @keyframes highlight {
+            0% { background: rgba(88,166,255,0.3); }
+            100% { background: transparent; }
+        }
+
+        .node-content.just-toggled {
+            animation: highlight 0.5s ease-out;
+        }
+
+        /* Search highlight */
+        .search-match .node-label {
+            background: rgba(255,215,0,0.3);
+            padding: 0 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📁 Interactive Folder Structure</h1>
+<p class="subtitle">Data Center Consensus GIS Model — Click folders to expand/collapse</p>
+        </header>
+
+        <!-- Google Drive Info Box -->
+        <div style="background: linear-gradient(135deg, rgba(66,133,244,0.15) 0%, rgba(66,133,244,0.05) 100%); border: 1px solid rgba(66,133,244,0.4); border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+            <h3 style="color: #4285f4; margin-bottom: 15px; text-align: center;">☁️ Google Drive — Team Access (Auto-Syncs)</h3>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+                <span style="background: var(--bg-card); padding: 8px 14px; border-radius: 6px; border: 1px solid #8957e5;">Edit locally</span>
+                <span style="color: #4285f4; font-size: 1.3em;">→</span>
+                <span style="background: var(--bg-card); padding: 8px 14px; border-radius: 6px; border: 1px solid #4285f4;">Copy to G:\</span>
+                <span style="color: #4285f4; font-size: 1.3em;">→</span>
+                <span style="background: var(--bg-card); padding: 8px 14px; border-radius: 6px; border: 1px solid #4285f4;">Auto-syncs</span>
+                <span style="color: #4285f4; font-size: 1.3em;">→</span>
+                <span style="background: var(--bg-card); padding: 8px 14px; border-radius: 6px; border: 1px solid #4285f4;">Team views</span>
+            </div>
+            <div style="font-family: monospace; font-size: 0.9em; background: #0d1117; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div style="color: #4285f4;">G:\My Drive\Consensus GIS Model Cleaned Inputs\Admin Documentation\</div>
+                <div style="margin-left: 20px; color: var(--text-secondary);">├── _archive/        <span style="color: #6e7681;">← Dated backups</span></div>
+                <div style="margin-left: 20px; color: var(--text-secondary);">├── context/         <span style="color: #6e7681;">← AI_CONTEXT_PROMPT.md</span></div>
+                <div style="margin-left: 20px; color: var(--text-secondary);">├── dashboards/      <span style="color: #6e7681;">← PROJECT_OVERVIEW.html</span></div>
+                <div style="margin-left: 20px; color: var(--text-secondary);">├── pipeline_diagnostics/ <span style="color: #3fb950;">← Auto-writes</span></div>
+                <div style="margin-left: 20px; color: var(--text-secondary);">├── progress_updates/ <span style="color: #6e7681;">← WEEKLY_STATUS + progress reports</span></div>
+                <div style="margin-left: 20px; color: var(--text-secondary);">├── schemas/         <span style="color: #6e7681;">← Schema documentation</span></div>
+                <div style="margin-left: 20px; color: var(--text-secondary);">├── visualizations/  <span style="color: #6e7681;">← Folder structure diagrams</span></div>
+                <div style="margin-left: 20px; color: var(--text-secondary);">└── workflows/       <span style="color: #6e7681;">← Pipeline docs, SOPs</span></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="expandAll()">➕ Expand All</button>
+            <button class="btn" onclick="collapseAll()">➖ Collapse All</button>
+            <button class="btn" onclick="expandLevel(1)">📂 Level 1</button>
+            <button class="btn" onclick="expandLevel(2)">📂 Level 2</button>
+            <button class="btn" onclick="showPipelineOnly()">⭐ Pipeline Only</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background: var(--color-docs);"></div><span>Documentation</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--color-ingestion);"></div><span>Ingestion</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--color-processing);"></div><span>Processing</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--color-ucid);"></div><span>UCID</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--color-validation);"></div><span>Validation</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--color-accuracy);"></div><span>Accuracy</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--color-visualization);"></div><span>Visualization</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: #8957e5;"></div><span>Pipeline Step</span></div>
+        </div>
+
+        <div class="tree-container">
+            <div class="tree-wrapper" id="tree"></div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">65</div>
+                <div class="stat-label">Active Scripts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24</div>
+                <div class="stat-label">Archived</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div class="stat-label">Main Folders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Pipeline Steps</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">28</div>
+                <div class="stat-label">Doc Files</div>
+            </div>
+        </div>
+
+        <footer>
+            <p>📁 Data Center Consensus GIS Model — Interactive Folder Structure</p>
+            <p>Generated January 5, 2026 | Session 7: Google Drive Integration</p>
+        </footer>
+    </div>
+
+    <script>
+        // Folder structure data
+        const folderData = {
+            name: "scripts/",
+            type: "folder",
+            folderClass: "root",
+            badge: "Root",
+            badgeClass: "badge-pipeline",
+            expanded: true,
+            children: [
+                {
+                    name: "00_docs/",
+                    type: "folder",
+                    folderClass: "00_docs",
+                    badge: "Documentation",
+                    badgeClass: "badge-docs",
+                    expanded: true,
+                    children: [
+                        {
+                            name: "context/",
+                            type: "folder",
+                            folderClass: "00_docs",
+                            count: 4,
+                            children: [
+                                { name: "AI_CONTEXT_PROMPT.md", type: "file", ext: "md" },
+                                { name: "SCRIPT_AUDIT_AND_REORG.md", type: "file", ext: "md" },
+                                { name: "SCRIPT_REORGANIZATION_PLAN.md", type: "file", ext: "md" },
+                                { name: "SESSION_LOG.md", type: "file", ext: "md" }
+                            ]
+                        },
+                        {
+                            name: "reports/",
+                            type: "folder",
+                            folderClass: "00_docs",
+                            children: [
+                                {
+                                    name: "dashboards/",
+                                    type: "folder",
+                                    folderClass: "00_docs",
+                                    count: 3,
+                                    children: [
+                                        { name: "FOLDER_STRUCTURE_DIAGRAM.html", type: "file", ext: "html" },
+                                        { name: "FOLDER_STRUCTURE_INTERACTIVE.html", type: "file", ext: "html" },
+                                        { name: "PROJECT_OVERVIEW.html", type: "file", ext: "html" }
+                                    ]
+                                },
+                                {
+                                    name: "pipeline_diagnostics/",
+                                    type: "folder",
+                                    folderClass: "00_docs",
+                                    count: 8,
+                                    children: [
+                                        { name: "PIPELINE_DIAGNOSTIC_*.html", type: "file", ext: "html", desc: "8 report files" }
+                                    ]
+                                },
+                                {
+                                    name: "progress_updates/",
+                                    type: "folder",
+                                    folderClass: "00_docs",
+                                    count: 4,
+                                    children: [
+                                        { name: "WEEKLY_STATUS_DASHBOARD.html", type: "file", ext: "html" },
+                                        { name: "PROGRESS_UPDATE_DEC30.html", type: "file", ext: "html" },
+                                        { name: "PROGRESS_UPDATE_JAN02.html", type: "file", ext: "html" },
+                                        { name: "PROGRESS_UPDATE_JAN05.html", type: "file", ext: "html" }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            name: "schemas/",
+                            type: "folder",
+                            folderClass: "00_docs",
+                            count: 8,
+                            children: [
+                                { name: "CAPACITY_*.md", type: "file", ext: "md", desc: "2 files" },
+                                { name: "SCHEMA_*.md", type: "file", ext: "md", desc: "3 files" },
+                                { name: "SCHEMA_*_DARK.html", type: "file", ext: "html", desc: "2 files" },
+                                { name: "UCID_VISUAL_SUMMARY.md", type: "file", ext: "md" }
+                            ]
+                        },
+                        {
+                            name: "workflows/",
+                            type: "folder",
+                            folderClass: "00_docs",
+                            count: 6,
+                            children: [
+                                { name: "GRANULARITY_STRATEGY.md", type: "file", ext: "md" },
+                                { name: "META_CANONICAL_WORKFLOW.md", type: "file", ext: "md" },
+                                { name: "PIPELINE_DOCUMENTATION.md", type: "file", ext: "md" },
+                                { name: "PIPELINE_EXECUTION_ORDER.md", type: "file", ext: "md" },
+                                { name: "UCID_DESIGN.md", type: "file", ext: "md" },
+                                { name: "V2_INGESTION_AUDIT_TASKS.md", type: "file", ext: "md" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "01_ingestion/",
+                    type: "folder",
+                    folderClass: "01_ingestion",
+                    badge: "Step 1",
+                    badgeClass: "badge-ingestion",
+                    expanded: true,
+                    children: [
+                        { name: "ingest_dch.py", type: "file", ext: "py", pipeline: true, desc: "DCH Hyper (~1,876)" },
+                        { name: "ingest_dch_lease.py", type: "file", ext: "py", pipeline: true, desc: "DCH Lease (~5,176)" },
+                        { name: "ingest_semianalysis.py", type: "file", ext: "py", pipeline: true, desc: "Semianalysis (~5,472)" },
+                        { name: "ingest_dcm.py", type: "file", ext: "py", pipeline: true, desc: "DataCenterMap (~8,453)" },
+                        { name: "ingest_npm.py", type: "file", ext: "py", pipeline: true, desc: "NewProjectMedia (~1,399)" },
+                        { name: "ingest_meta_canonical.py", type: "file", ext: "py", pipeline: true, desc: "Meta (~318)" }
+                    ]
+                },
+                {
+                    name: "02_processing/",
+                    type: "folder",
+                    folderClass: "02_processing",
+                    badge: "Transform",
+                    badgeClass: "badge-processing",
+                    expanded: true,
+                    children: [
+                        { name: "migrate_company_fields_v2.py", type: "file", ext: "py", pipeline: true, desc: "⭐ Step 2" },
+                        { name: "campus_rollup_new.py", type: "file", ext: "py", pipeline: true, desc: "⭐ Step 4" },
+                        { name: "cleanup_gold_campus.py", type: "file", ext: "py", pipeline: true, desc: "⭐ Step 5" },
+                        { name: "meta_deduplicate.py", type: "file", ext: "py", desc: "Suite→Building" },
+                        { name: "enrich_geography_fields.py", type: "file", ext: "py", desc: "Utility" },
+                        { name: "populate_latlon_from_geometry.py", type: "file", ext: "py", desc: "Utility" },
+                        { name: "recreate_gold_buildings.py", type: "file", ext: "py", desc: "Recovery" }
+                    ]
+                },
+                {
+                    name: "03_ucid/",
+                    type: "folder",
+                    folderClass: "03_ucid",
+                    badge: "Step 3",
+                    badgeClass: "badge-ucid",
+                    expanded: true,
+                    children: [
+                        { name: "generate_text_ucid.py", type: "file", ext: "py", pipeline: true, desc: "⭐ Main UCID" },
+                        { name: "analyze_ucid_confidence.py", type: "file", ext: "py" },
+                        { name: "assign_ucid_to_gold.py", type: "file", ext: "py" },
+                        { name: "generate_ucid_clusters.py", type: "file", ext: "py" },
+                        { name: "ucid_intake_matcher.py", type: "file", ext: "py" },
+                        { name: "validate_ucid_comparison.py", type: "file", ext: "py" },
+                        { name: "README.md", type: "file", ext: "md" }
+                    ]
+                },
+                {
+                    name: "04_validation/",
+                    type: "folder",
+                    folderClass: "04_validation",
+                    badge: "QA",
+                    badgeClass: "badge-validation",
+                    expanded: true,
+                    children: [
+                        {
+                            name: "core/",
+                            type: "folder",
+                            folderClass: "04_validation",
+                            count: 6,
+                            children: [
+                                { name: "validate_granularity.py", type: "file", ext: "py" },
+                                { name: "validate_canonical_integrity.py", type: "file", ext: "py" },
+                                { name: "torture_test_gold_datasets.py", type: "file", ext: "py" },
+                                { name: "validate_gold_buildings_data.py", type: "file", ext: "py" },
+                                { name: "validate_gold_build_schema.py", type: "file", ext: "py" },
+                                { name: "validate_coordinate_independence.py", type: "file", ext: "py" }
+                            ]
+                        },
+                        {
+                            name: "diagnostics/",
+                            type: "folder",
+                            folderClass: "04_validation",
+                            count: 14,
+                            desc: "Ad-hoc checks",
+                            children: [
+                                { name: "*.py", type: "file", ext: "py", desc: "14 diagnostic scripts" }
+                            ]
+                        },
+                        {
+                            name: "reports/",
+                            type: "folder",
+                            folderClass: "04_validation",
+                            children: [
+                                { name: "generate_pipeline_report.py", type: "file", ext: "py", pipeline: true, desc: "⭐ Dashboard" },
+                                { name: "full_data_source_audit.py", type: "file", ext: "py" },
+                                { name: "analyze_capacity_coverage.py", type: "file", ext: "py" },
+                                { name: "apple_dark_theme.css", type: "file", ext: "css" }
+                            ]
+                        },
+                        {
+                            name: "fixes/",
+                            type: "folder",
+                            folderClass: "04_validation",
+                            count: 5,
+                            desc: "Data quality fixes",
+                            children: [
+                                { name: "*.py", type: "file", ext: "py", desc: "5 fix scripts" }
+                            ]
+                        },
+                        { name: "README.md", type: "file", ext: "md" }
+                    ]
+                },
+                {
+                    name: "05_accuracy/",
+                    type: "folder",
+                    folderClass: "05_accuracy",
+                    badge: "Analysis",
+                    badgeClass: "badge-accuracy",
+                    expanded: true,
+                    children: [
+                        { name: "capacity_accuracy_analysis_v2.py", type: "file", ext: "py" },
+                        { name: "capacity_variance_experiments.py", type: "file", ext: "py" },
+                        { name: "capacity_variance_experiments_all_sources.py", type: "file", ext: "py" },
+                        { name: "comprehensive_spatial_accuracy_report.py", type: "file", ext: "py" },
+                        { name: "multi_source_spatial_accuracy.py", type: "file", ext: "py", desc: "Merged from 03_" },
+                        {
+                            name: "_diagnostics/",
+                            type: "folder",
+                            folderClass: "05_accuracy",
+                            count: 9,
+                            desc: "Source-specific",
+                            children: [
+                                { name: "analyze_dch_source.py", type: "file", ext: "py" },
+                                { name: "audit_capacity_by_source.py", type: "file", ext: "py" },
+                                { name: "compare_semi_vs_dch_campus.py", type: "file", ext: "py" },
+                                { name: "dch_building_level_accuracy.py", type: "file", ext: "py" },
+                                { name: "investigate_dch_granularity_v2.py", type: "file", ext: "py" },
+                                { name: "...", type: "file", ext: "py", desc: "+4 more" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "06_visualization/",
+                    type: "folder",
+                    folderClass: "06_visualization",
+                    badge: "Step 6",
+                    badgeClass: "badge-visualization",
+                    expanded: true,
+                    children: [
+                        { name: "create_xb_combined_layer.py", type: "file", ext: "py", pipeline: true, desc: "⭐ XB Layer" },
+                        { name: "generate_capacity_presentation_charts.py", type: "file", ext: "py" },
+                        { name: "plot_spatial_accuracy_LIGHT_THEME.py", type: "file", ext: "py" }
+                    ]
+                },
+                {
+                    name: "_utils/",
+                    type: "folder",
+                    folderClass: "_utils",
+                    badge: "Utilities",
+                    badgeClass: "badge-utils",
+                    expanded: true,
+                    children: [
+                        { name: "config.py", type: "file", ext: "py", desc: "⚠️ CRITICAL" },
+                        { name: "helper_scripts.py", type: "file", ext: "py", desc: "Shared functions" },
+                        { name: "load_helpers.py", type: "file", ext: "py", desc: "Interactive console" },
+                        { name: "test_scripts.py", type: "file", ext: "py", desc: "Dev tool" },
+                        { name: "copy_to_fbsource.ps1", type: "file", ext: "ps1", desc: "Deployment" }
+                    ]
+                },
+                {
+                    name: "_archive/",
+                    type: "folder",
+                    folderClass: "_archive",
+                    badge: "24 Archived",
+                    badgeClass: "badge-archive",
+                    children: [
+                        { name: "consensus/", type: "folder", folderClass: "_archive", count: 3, desc: "Superseded by UCID" },
+                        { name: "ingestion/", type: "folder", folderClass: "_archive", count: 5, desc: "Deprecated sources" },
+                        { name: "migrations/", type: "folder", folderClass: "_archive", count: 4, desc: "Schema migrations" },
+                        { name: "processing/", type: "folder", folderClass: "_archive", count: 7, desc: "Superseded workflows" },
+                        { name: "validation/", type: "folder", folderClass: "_archive", count: 5, desc: "One-time audits" },
+                        { name: "README.md", type: "file", ext: "md", desc: "Archive docs" }
+                    ]
+                },
+                {
+                    name: "outputs/",
+                    type: "folder",
+                    folderClass: "outputs",
+                    count: 9,
+                    desc: "CSV outputs",
+                    children: [
+                        { name: "*.csv", type: "file", ext: "csv", desc: "9 output files" }
+                    ]
+                },
+                { name: "run_full_pipeline.py", type: "file", ext: "py", pipeline: true, desc: "⭐ MASTER SCRIPT" }
+            ]
+        };
+
+        // File type icons
+        const fileIcons = {
+            py: { icon: "🐍", name: "Python" },
+            md: { icon: "📄", name: "Markdown" },
+            html: { icon: "🌐", name: "HTML" },
+            css: { icon: "🎨", name: "CSS" },
+            csv: { icon: "📊", name: "CSV" },
+            ps1: { icon: "⚡", name: "PowerShell" }
+        };
+
+        // Render tree recursively
+        function renderNode(node, level = 0) {
+            const isFolder = node.type === "folder";
+            const expanded = node.expanded !== false;
+
+            let html = `<div class="tree-node" data-level="${level}" data-expanded="${expanded}">`;
+
+            // Node content
+            const folderClass = node.folderClass ? `folder-${node.folderClass}` : "";
+            const fileClass = node.ext ? `file-${node.ext}` : "";
+            const pipelineClass = node.pipeline ? "pipeline-step" : "";
+
+            html += `<div class="node-content ${isFolder ? 'folder-node' : ''} ${folderClass} ${fileClass} ${pipelineClass}" onclick="${isFolder ? 'toggleNode(this)' : ''}">`;
+
+            // Toggle icon (for folders)
+            if (isFolder && node.children && node.children.length > 0) {
+                html += `<span class="toggle-icon ${expanded ? 'expanded' : ''}">▶</span>`;
+            } else {
+                html += `<span class="toggle-icon hidden">▶</span>`;
+            }
+
+            // Node icon
+            if (isFolder) {
+                html += `<span class="node-icon">${expanded ? '📂' : '📁'}</span>`;
+            } else {
+                const fileInfo = fileIcons[node.ext] || { icon: "📄" };
+                html += `<span class="node-icon">${fileInfo.icon}</span>`;
+            }
+
+            // Node label
+            html += `<span class="node-label">${node.name}</span>`;
+
+            // Badge
+            if (node.badge) {
+                html += `<span class="node-badge ${node.badgeClass || ''}">${node.badge}</span>`;
+            }
+
+            // Count
+            if (node.count) {
+                html += `<span class="node-count">(${node.count})</span>`;
+            }
+
+            // Description
+            if (node.desc) {
+                html += `<span class="node-desc">— ${node.desc}</span>`;
+            }
+
+            html += `</div>`;
+
+            // Children
+            if (isFolder && node.children && node.children.length > 0) {
+                const childrenHtml = node.children.map(child => renderNode(child, level + 1)).join('');
+                html += `<div class="node-children ${expanded ? '' : 'collapsed'}" style="max-height: ${expanded ? '2000px' : '0'}">${childrenHtml}</div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        // Toggle folder expand/collapse
+        function toggleNode(element) {
+            const node = element.closest('.tree-node');
+            const children = node.querySelector('.node-children');
+            const toggle = node.querySelector('.toggle-icon');
+            const icon = node.querySelector('.node-icon');
+
+            if (!children) return;
+
+            const isExpanded = !children.classList.contains('collapsed');
+
+            if (isExpanded) {
+                children.style.maxHeight = children.scrollHeight + 'px';
+                requestAnimationFrame(() => {
+                    children.classList.add('collapsed');
+                    children.style.maxHeight = '0';
+                });
+                toggle.classList.remove('expanded');
+                icon.textContent = '📁';
+            } else {
+                children.classList.remove('collapsed');
+                children.style.maxHeight = children.scrollHeight + 'px';
+                toggle.classList.add('expanded');
+                icon.textContent = '📂';
+            }
+
+            element.classList.add('just-toggled');
+            setTimeout(() => element.classList.remove('just-toggled'), 500);
+
+            node.dataset.expanded = !isExpanded;
+        }
+
+        // Expand all nodes
+        function expandAll() {
+            document.querySelectorAll('.node-children').forEach(el => {
+                el.classList.remove('collapsed');
+                el.style.maxHeight = '2000px';
+            });
+            document.querySelectorAll('.toggle-icon').forEach(el => {
+                if (!el.classList.contains('hidden')) {
+                    el.classList.add('expanded');
+                }
+            });
+            document.querySelectorAll('.tree-node').forEach(el => {
+                el.dataset.expanded = 'true';
+            });
+            document.querySelectorAll('.folder-node .node-icon').forEach(el => {
+                el.textContent = '📂';
+            });
+        }
+
+        // Collapse all nodes
+        function collapseAll() {
+            document.querySelectorAll('.node-children').forEach(el => {
+                el.classList.add('collapsed');
+                el.style.maxHeight = '0';
+            });
+            document.querySelectorAll('.toggle-icon').forEach(el => {
+                el.classList.remove('expanded');
+            });
+            document.querySelectorAll('.tree-node').forEach(el => {
+                el.dataset.expanded = 'false';
+            });
+            document.querySelectorAll('.folder-node .node-icon').forEach(el => {
+                el.textContent = '📁';
+            });
+        }
+
+        // Expand to specific level
+        function expandLevel(maxLevel) {
+            document.querySelectorAll('.tree-node').forEach(node => {
+                const level = parseInt(node.dataset.level);
+                const children = node.querySelector('.node-children');
+                const toggle = node.querySelector('.toggle-icon');
+                const icon = node.querySelector('.node-icon');
+
+                if (!children) return;
+
+                if (level < maxLevel) {
+                    children.classList.remove('collapsed');
+                    children.style.maxHeight = '2000px';
+                    if (toggle && !toggle.classList.contains('hidden')) {
+                        toggle.classList.add('expanded');
+                    }
+                    if (icon && node.querySelector('.folder-node')) {
+                        icon.textContent = '📂';
+                    }
+                    node.dataset.expanded = 'true';
+                } else {
+                    children.classList.add('collapsed');
+                    children.style.maxHeight = '0';
+                    if (toggle) {
+                        toggle.classList.remove('expanded');
+                    }
+                    if (icon && node.querySelector('.folder-node')) {
+                        icon.textContent = '📁';
+                    }
+                    node.dataset.expanded = 'false';
+                }
+            });
+        }
+
+        // Show only pipeline steps
+        function showPipelineOnly() {
+            collapseAll();
+
+            // Find and highlight all pipeline steps
+            document.querySelectorAll('.pipeline-step').forEach(el => {
+                // Expand all parent nodes
+                let parent = el.closest('.node-children');
+                while (parent) {
+                    parent.classList.remove('collapsed');
+                    parent.style.maxHeight = '2000px';
+
+                    const parentNode = parent.closest('.tree-node');
+                    if (parentNode) {
+                        parentNode.dataset.expanded = 'true';
+                        const toggle = parentNode.querySelector(':scope > .node-content .toggle-icon');
+                        const icon = parentNode.querySelector(':scope > .node-content .node-icon');
+                        if (toggle && !toggle.classList.contains('hidden')) {
+                            toggle.classList.add('expanded');
+                        }
+                        if (icon) {
+                            icon.textContent = '📂';
+                        }
+                    }
+
+                    parent = parent.parentElement.closest('.node-children');
+                }
+
+                // Highlight the pipeline item
+                el.classList.add('just-toggled');
+                setTimeout(() => el.classList.remove('just-toggled'), 1500);
+            });
+        }
+
+        // Initialize tree on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const treeContainer = document.getElementById('tree');
+            treeContainer.innerHTML = renderNode(folderData);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Center Consensus GIS Model - Project Overview</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-card: rgba(255,255,255,0.05);
+            --accent-blue: #4facfe;
+            --accent-cyan: #00f2fe;
+            --text-light: #e8e8e8;
+            --text-muted: #8892b0;
+            --shadow-dark: rgba(0,0,0,0.4);
+            --shadow-light: rgba(255,255,255,0.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh; color: #e8e8e8; line-height: 1.6;
+        }
+        /* Layout with fixed sidebar */
+        .page-wrapper { display: flex; min-height: 100vh; }
+
+        /* Fixed Left Navigation */
+        .sidebar {
+            position: fixed; left: 0; top: 0; bottom: 0; width: 220px;
+            background: linear-gradient(180deg, rgba(15,52,96,0.95) 0%, rgba(22,33,62,0.98) 100%);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding: 25px 15px; z-index: 100;
+            display: flex; flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+        }
+        .sidebar-header { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-logo { font-size: 2rem; margin-bottom: 8px; }
+        .sidebar-title { font-size: 0.85rem; color: var(--accent-blue); font-weight: 600; line-height: 1.3; }
+        .sidebar nav { flex: 1; }
+        .sidebar nav ul { list-style: none; }
+        .sidebar nav a {
+            display: flex; align-items: center; gap: 10px;
+            color: var(--text-muted); text-decoration: none;
+            padding: 12px 15px; margin: 4px 0;
+            border-radius: 10px; font-size: 0.9rem;
+            transition: all 0.3s ease;
+            /* Neomorphism effect */
+            background: transparent;
+        }
+        .sidebar nav a:hover {
+            color: var(--accent-cyan);
+            background: rgba(79,172,254,0.1);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2), inset -2px -2px 5px rgba(255,255,255,0.05);
+            transform: translateX(5px);
+        }
+        .sidebar nav a.active {
+            color: var(--accent-cyan);
+            background: linear-gradient(135deg, rgba(79,172,254,0.15), rgba(0,242,254,0.1));
+            box-shadow: 0 4px 15px rgba(79,172,254,0.2);
+        }
+        .nav-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 220px; flex: 1;
+            padding: 40px 40px 40px 50px;
+        }
+
+        /* Header */
+        header {
+            text-align: center; margin-bottom: 50px; padding: 45px;
+            background: linear-gradient(135deg, rgba(79,172,254,0.1), rgba(0,242,254,0.05));
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            /* Neomorphism */
+            box-shadow:
+                8px 8px 20px rgba(0,0,0,0.4),
+                -4px -4px 15px rgba(255,255,255,0.03),
+                inset 1px 1px 2px rgba(255,255,255,0.1);
+        }
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            text-shadow: 0 0 40px rgba(79,172,254,0.3);
+        }
+        .subtitle { font-size: 1.2rem; color: #8892b0; margin-bottom: 10px; }
+        .date { color: #6c757d; font-size: 0.95rem; }
+        .status-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            color: white; padding: 10px 25px; border-radius: 25px;
+            font-weight: 600; margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(40,167,69,0.4);
+        }
+
+        /* Stats Grid with 3D effect */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 20px; margin-bottom: 50px;
+        }
+        .stat-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+            border-radius: 20px; padding: 28px 15px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.4s ease;
+            /* Neomorphism 3D effect */
+            box-shadow:
+                8px 8px 20px rgba(0,0,0,0.35),
+                -4px -4px 12px rgba(255,255,255,0.03);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow:
+                12px 12px 30px rgba(0,0,0,0.45),
+                -6px -6px 18px rgba(255,255,255,0.05),
+                0 0 30px rgba(79,172,254,0.15);
+        }
+        .stat-value {
+            font-size: 2.4rem; font-weight: 700;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(79,172,254,0.3);
+        }
+        .stat-label { color: #8892b0; margin-top: 10px; font-size: 0.85rem; }
+
+        /* Sections with collapsible headers */
+        section {
+            background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            border-radius: 24px; padding: 0; margin-bottom: 35px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow:
+                10px 10px 25px rgba(0,0,0,0.35),
+                -5px -5px 15px rgba(255,255,255,0.02);
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 25px 35px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(90deg, rgba(79,172,254,0.08), transparent);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        .section-header:hover {
+            background: linear-gradient(90deg, rgba(79,172,254,0.15), rgba(0,242,254,0.05));
+        }
+        .section-header h2 {
+            font-size: 1.5rem; color: #4facfe; margin: 0; padding: 0; border: none;
+        }
+        .collapse-icon {
+            font-size: 1.2rem; color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+        .section-header.collapsed .collapse-icon { transform: rotate(-90deg); }
+        .section-content {
+            padding: 30px 35px;
+            max-height: 5000px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+        }
+        .section-content.collapsed {
+            max-height: 0; padding-top: 0; padding-bottom: 0;
+        }
+
+        h3 { font-size: 1.15rem; color: #00f2fe; margin: 25px 0 15px; }
+        p { color: #c9d1d9; margin-bottom: 15px; }
+
+        /* Tables with depth */
+        table {
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden;
+            box-shadow: inset 2px 2px 8px rgba(0,0,0,0.3);
+        }
+        th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        th {
+            color: #4facfe; font-weight: 600;
+            background: rgba(79,172,254,0.1);
+            font-size: 0.85rem; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        td { color: #c9d1d9; }
+        tr:hover td { background: rgba(255,255,255,0.03); }
+
+        /* Highlight boxes with glow */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(79,172,254,0.12), rgba(0,242,254,0.08));
+            border: 1px solid rgba(79,172,254,0.25);
+            border-radius: 16px; padding: 22px; margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(79,172,254,0.15);
+        }
+        .highlight-box.success {
+            background: linear-gradient(135deg, rgba(40,167,69,0.12), rgba(32,201,151,0.08));
+            border-color: rgba(40,167,69,0.25);
+            box-shadow: 0 4px 20px rgba(40,167,69,0.15);
+        }
+
+        /* Pipeline steps with 3D */
+        .pipeline-step {
+            display: flex; align-items: center; gap: 20px;
+            padding: 20px 28px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border-radius: 16px;
+            border-left: 4px solid #4facfe;
+            margin-bottom: 14px;
+            box-shadow:
+                6px 6px 15px rgba(0,0,0,0.3),
+                -3px -3px 10px rgba(255,255,255,0.02);
+            transition: all 0.3s ease;
+        }
+        .pipeline-step:hover {
+            transform: translateX(8px);
+            box-shadow:
+                8px 8px 20px rgba(0,0,0,0.35),
+                -4px -4px 12px rgba(255,255,255,0.03),
+                0 0 20px rgba(79,172,254,0.1);
+        }
+        .step-number {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #1a1a2e; flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(79,172,254,0.4);
+        }
+        .step-title { font-weight: 600; color: #fff; }
+        .step-desc { font-size: 0.9rem; color: #8892b0; }
+
+        /* Mermaid container */
+        .mermaid-container {
+            background: rgba(0,0,0,0.25);
+            border-radius: 16px; padding: 35px; margin: 25px 0;
+            overflow-x: auto;
+            box-shadow: inset 3px 3px 10px rgba(0,0,0,0.3);
+        }
+        .mermaid { display: flex; justify-content: center; }
+
+        /* Source and accuracy cards */
+        .source-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px; margin: 20px 0;
+        }
+        .source-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            border-radius: 16px; padding: 25px;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow:
+                6px 6px 15px rgba(0,0,0,0.3),
+                -3px -3px 10px rgba(255,255,255,0.02);
+            transition: all 0.3s ease;
+        }
+        .source-card:hover {
+            transform: translateY(-5px);
+            box-shadow:
+                10px 10px 25px rgba(0,0,0,0.4),
+                -5px -5px 15px rgba(255,255,255,0.03);
+        }
+        .source-card h4 { color: #00f2fe; font-size: 1.05rem; margin-bottom: 12px; }
+        .source-card .count {
+            color: #4facfe; font-size: 1.9rem; font-weight: 700;
+            text-shadow: 0 2px 10px rgba(79,172,254,0.3);
+        }
+        .source-card .details { color: #8892b0; font-size: 0.85rem; margin-top: 12px; line-height: 1.7; }
+
+        /* Accuracy cards with medals */
+        .accuracy-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            border-radius: 16px; padding: 25px; text-align: center;
+            border: 2px solid transparent;
+            box-shadow:
+                6px 6px 15px rgba(0,0,0,0.3),
+                -3px -3px 10px rgba(255,255,255,0.02);
+            transition: all 0.3s ease;
+        }
+        .accuracy-card:hover { transform: scale(1.03); }
+        .accuracy-card.gold {
+            border-color: #ffd700;
+            box-shadow: 0 0 25px rgba(255,215,0,0.2), 6px 6px 15px rgba(0,0,0,0.3);
+        }
+        .accuracy-card.silver {
+            border-color: #c0c0c0;
+            box-shadow: 0 0 20px rgba(192,192,192,0.15), 6px 6px 15px rgba(0,0,0,0.3);
+        }
+        .accuracy-card.bronze {
+            border-color: #cd7f32;
+            box-shadow: 0 0 20px rgba(205,127,50,0.15), 6px 6px 15px rgba(0,0,0,0.3);
+        }
+        .accuracy-card .rank { font-size: 2rem; margin-bottom: 10px; }
+        .accuracy-card .source-name { color: #fff; font-weight: 600; font-size: 1.1rem; }
+        .accuracy-card .metric {
+            color: #4facfe; font-size: 1.6rem; font-weight: 700; margin: 10px 0;
+            text-shadow: 0 2px 10px rgba(79,172,254,0.3);
+        }
+        .accuracy-card .metric-label { color: #8892b0; font-size: 0.8rem; }
+
+        /* Timeline with glow */
+        .timeline { position: relative; padding-left: 35px; }
+        .timeline::before {
+            content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 3px;
+            background: linear-gradient(180deg, #4facfe, #00f2fe);
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(79,172,254,0.5);
+        }
+        .timeline-item {
+            position: relative; padding: 20px 25px; margin-bottom: 20px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border-radius: 14px;
+            box-shadow: 5px 5px 12px rgba(0,0,0,0.25);
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .timeline-item:hover {
+            transform: translateX(8px);
+            background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            border-color: rgba(79,172,254,0.2);
+            box-shadow:
+                8px 8px 20px rgba(0,0,0,0.35),
+                -4px -4px 12px rgba(255,255,255,0.03),
+                0 0 20px rgba(79,172,254,0.15);
+        }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -29px; top: 25px;
+            width: 14px; height: 14px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border-radius: 50%; border: 3px solid #1a1a2e;
+            box-shadow: 0 0 10px rgba(79,172,254,0.5);
+            transition: all 0.3s ease;
+        }
+        .timeline-item:hover::before {
+            transform: scale(1.3);
+            box-shadow: 0 0 20px rgba(79,172,254,0.8);
+        }
+        .timeline-date { color: #4facfe; font-weight: 600; margin-bottom: 8px; }
+        .timeline-content { color: #c9d1d9; font-size: 0.95rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; margin-top: 50px; padding: 30px;
+            color: #8892b0; font-size: 0.9rem;
+            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border-radius: 16px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { width: 180px; }
+            .main-content { margin-left: 180px; padding: 30px 25px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 20px 15px; }
+            h1 { font-size: 1.8rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .section-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'dark' });</script>
+
+    <!-- Fixed Left Sidebar -->
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">DC</div>
+                <div class="sidebar-title">Data Center<br/>Consensus GIS</div>
+            </div>
+            <nav>
+                <ul>
+                    <li style="color: rgba(255,255,255,0.4); font-size: 0.7rem; padding: 8px 12px; text-transform: uppercase; letter-spacing: 1px;">Overview</li>
+                    <li><a href="#overview"><span class="nav-icon">›</span>Project Overview</a></li>
+                    <li><a href="#workflow"><span class="nav-icon">›</span>Workflow</a></li>
+
+                    <li style="color: rgba(255,255,255,0.4); font-size: 0.7rem; padding: 8px 12px; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px;">Data Pipeline</li>
+                    <li><a href="#sources"><span class="nav-icon">›</span>Data Sources</a></li>
+                    <li><a href="#pipeline"><span class="nav-icon">›</span>Pipeline Steps</a></li>
+
+                    <li style="color: rgba(255,255,255,0.4); font-size: 0.7rem; padding: 8px 12px; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px;">Accuracy Analysis</li>
+                    <li><a href="#spatial"><span class="nav-icon">›</span>Spatial Accuracy</a></li>
+                    <li><a href="#capacity"><span class="nav-icon">›</span>Capacity Accuracy</a></li>
+
+                    <li style="color: rgba(255,255,255,0.4); font-size: 0.7rem; padding: 8px 12px; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px;">Documentation</li>
+                    <li><a href="#validation"><span class="nav-icon">›</span>Validation</a></li>
+                    <li><a href="#methodology"><span class="nav-icon">›</span>Methodology</a></li>
+                    <li><a href="#timeline"><span class="nav-icon">›</span>Timeline</a></li>
+                    <li><a href="#technical"><span class="nav-icon">›</span>Technical Resources</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+        <header>
+            <h1>Data Center Consensus GIS Model</h1>
+            <p class="subtitle">Production-Ready Data Pipeline for Meta Infrastructure Planning</p>
+            <p class="date">Project Duration: December 2025 — February 2026 | Last Updated: February 2, 2026</p>
+            <span class="status-badge">PIPELINE VALIDATED + SA/DCH COMPARISON COMPLETE</span>
+        </header>
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value">35,077</div><div class="stat-label">Total XB Records</div></div>
+            <div class="stat-card"><div class="stat-value">23,184</div><div class="stat-label">Building Records</div></div>
+            <div class="stat-card"><div class="stat-value">11,893</div><div class="stat-label">Campus Records</div></div>
+            <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">Data Sources</div></div>
+            <div class="stat-card"><div class="stat-value">65</div><div class="stat-label">Active Scripts</div></div>
+            <div class="stat-card"><div class="stat-value">233m</div><div class="stat-label">Best Spatial Accuracy</div></div>
+        </div>
+
+        <!-- Project Overview -->
+        <section id="overview">
+            <div class="section-header">
+                <h2>Project Overview</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <p>The <strong>Data Center Consensus GIS Model</strong> is a production-ready data pipeline that integrates multiple external vendor data sources with Meta's internal canonical datacenter inventory. The goal is to create a unified, validated view of global datacenter facilities for infrastructure planning and competitive intelligence.</p>
+            <h3>Project Objectives</h3>
+            <div class="highlight-box">
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    <li style="margin-bottom: 8px;">📥 <strong>Ingest</strong> 6 external vendor sources + Meta canonical data</li>
+                    <li style="margin-bottom: 8px;">🔄 <strong>Harmonize</strong> into standardized "gold" feature classes</li>
+                    <li style="margin-bottom: 8px;">✅ <strong>Validate</strong> using Meta canonical as ground truth</li>
+                    <li style="margin-bottom: 8px;">📊 <strong>Benchmark</strong> vendor spatial and capacity accuracy</li>
+                    <li>🔁 <strong>Produce</strong> repeatable, documented workflows</li>
+                </ul>
+            </div>
+            <h3>Key Deliverables</h3>
+            <table>
+                <thead><tr><th>Deliverable</th><th>Description</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr><td>gold_buildings_full</td><td>Harmonized building-level feature class (23,184 records)</td><td>✅ Complete</td></tr>
+                    <tr><td>gold_campus_full</td><td>Aggregated campus-level feature class (11,893 records)</td><td>✅ Complete</td></tr>
+                    <tr><td>gold_combined_xb</td><td>Experience Builder layer with 50 unified fields</td><td>✅ Complete</td></tr>
+                    <tr><td>Essential DC Integration</td><td>73 strategic campuses (127 buildings) flagged with is_essential field</td><td>✅ Complete</td></tr>
+                    <tr><td>Spatial Accuracy Report</td><td>Vendor rankings by proximity to Meta ground truth</td><td>✅ Complete</td></tr>
+                    <tr><td>Capacity Accuracy Report</td><td>MW estimation accuracy by vendor</td><td>✅ Complete</td></tr>
+                    <tr><td>Pipeline Diagnostic Report</td><td>Composite consensus score with Essential DC + Tier weighting</td><td>✅ Complete</td></tr>
+                    <tr><td>Repeatable Pipeline</td><td>8-step execution process with clean re-ingestion</td><td>✅ Complete</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+        <!-- Workflow Diagram -->
+        <section id="workflow">
+            <div class="section-header">
+                <h2>Pipeline Workflow</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <p>The pipeline follows an 8-step process from raw data ingestion to validated output layers. Each step is idempotent and can be re-run safely.</p>
+
+            <!-- Custom HTML/CSS Pipeline Diagram -->
+            <div class="pipeline-diagram">
+                <!-- Step 1: Ingestion Row -->
+                <div class="diagram-section ingestion-section">
+                    <div class="section-label">STEP 1: DATA INGESTION</div>
+                    <div class="source-row">
+                        <div class="source-box"><div class="source-name">DCH Hyper</div><div class="source-count">1,876</div></div>
+                        <div class="source-box"><div class="source-name">DCH Lease</div><div class="source-count">5,176</div></div>
+                        <div class="source-box"><div class="source-name">Semianalysis</div><div class="source-count">5,472</div></div>
+                        <div class="source-box"><div class="source-name">DCM</div><div class="source-count">8,453</div></div>
+                        <div class="source-box"><div class="source-name">NPM</div><div class="source-count">1,399</div></div>
+                        <div class="source-box meta-box"><div class="source-name">Meta</div><div class="source-count">643</div></div>
+                    </div>
+                </div>
+
+                <!-- Funnel Lines -->
+                <div class="funnel-connector">
+                    <svg width="100%" height="50" viewBox="0 0 800 50" preserveAspectRatio="none">
+                        <path d="M 67 0 L 400 45" stroke="#4facfe" stroke-width="2" fill="none" opacity="0.6"/>
+                        <path d="M 200 0 L 400 45" stroke="#4facfe" stroke-width="2" fill="none" opacity="0.6"/>
+                        <path d="M 333 0 L 400 45" stroke="#4facfe" stroke-width="2" fill="none" opacity="0.6"/>
+                        <path d="M 467 0 L 400 45" stroke="#4facfe" stroke-width="2" fill="none" opacity="0.6"/>
+                        <path d="M 600 0 L 400 45" stroke="#4facfe" stroke-width="2" fill="none" opacity="0.6"/>
+                        <path d="M 733 0 L 400 45" stroke="#00f2fe" stroke-width="2" fill="none" opacity="0.8"/>
+                    </svg>
+                </div>
+
+                <!-- Gold Buildings -->
+<div class="diagram-node buildings-node">
+                    <span class="node-text">gold_buildings_full — 23,184 records</span>
+                </div>
+
+                <!-- Down Arrow -->
+                <div class="arrow-down">▼</div>
+
+                <!-- Steps 2-5: Processing -->
+                <div class="diagram-section processing-section">
+                <div class="section-label">STEPS 2-6: PROCESSING</div>
+                    <div class="process-flow">
+                        <div class="process-step">Step 2: Geography Enrichment</div>
+                        <div class="arrow-right">→</div>
+                        <div class="process-step">Step 3: Company Standardization</div>
+                        <div class="arrow-right">→</div>
+                        <div class="process-step">Step 4: UCID Generation</div>
+                        <div class="arrow-right">→</div>
+                        <div class="process-step">Step 5: Essential DC</div>
+                        <div class="arrow-right">→</div>
+                        <div class="process-step">Step 6: Campus Rollup</div>
+                    </div>
+                </div>
+
+                <!-- Down Arrow -->
+                <div class="arrow-down">▼</div>
+
+                <!-- Gold Campus -->
+<div class="diagram-node campus-node">
+                    <span class="node-text">gold_campus_full — 11,715 records</span>
+                </div>
+
+                <!-- Merge Lines -->
+                <div class="merge-connector">
+                    <svg width="100%" height="40" viewBox="0 0 600 40" preserveAspectRatio="none">
+                        <path d="M 150 0 L 300 35" stroke="#28a745" stroke-width="2" fill="none"/>
+                        <path d="M 450 0 L 300 35" stroke="#4facfe" stroke-width="2" fill="none"/>
+                    </svg>
+                </div>
+
+                <!-- XB Output -->
+<div class="diagram-node xb-node">
+                    <span class="node-text">gold_combined_xb — 34,411 records</span>
+                </div>
+            </div>
+
+            <style>
+                .pipeline-diagram {
+                    background: rgba(0,0,0,0.3);
+                    border-radius: 20px;
+                    padding: 30px;
+                    margin: 25px 0;
+                    text-align: center;
+                }
+                .diagram-section {
+                    border-radius: 16px;
+                    padding: 20px;
+                    margin-bottom: 10px;
+                }
+                .ingestion-section {
+                    background: linear-gradient(135deg, rgba(26,54,93,0.8), rgba(26,54,93,0.4));
+                    border: 2px solid #4facfe;
+                }
+                .processing-section {
+                    background: linear-gradient(135deg, rgba(26,58,26,0.8), rgba(26,58,26,0.4));
+                    border: 2px solid #28a745;
+                }
+                .section-label {
+                    font-weight: 600;
+                    color: #fff;
+                    margin-bottom: 15px;
+                    font-size: 1rem;
+                }
+                .source-row {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 12px;
+                    flex-wrap: nowrap;
+                    padding: 0 10px;
+                }
+                .source-box {
+                    background: rgba(0,0,0,0.4);
+                    border: 1px solid rgba(255,255,255,0.2);
+                    border-radius: 12px;
+                    padding: 15px 25px;
+                    flex: 1;
+                    min-width: 110px;
+                    max-width: 180px;
+                    transition: all 0.3s ease;
+                    box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+                }
+                .source-box:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 8px 20px rgba(79,172,254,0.3);
+                }
+                .meta-box {
+                    border-color: #00f2fe;
+                    box-shadow: 0 0 15px rgba(0,242,254,0.3);
+                }
+                .source-icon { font-size: 1.5rem; margin-bottom: 5px; }
+                .source-name { font-weight: 600; color: #fff; font-size: 0.9rem; }
+                .source-count { color: #4facfe; font-weight: 700; font-size: 1.1rem; margin-top: 5px; }
+                .funnel-connector, .merge-connector {
+                    height: 50px;
+                    margin: 0;
+                }
+                .diagram-node {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 18px 30px;
+                    border-radius: 14px;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    margin: 5px 0;
+                    box-shadow: 6px 6px 15px rgba(0,0,0,0.4);
+                }
+                .buildings-node {
+                    background: linear-gradient(135deg, #2d2d44, #1a1a2e);
+                    border: 2px solid #4facfe;
+                    color: #fff;
+                }
+                .campus-node {
+                    background: linear-gradient(135deg, #1a3a1a, #0d1f0d);
+                    border: 2px solid #28a745;
+                    color: #fff;
+                }
+                .xb-node {
+                    background: linear-gradient(135deg, #3d1a3d, #2a0a2a);
+                    border: 3px solid #a855f7;
+                    color: #fff;
+                    box-shadow: 0 0 25px rgba(168,85,247,0.4);
+                }
+                .node-icon { font-size: 1.4rem; }
+                .node-text { color: #fff; }
+                .arrow-down {
+                    color: #4facfe;
+                    font-size: 1.5rem;
+                    margin: 10px 0;
+                    text-shadow: 0 0 10px rgba(79,172,254,0.5);
+                }
+                .process-flow {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 8px;
+                    flex-wrap: nowrap;
+                    padding: 0 10px;
+                }
+                .process-step {
+                    background: rgba(0,0,0,0.4);
+                    padding: 14px 20px;
+                    border-radius: 10px;
+                    font-size: 0.85rem;
+                    color: #c9d1d9;
+                    border: 1px solid rgba(255,255,255,0.1);
+                    flex: 1;
+                    text-align: center;
+                    min-width: 140px;
+                }
+                .arrow-right {
+                    color: #28a745;
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                }
+            </style>
+            <div class="highlight-box">
+                <strong>💡 Quick Run:</strong> Execute the full pipeline with a single command:
+                <code style="display:block; margin-top:10px; padding:12px; background:rgba(0,0,0,0.3); border-radius:6px; font-family:monospace; color:#00f2fe;">
+                exec(open(r"C:\...\scripts\run_full_pipeline.py", encoding='utf-8').read())
+                </code>
+            </div>
+            </div>
+        </section>
+
+        <!-- Data Sources -->
+        <section id="sources">
+            <div class="section-header">
+                <h2>Data Sources</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <p>The pipeline integrates 6 external vendor sources plus Meta's internal canonical data.</p>
+            <div class="source-grid">
+                <div class="source-card">
+                    <h4>DataCenterMap</h4>
+                    <div class="count">8,453</div>
+                    <div class="details"><strong>Coverage:</strong> Global | <strong>Capacity:</strong> 32.7%</div>
+                </div>
+                <div class="source-card">
+                    <h4>DCH Hyper</h4>
+                    <div class="count">1,876</div>
+                    <div class="details"><strong>Coverage:</strong> Hyperscale | <strong>Capacity:</strong> 100%</div>
+                </div>
+                <div class="source-card">
+                    <h4>DCH Lease</h4>
+                    <div class="count">5,176</div>
+                    <div class="details"><strong>Coverage:</strong> Leased/Colo | <strong>Capacity:</strong> 92.6%</div>
+                </div>
+                <div class="source-card">
+                    <h4>Semianalysis</h4>
+                    <div class="count">5,472</div>
+                    <div class="details"><strong>Coverage:</strong> Global | <strong>Forecasts:</strong> 2023-2032</div>
+                </div>
+                <div class="source-card">
+                    <h4>NewProjectMedia</h4>
+                    <div class="count">1,399</div>
+                    <div class="details"><strong>Coverage:</strong> US Only | <strong>Has Cost Data:</strong> Yes</div>
+                </div>
+                <div class="source-card">
+                    <h4>Meta Canonical</h4>
+                    <div class="count">318</div>
+                    <div class="details"><strong>Purpose:</strong> Ground Truth | <strong>IT Load:</strong> 100%</div>
+                </div>
+            </div>
+            <h3>Source Completeness Matrix</h3>
+            <table>
+                <thead><tr><th>Source</th><th>Records</th><th>Coords</th><th>Capacity</th><th>Region</th></tr></thead>
+                <tbody>
+                    <tr><td>DataCenterMap</td><td>8,453</td><td>95.0%</td><td>32.7%</td><td>Global</td></tr>
+                    <tr><td>DCH Hyper</td><td>1,876</td><td>100%</td><td>100%</td><td>Global</td></tr>
+                    <tr><td>DCH Lease</td><td>5,176</td><td>99.8%</td><td>92.6%</td><td>Global</td></tr>
+                    <tr><td>Semianalysis</td><td>5,472</td><td>95.4%</td><td>98.0%</td><td>Global</td></tr>
+                    <tr><td>NewProjectMedia</td><td>1,399</td><td>99.9%</td><td>53.3%</td><td>US Only</td></tr>
+                    <tr><td>Meta Canonical</td><td>318</td><td>86.8%</td><td>100%</td><td>Global</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+        <!-- Pipeline Steps -->
+        <section id="pipeline">
+            <div class="section-header">
+                <h2>Pipeline Execution Steps</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+<p>Run these steps in order. Each ingestion script auto-deletes existing records before inserting.</p>
+            <div class="pipeline-step"><span class="step-number">1</span><div><div class="step-title">Ingest Sources → gold_buildings_full</div><div class="step-desc">Run 6 ingestion scripts (DCH, DCH Lease, Semianalysis, DCM, NPM, Meta Canonical)</div></div></div>
+            <div class="pipeline-step"><span class="step-number">2</span><div><div class="step-title">Geography Enrichment</div><div class="step-desc">enrich_geography_fields.py — Populate region from country, normalize state/state_abbr</div></div></div>
+            <div class="pipeline-step"><span class="step-number">3</span><div><div class="step-title">Company Standardization</div><div class="step-desc">migrate_company_fields_v2.py — Populate company_clean and company_clean_filter</div></div></div>
+            <div class="pipeline-step"><span class="step-number">4</span><div><div class="step-title">UCID Generation</div><div class="step-desc">generate_text_ucid.py — Spatial clustering + human-readable UCID assignment</div></div></div>
+            <div class="pipeline-step"><span class="step-number">5</span><div><div class="step-title">Essential DC Flag</div><div class="step-desc">integrate_essential_by_uid.py — Flag 127 strategic buildings from curated Essential DC list</div></div></div>
+            <div class="pipeline-step"><span class="step-number">6</span><div><div class="step-title">Campus Rollup</div><div class="step-desc">campus_rollup_new.py — Aggregate buildings by UCID → gold_campus_full (rolls up is_essential)</div></div></div>
+            <div class="pipeline-step"><span class="step-number">7</span><div><div class="step-title">Cleanup + Create XB Layer</div><div class="step-desc">cleanup_gold_campus.py + create_xb_combined_layer.py — Populate lat/lon, union to 45-field XB layer</div></div></div>
+            <div class="pipeline-step"><span class="step-number">8</span><div><div class="step-title">Validation</div><div class="step-desc">validate_granularity.py — Verify data quality and relationships</div></div></div>
+            </div>
+        </section>
+
+        <!-- Spatial Accuracy -->
+        <section id="spatial">
+            <div class="section-header">
+                <h2>Spatial Accuracy Analysis</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <p>Vendor coordinates were compared against Meta's canonical ground truth (276 buildings with known coordinates). Rankings are based on median distance from actual building locations.</p>
+            <h3>Vendor Rankings (December 2025)</h3>
+            <div class="source-grid">
+                <div class="accuracy-card gold">
+                    <div class="rank">🥇</div>
+                    <div class="source-name">DataCenterHawk</div>
+                    <div class="metric">233m</div>
+                    <div class="metric-label">Median Distance</div>
+                    <div style="color:#8892b0; margin-top:10px;">89.9% Recall | 204m MAD</div>
+                </div>
+                <div class="accuracy-card silver">
+                    <div class="rank">🥈</div>
+                    <div class="source-name">Semianalysis</div>
+                    <div class="metric">307m</div>
+                    <div class="metric-label">Median Distance</div>
+                    <div style="color:#8892b0; margin-top:10px;">88.8% Recall | 285m MAD</div>
+                </div>
+                <div class="accuracy-card bronze">
+                    <div class="rank">🥉</div>
+                    <div class="source-name">DataCenterMap</div>
+                    <div class="metric">677m</div>
+                    <div class="metric-label">Median Distance</div>
+                    <div style="color:#8892b0; margin-top:10px;">69.6% Recall | 586m MAD</div>
+                </div>
+                <div class="accuracy-card">
+                    <div class="rank">4️⃣</div>
+                    <div class="source-name">NewProjectMedia</div>
+                    <div class="metric">1,002m</div>
+                    <div class="metric-label">Median Distance</div>
+                    <div style="color:#8892b0; margin-top:10px;">73.2% Recall | US Only</div>
+                </div>
+            </div>
+            <h3>Regional Coverage</h3>
+            <table>
+                <thead><tr><th>Region</th><th>Meta Buildings</th><th>DCHawk</th><th>Semianalysis</th><th>DCMap</th><th>NPM</th></tr></thead>
+                <tbody>
+                    <tr><td>AMER</td><td>251</td><td>90.4%</td><td>89.2%</td><td>68.1%</td><td>80.5%</td></tr>
+                    <tr><td>EMEA</td><td>20</td><td>80.0%</td><td>80.0%</td><td>80.0%</td><td>0%</td></tr>
+                    <tr><td>APAC</td><td>5</td><td>100%</td><td>100%</td><td>100%</td><td>0%</td></tr>
+                </tbody>
+            </table>
+            <div class="highlight-box">
+                <strong>Key Finding:</strong> DataCenterHawk and Semianalysis provide the best spatial accuracy, with median distances under 500m from actual building locations. NewProjectMedia is US-only and should not be used for international sites.
+            </div>
+            </div>
+        </section>
+        <!-- Capacity Accuracy -->
+        <section id="capacity">
+            <div class="section-header">
+                <h2>Capacity Accuracy Analysis</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <p>External vendor MW estimates were compared against Meta's actual IT load (ground truth) using apples-to-apples methodology: granularity-aware matching, definition-aligned capacity fields, and deduplicated spatial joins.</p>
+
+            <h3>Executive Summary</h3>
+            <table>
+                <thead><tr><th>Source</th><th>MAPE</th><th>Granularity</th><th>Sample</th><th>Best Field</th><th>Grade</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Semianalysis</strong></td><td><strong>11.9%</strong> 🏆</td><td>Building</td><td>92</td><td>mw_2023</td><td style="color:#22c55e;">A</td></tr>
+                    <tr><td><strong>DataCenterHawk</strong></td><td><strong>17.6%</strong></td><td>Building</td><td>115</td><td>commissioned_power_mw</td><td style="color:#84cc16;">A-</td></tr>
+                    <tr><td>DataCenterMap</td><td>Insufficient</td><td>Mixed</td><td>1</td><td>—</td><td style="color:#ef4444;">F</td></tr>
+                    <tr><td>NewProjectMedia</td><td>Sparse</td><td>Building</td><td>8</td><td>full_capacity_mw</td><td style="color:#f97316;">D</td></tr>
+                    <tr><td>WoodMac</td><td>No data</td><td>—</td><td>0</td><td>—</td><td style="color:#ef4444;">F</td></tr>
+                    <tr><td>Synergy</td><td>No capacity fields</td><td>—</td><td>0</td><td>—</td><td style="color:#ef4444;">F</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Capacity Estimation Results</h3>
+            <div class="source-grid">
+                <div class="accuracy-card gold">
+                    <div class="rank">🏆</div>
+                    <div class="source-name">Semianalysis</div>
+                    <div class="metric">11.9%</div>
+                    <div class="metric-label">MAPE (Complete Builds)</div>
+                    <div style="color:#8892b0; margin-top:10px;">Uses mw_2023 field<br/>Correlation: 0.95<br/>Bias: +2.1%</div>
+                </div>
+                <div class="accuracy-card silver">
+                    <div class="rank">2️⃣</div>
+                    <div class="source-name">DataCenterHawk</div>
+                    <div class="metric">17.6%</div>
+                    <div class="metric-label">MAPE (Complete Builds)</div>
+                    <div style="color:#8892b0; margin-top:10px;">No PUE adjustment needed<br/>Ratio: 0.84 (under-reports)<br/>Bias: -10.0%</div>
+                </div>
+            </div>
+
+            <h3>Methodology: Apples-to-Apples Comparison</h3>
+            <div class="highlight-box">
+                <p style="margin:0;"><strong>Ground Truth:</strong> Meta Canonical IT Load (276 buildings, 10,968.61 MW total)</p>
+                <p style="margin:10px 0 0 0;"><strong>Matching Method:</strong> Closest spatial match per building, deduplicated to 1:1</p>
+            </div>
+            <table>
+                <thead><tr><th>Factor</th><th>Approach</th><th>Why It Matters</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Granularity</strong></td><td>Building-level matches only</td><td>Avoids apples-to-oranges campus vs building comparisons</td></tr>
+                    <tr><td><strong>Capacity Definition</strong></td><td>IT load vs IT load (no PUE adjustment)</td><td>Both Semi and DCH report IT capacity directly</td></tr>
+                    <tr><td><strong>Time Alignment</strong></td><td>Use mw_2023 (not 2024+)</td><td>Meta data reflects ~2023 state; future forecasts add variance</td></tr>
+                    <tr><td><strong>Deduplication</strong></td><td>Keep closest match per building/source</td><td>Prevents 1:many spatial join inflation</td></tr>
+                    <tr><td><strong>Build Status Filter</strong></td><td>Complete Builds only for MAPE</td><td>Active/Future builds have inherent uncertainty</td></tr>
+                </tbody>
+            </table>
+
+            <h3>PUE Adjustment Analysis</h3>
+            <p>We tested whether DataCenterHawk reports facility power (requiring PUE adjustment) or IT capacity:</p>
+            <table>
+                <thead><tr><th>PUE Factor</th><th>MAPE</th><th>Bias</th><th>Verdict</th></tr></thead>
+                <tbody>
+                    <tr style="background:rgba(34,197,94,0.15);"><td><strong>1.0 (none)</strong></td><td><strong>17.6%</strong></td><td>-10.0%</td><td>✅ Best — confirms IT capacity</td></tr>
+                    <tr><td>1.1</td><td>19.0%</td><td>-18.4%</td><td>Worse</td></tr>
+                    <tr><td>1.2</td><td>21.3%</td><td>-25.4%</td><td>Worse</td></tr>
+                    <tr><td>1.3</td><td>23.5%</td><td>-31.0%</td><td>Much worse</td></tr>
+                </tbody>
+            </table>
+            <p><strong>Conclusion:</strong> DCH reports IT capacity directly. No PUE adjustment needed.</p>
+
+            <h3>Variance by Build Status</h3>
+            <table>
+                <thead><tr><th>Build Status</th><th>Semianalysis MAPE</th><th>DCH MAPE</th><th>Interpretation</th></tr></thead>
+                <tbody>
+                    <tr><td>Complete Build</td><td>11.9%</td><td>17.6%</td><td>✅ Both excellent</td></tr>
+                    <tr><td>Active Build</td><td>61.6%</td><td>~55%</td><td>⚠️ Volatile (expected for in-progress)</td></tr>
+                    <tr><td>Future Build</td><td>N/A</td><td>N/A</td><td>Insufficient sample</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Outlier Analysis</h3>
+            <table>
+                <thead><tr><th>Building</th><th>Issue</th><th>Meta IT (MW)</th><th>Vendor (MW)</th><th>Error</th></tr></thead>
+                <tbody>
+                    <tr><td>FTW-4</td><td>Over-estimate</td><td>22</td><td>133</td><td>+505%</td></tr>
+                    <tr><td>VLL-4</td><td>Over-estimate</td><td>18</td><td>108</td><td>+500%</td></tr>
+                    <tr><td>ODN-3</td><td>Under-estimate</td><td>89</td><td>31</td><td>-65%</td></tr>
+                    <tr><td>LCO-1</td><td>Under-estimate</td><td>76</td><td>27</td><td>-64%</td></tr>
+                </tbody>
+            </table>
+            <div class="highlight-box">
+                <strong>Key Insight:</strong> Excluding these 4 outliers, Semianalysis MAPE drops to <strong>3.7%</strong> — indicating excellent underlying data quality. Outliers likely represent timing differences or ramp-up phase captures.
+            </div>
+
+            <h3>Capacity Data Coverage by Source</h3>
+            <table>
+                <thead><tr><th>Source</th><th>Capacity Coverage</th><th>Primary Field</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td>Semianalysis</td><td>53-96%</td><td>mw_2023 - mw_2032</td><td>Time-series forecasts available</td></tr>
+                    <tr><td>DataCenterHawk</td><td>54-100%</td><td>commissioned_power_mw</td><td>Also has full_capacity_mw</td></tr>
+                    <tr><td>NewProjectMedia</td><td>24%</td><td>full_capacity_mw</td><td>Only 8 matched records — too sparse</td></tr>
+                    <tr><td>DataCenterMap</td><td>1.5%</td><td>commissioned_power_mw</td><td>1 matched record — unusable</td></tr>
+                    <tr><td>WoodMac</td><td>0%</td><td>—</td><td>No capacity data in source</td></tr>
+                    <tr><td>Synergy</td><td>0%</td><td>—</td><td>No capacity fields ingested</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Recommended Configuration</h3>
+            <div class="highlight-box success">
+                <strong>Best Practice:</strong> Use <code>Semianalysis mw_2023</code> as primary capacity source (~12% MAPE). Use <code>DataCenterHawk commissioned_power_mw</code> as backup (~18% MAPE). Both are building-level and require no PUE adjustment.
+            </div>
+            <pre style="background:rgba(0,0,0,0.3); border-radius:10px; padding:15px; color:#00f2fe; font-size:0.85rem; overflow-x:auto;">
+RECOMMENDED_CONFIG = {
+    'Semianalysis': {
+        'field': 'mw_2023',
+        'pue_adjust': False,
+        'mape': 11.9,
+        'n': 92
+    },
+    'DataCenterHawk': {
+        'field': 'commissioned_power_mw',
+        'pue_adjust': False,
+        'mape': 17.6,
+        'n': 115
+    },
+}</pre>
+
+            <h3>Scripts & Documentation</h3>
+            <table>
+                <thead><tr><th>Script</th><th>Purpose</th></tr></thead>
+                <tbody>
+                    <tr><td>capacity_accuracy_analysis_v2.py</td><td>Main apples-to-apples comparison with granularity-aware matching</td></tr>
+                    <tr><td>capacity_variance_experiments_all_sources.py</td><td>Tests all field/PUE/status combinations per source</td></tr>
+                    <tr><td>audit_capacity_by_source.py</td><td>Audits capacity data availability across sources</td></tr>
+                    <tr><td>CAPACITY_FIELD_DEFINITIONS.md</td><td>Field definitions and interpretation guide</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- Validation -->
+        <section id="validation">
+            <div class="section-header">
+                <h2>Validation & Quality Assurance</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <p>Multiple validation scripts ensure data integrity throughout the pipeline.</p>
+            <h3>Validation Scripts</h3>
+            <table>
+                <thead><tr><th>Script</th><th>Purpose</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr><td>validate_granularity.py</td><td>Verify building/campus relationships</td><td>✅ Pass</td></tr>
+                    <tr><td>torture_test_gold_datasets.py</td><td>Comprehensive data integrity checks</td><td>✅ Pass</td></tr>
+                    <tr><td>deep_dive_campus_validation.py</td><td>Meta canonical comparison</td><td>✅ Complete</td></tr>
+                    <tr><td>audit_company_names.py</td><td>Company standardization audit</td><td>✅ Complete</td></tr>
+                    <tr><td>audit_raw_tables_v2_fields.py</td><td>V2.0 field availability check</td><td>✅ Complete</td></tr>
+                </tbody>
+            </table>
+            <h3>Data Quality Metrics</h3>
+            <table>
+                <thead><tr><th>Metric</th><th>Buildings</th><th>Campuses</th></tr></thead>
+                <tbody>
+                    <tr><td>Total Records</td><td>22,694</td><td>11,560</td></tr>
+                    <tr><td>With Coordinates</td><td>96.2%</td><td>100%</td></tr>
+                    <tr><td>With Capacity Data</td><td>67.9%</td><td>60.8%</td></tr>
+                    <tr><td>Company Standardized</td><td>100%</td><td>100%</td></tr>
+                    <tr><td>UCID Assigned</td><td>100%</td><td>100%</td></tr>
+                </tbody>
+            </table>
+            <h3>Issues Resolved</h3>
+            <table>
+                <thead><tr><th>Issue</th><th>Solution</th><th>Date</th></tr></thead>
+                <tbody>
+                    <tr><td>Semianalysis coordinate swap</td><td>Fixed lat/lon field mapping</td><td>Dec 9</td></tr>
+                    <tr><td>DCM duplicate records</td><td>Added duplicate prevention</td><td>Dec 9</td></tr>
+                    <tr><td>Company name variations</td><td>Standardized to 9 categories</td><td>Dec 17</td></tr>
+                    <tr><td>UCID false merges</td><td>Use company_clean (distinct)</td><td>Dec 30</td></tr>
+                    <tr><td>Semianalysis planned_plus_uc bug</td><td>Added field to insertRow()</td><td>Dec 29</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+        <!-- Timeline -->
+        <section id="timeline">
+            <div class="section-header">
+                <h2>Development Timeline</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <p>Key milestones and achievements throughout the project.</p>
+<div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">January 8, 2026</div>
+                    <div class="timeline-content">
+                        <strong>Session 17: XB Schema Reorganization & Pipeline Enhancement</strong><br/>
+                        Reorganized XB layer schema into 11 logical categories for easier attribute table navigation. Added Geography Enrichment as Step 2 in pipeline (now 8 steps total). Fixed SA UCID issue (pipeline execution order). Added market, county, postal_code to XB schema. Verified construction_start_date aggregation flows through campus rollup. Updated generate_pipeline_report.py CRITICAL_FIELDS with new geography fields.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">January 8, 2026</div>
+                    <div class="timeline-content">
+                        <strong>Session 16: GDrive Sync & Pipeline Sharing</strong><br/>
+                        Created nightly GDrive sync script (sync_to_gdrive.ps1) for automated documentation and pipeline script migration. Created pipeline/ folder with 24 core scripts for dev team SQL/HIVE porting. Created README.html developer documentation with execution order and porting notes.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">January 8, 2026</div>
+                    <div class="timeline-content">
+                        <strong>Session 15: Date Field Mapping + XB Schema Optimization</strong><br/>
+                        Added construction timeline dates from SemiAnalysis (construction_start_date: 38.8%, actual_live_date: 36.8%). Created date_helpers.py utility module for flexible date parsing (M/D/YYYY, quarters, years). Removed 9 sparse building-characteristic fields from XB schema (50→41 fields). Verified date mappings across all other sources.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">January 8, 2026</div>
+                    <div class="timeline-content">
+                        <strong>Session 14: Essential DC Integration + Composite Scoring</strong><br/>
+                        Integrated curated Essential DC list (127/129 buildings matched, 73 campuses flagged). Added is_essential field to all layers with automatic rollup from buildings → campus → XB. Created composite consensus score: Tier-weighted (80%) + Essential DC (20%). Added Essential DC Coverage section to diagnostic report.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">January 7, 2026</div>
+                    <div class="timeline-content">
+                        <strong>Weighted Consensus Scoring by Business Value</strong><br/>
+                        Enhanced Consensus Strength calculation to weight multi-source coverage by company tier: Hyperscaler/Frontier (60%), Major Colo (30%), Other (10%). Added category dividers to Pipeline Diagnostic. Removed emojis from navigation/headers. Fixed campus data_vintage aggregation (MAX from buildings). Excluded Meta Canonical from accuracy scoring (can't score ground truth against itself).
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">January 7, 2026</div>
+                    <div class="timeline-content">
+                        <strong>Executive Report Card + Consensus Strength</strong><br/>
+                        Added 3-pillar Executive Report Card at top of Pipeline Diagnostic (Source Quality, Pipeline Health, Consensus Strength). Created new Consensus Strength section measuring source agreement and multi-source validation. Added natural language question subheaders to all major sections ("Can I trust the coordinates?", etc.). Reorganized report navigation structure with detailed Pipeline Health moved to Output Quality section.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">January 6, 2026</div>
+                    <div class="timeline-content">
+                        <strong>Session 9-10: Capacity Accuracy + Source Health</strong><br/>
+                        Added live capacity accuracy to Pipeline Diagnostic Report (Semi: 11.9% MAPE, DCH: 17.6%). Enhanced Source Health Matrix with 5 dimensions (Overall, Spatial, Capacity, Freshness, Recommendation). Added excluded sources (Synergy, WoodMac) to matrix. Auto-sorted by overall score. Fixed Meta Canonical to show "Ground Truth" instead of grades. Improved workflow diagram layout.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">January 5, 2026</div>
+                    <div class="timeline-content">
+                        <strong>Scripts Reorganization + Google Drive Integration</strong><br/>
+                        Complete audit of 89 scripts. Archived 24 deprecated scripts. Renumbered folders (06_ucid → 03_ucid). Created interactive folder structure visualization. Enhanced PROJECT_OVERVIEW.html with fixed nav, collapsible sections, neomorphism styling. Implemented Google Drive auto-sync for reports. Created REPORT_OUTPUT_SOP.md.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">January 2, 2026</div>
+                    <div class="timeline-content">
+                        <strong>Diagnostic Report & Clean Re-ingestion</strong><br/>
+                        Created glassmorphism HTML diagnostic dashboard with weighted source scoring. All 6 ingestion scripts updated with auto-delete functionality. Added data_vintage field. Created run_full_pipeline.py master script.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">December 30, 2025</div>
+                    <div class="timeline-content">
+                        <strong>Company Fields & Text UCID</strong><br/>
+                        Implemented 3-field company structure (company_source, company_clean, company_clean_filter). Created human-readable text-based UCID system (e.g., META-ALTOONA-01).
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">December 29, 2025</div>
+                    <div class="timeline-content">
+                        <strong>Schema v2.0 & Semianalysis Bug Fix</strong><br/>
+                        Completed schema comparison analysis. Fixed planned_plus_uc_mw bug in Semianalysis ingestion script.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">December 18, 2025</div>
+                    <div class="timeline-content">
+                        <strong>Meta Canonical Integration</strong><br/>
+                        Added owned_leased field. Created meta_canonical_campus layer (83 campuses). Integrated Meta data into gold_buildings_full with source="Meta Canonical".
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">December 17, 2025</div>
+                    <div class="timeline-content">
+                        <strong>Company Standardization & Deep Dive</strong><br/>
+                        Reduced company names from 100s of variations to 9 categories. Completed deep dive campus validation comparing DCH vs Semianalysis accuracy.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">December 16, 2025</div>
+                    <div class="timeline-content">
+                        <strong>Full Pipeline Complete</strong><br/>
+                        All 6 sources ingested (22,696 buildings). Campus rollup working (11,715 campuses). Torture test validation passed.
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">December 10, 2025</div>
+                    <div class="timeline-content">
+                        <strong>Capacity Accuracy Analysis</strong><br/>
+                        Completed capacity comparison. Best result: 11.9% MAPE using Semianalysis mw_2023. Confirmed DCH reports IT capacity (no PUE adjustment needed).
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">December 9, 2025</div>
+                    <div class="timeline-content">
+                        <strong>Semianalysis Coordinate Fix</strong><br/>
+                        Fixed lat/lon field mapping. Spatial accuracy improved from 841m to 307m median. Semianalysis moved from #4 to #2 ranking.
+                    </div>
+                </div>
+            </div>
+            </div>
+        </section>
+
+        <!-- Methodology -->
+        <section id="methodology">
+            <div class="section-header">
+                <h2>Methodology</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <p>Detailed methodology documentation is maintained in separate files for in-depth reference. Click links below to access full documentation.</p>
+
+            <div class="source-grid">
+                <div class="source-card">
+                    <h4>UCID Clustering</h4>
+                    <div class="details">
+                        <strong>Purpose:</strong> Source-agnostic spatial clustering for campus identification<br/><br/>
+                        <strong>Approach:</strong> Geospatial clustering + company matching to generate human-readable IDs (e.g., META-ALTOONA-01)<br/><br/>
+                        <strong>Documentation:</strong> <code>UCID_DESIGN.md</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>Meta Deduplication</h4>
+                    <div class="details">
+                        <strong>Purpose:</strong> Aggregate Meta canonical data from suite → building → campus levels<br/><br/>
+                        <strong>Approach:</strong> Dissolve by building_key with MULTI_PART geometry, sum IT loads<br/><br/>
+                        <strong>Documentation:</strong> <code>META_CANONICAL_WORKFLOW.md</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>Spatial Accuracy Testing</h4>
+                    <div class="details">
+                        <strong>Purpose:</strong> Benchmark vendor coordinate accuracy against Meta ground truth<br/><br/>
+                        <strong>Approach:</strong> Haversine distance calculation, recall %, threshold analysis (100m, 500m, 1km)<br/><br/>
+                        <strong>Documentation:</strong> <code>PIPELINE_DOCUMENTATION.md</code> (Section 4)
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>Capacity Accuracy Testing</h4>
+                    <div class="details">
+                        <strong>Purpose:</strong> Validate vendor MW estimates against Meta actual IT load<br/><br/>
+                        <strong>Approach:</strong> MAPE calculation, PUE adjustment analysis, outlier detection<br/><br/>
+                        <strong>Documentation:</strong> <code>CAPACITY_FIELD_DEFINITIONS.md</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>Company Standardization</h4>
+                    <div class="details">
+                        <strong>Purpose:</strong> Normalize 3,000+ company names to canonical forms<br/><br/>
+                        <strong>Approach:</strong> 3-field structure (source, clean, filter) with hyperscaler priority list<br/><br/>
+                        <strong>Documentation:</strong> <code>migrate_company_fields_v2.py</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>Schema Design</h4>
+                    <div class="details">
+                        <strong>Purpose:</strong> Define optimal field structure for consensus model<br/><br/>
+                        <strong>Approach:</strong> Compared 4 schemas, identified 14 fields to add, 9 to remove<br/><br/>
+                        <strong>Documentation:</strong> <code>SCHEMA_COMPARISON_ANALYSIS.md</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>Field Lineage</h4>
+                    <div class="details">
+                        <strong>Purpose:</strong> Track every field from raw source through pipeline to XB layer<br/><br/>
+                        <strong>Approach:</strong> Source-to-gold mapping tables, aggregation rules, unit conversions<br/><br/>
+                        <strong>Documentation:</strong> <code>MASTER_FIELD_MAPPING.html</code>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Documentation Index</h3>
+            <table>
+                <thead><tr><th>Document</th><th>Location</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td>UCID_DESIGN.md</td><td>00_docs/workflows/</td><td>Text-based UCID format, disambiguation rules, company codes</td></tr>
+                    <tr><td>META_CANONICAL_WORKFLOW.md</td><td>00_docs/workflows/</td><td>Suite→Building→Campus deduplication process</td></tr>
+                    <tr><td>PIPELINE_DOCUMENTATION.md</td><td>00_docs/workflows/</td><td>Full pipeline documentation with accuracy methodology</td></tr>
+                    <tr><td>CAPACITY_FIELD_DEFINITIONS.md</td><td>00_docs/schemas/</td><td>Source-specific capacity field interpretation</td></tr>
+                    <tr><td>SCHEMA_COMPARISON_ANALYSIS.md</td><td>00_docs/schemas/</td><td>V2.0 schema decisions and field mapping</td></tr>
+                    <tr><td>GRANULARITY_STRATEGY.md</td><td>00_docs/workflows/</td><td>Building vs campus granularity decisions</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- Company Distribution -->
+        <section>
+            <div class="section-header">
+                <h2>Company Distribution (XB Layer)</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <table>
+                <thead><tr><th>Company</th><th>Records</th><th>Percentage</th></tr></thead>
+                <tbody>
+                    <tr><td>Colo - All Other</td><td>28,266</td><td>82.5%</td></tr>
+                    <tr><td>AWS</td><td>2,265</td><td>6.6%</td></tr>
+                    <tr><td>Microsoft</td><td>1,546</td><td>4.5%</td></tr>
+                    <tr><td>Meta</td><td>1,028</td><td>3.0%</td></tr>
+                    <tr><td>Google</td><td>966</td><td>2.8%</td></tr>
+                    <tr><td>Apple</td><td>112</td><td>0.3%</td></tr>
+                    <tr><td>Oracle</td><td>46</td><td>0.1%</td></tr>
+                    <tr><td>Alibaba</td><td>19</td><td>0.1%</td></tr>
+                    <tr><td>xAI</td><td>6</td><td>&lt;0.1%</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- Documentation -->
+        <section>
+            <div class="section-header">
+                <h2>Documentation</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <table>
+                <thead><tr><th>Document</th><th>Purpose</th></tr></thead>
+                <tbody>
+                    <tr><td>AI_CONTEXT_PROMPT.md</td><td>Full context for AI assistants (copy for new sessions)</td></tr>
+                    <tr><td>PIPELINE_EXECUTION_ORDER.md</td><td>Correct script execution order with commands</td></tr>
+                    <tr><td>PIPELINE_DOCUMENTATION.md</td><td>Comprehensive technical documentation</td></tr>
+                    <tr><td>CAPACITY_FIELD_DEFINITIONS.md</td><td>Source-specific capacity field interpretation</td></tr>
+                    <tr><td>CAPACITY_CONCEPTS_DIAGRAM.md</td><td>Visual capacity field guide with Mermaid</td></tr>
+                    <tr><td>SCHEMA_COMPARISON_ANALYSIS.md</td><td>V2.0 schema comparison and recommendations</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- Technical Resources -->
+        <section id="technical">
+            <div class="section-header">
+                <h2>Technical Resources</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="section-content">
+            <p>Detailed technical documentation for developers, data engineers, and teams porting the pipeline to other platforms.</p>
+
+            <div class="source-grid">
+                <div class="source-card">
+                    <h4>📦 Pipeline README</h4>
+                    <div class="details">
+                        <strong>For:</strong> SQL/HIVE dev team<br/><br/>
+                        <strong>Contents:</strong> Script descriptions, execution order, UCID format, data schema, ArcPy→SQL porting notes<br/><br/>
+                        <strong>Location:</strong> <code>GDrive/pipeline/README.html</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>🆔 UCID Design</h4>
+                    <div class="details">
+                        <strong>For:</strong> Understanding campus ID system<br/><br/>
+                        <strong>Contents:</strong> Human-readable ID format, company codes (60+), disambiguation rules, spatial clustering logic<br/><br/>
+                        <strong>Location:</strong> <code>00_docs/workflows/UCID_DESIGN.md</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>📊 Schema Comparison</h4>
+                    <div class="details">
+                        <strong>For:</strong> Data model understanding<br/><br/>
+                        <strong>Contents:</strong> Gold vs XB schema, field definitions, v2.0 changes (14 add, 9 remove)<br/><br/>
+                        <strong>Location:</strong> <code>00_docs/schemas/SCHEMA_COMPARISON_ANALYSIS.md</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>⚡ Capacity Field Definitions</h4>
+                    <div class="details">
+                        <strong>For:</strong> Capacity data interpretation<br/><br/>
+                        <strong>Contents:</strong> Source-specific field meanings, IT vs facility power, time-series forecasts<br/><br/>
+                        <strong>Location:</strong> <code>00_docs/schemas/CAPACITY_FIELD_DEFINITIONS.md</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>🔄 Pipeline Sync Script</h4>
+                    <div class="details">
+                        <strong>For:</strong> Automation & DevOps<br/><br/>
+                        <strong>Contents:</strong> Nightly GDrive sync, incremental copy, changelog tracking, 30-day log retention<br/><br/>
+                        <strong>Location:</strong> <code>_utils/sync_to_gdrive.ps1</code>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <h4>📋 Pipeline Changelog</h4>
+                    <div class="details">
+                        <strong>For:</strong> Tracking script changes<br/><br/>
+                        <strong>Contents:</strong> Timestamped log of all pipeline script additions and updates synced to GDrive<br/><br/>
+                        <strong>Location:</strong> <code>GDrive/pipeline/PIPELINE_CHANGELOG.md</code>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Google Drive Documentation Structure</h3>
+            <div class="highlight-box">
+                <pre style="margin:0; font-family:monospace; font-size:0.85rem; color:#00f2fe; line-height:1.6;">
+G:\My Drive\Consensus GIS Model Cleaned Inputs\Admin Documentation\
+├── context\                 ← AI_CONTEXT_PROMPT.md
+├── dashboards\              ← PROJECT_OVERVIEW.html (this file)
+├── pipeline\                ← 🆕 24 core scripts for dev team
+│   ├── ingestion\           ← 6 ingestion scripts
+│   ├── processing\          ← 6 processing scripts
+│   ├── consensus\           ← 2 consensus scripts
+│   ├── utilities\           ← 4 utility scripts
+│   ├── README.html          ← Developer documentation
+│   └── PIPELINE_CHANGELOG.md
+├── pipeline_diagnostics\    ← Auto-generated reports
+├── progress_updates\        ← WEEKLY_STATUS + daily updates
+├── schemas\                 ← Schema documentation
+├── visualizations\          ← Folder structure diagrams
+└── workflows\               ← Pipeline docs, SOPs
+                </pre>
+            </div>
+
+            <h3>Key Technical Concepts</h3>
+            <table>
+                <thead><tr><th>Concept</th><th>Description</th><th>Key Files</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><strong>UCID</strong></td>
+                        <td>Universal Campus ID — human-readable identifier (e.g., META-ALTOONA-01) that groups buildings into campuses using spatial clustering</td>
+                        <td>generate_text_ucid.py, UCID_DESIGN.md</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Essential DC</strong></td>
+                        <td>Curated list of 39 strategic campus sites (127 buildings) flagged with is_essential=1 for priority coverage tracking</td>
+                        <td>integrate_essential_by_uid.py</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Company Tiers</strong></td>
+                        <td>Hyperscaler (60%), Major Colo (30%), Other (10%) — weights for consensus scoring</td>
+                        <td>authority_config.py</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Clean Re-ingestion</strong></td>
+                        <td>All ingestion scripts delete existing records from their source before inserting — safe to re-run anytime</td>
+                        <td>All ingest_*.py scripts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>XB Layer</strong></td>
+                        <td>Experience Builder layer combining buildings + campuses with 41 unified fields for visualization</td>
+                        <td>create_xb_combined_layer.py</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <footer>
+            <p><strong>Data Center Consensus GIS Model</strong></p>
+            <p>Meta Infrastructure Planning Team</p>
+            <p style="margin-top:15px;">Last Updated: January 8, 2026</p>
+        </footer>
+        </main>
+    </div>
+
+    <!-- Collapsible Section JavaScript -->
+    <script>
+        document.querySelectorAll('.section-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                header.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+            });
+        });
+
+        // Highlight active nav on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.sidebar nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

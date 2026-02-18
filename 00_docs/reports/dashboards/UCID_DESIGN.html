@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Campus ID (UCID) Design Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-card: rgba(255,255,255,0.05);
+            --accent-blue: #4facfe;
+            --accent-cyan: #00f2fe;
+            --text-light: #e8e8e8;
+            --text-muted: #8892b0;
+            --shadow-dark: rgba(0,0,0,0.4);
+            --shadow-light: rgba(255,255,255,0.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh; color: #e8e8e8; line-height: 1.6;
+        }
+        .page-wrapper { display: flex; min-height: 100vh; }
+
+        /* Fixed Left Navigation */
+        .sidebar {
+            position: fixed; left: 0; top: 0; bottom: 0; width: 220px;
+            background: linear-gradient(180deg, rgba(15,52,96,0.95) 0%, rgba(22,33,62,0.98) 100%);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding: 25px 15px; z-index: 100;
+            display: flex; flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+            overflow-y: auto;
+        }
+        .sidebar-header { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-logo { font-size: 2rem; margin-bottom: 8px; }
+        .sidebar-title { font-size: 0.85rem; color: var(--accent-blue); font-weight: 600; line-height: 1.3; }
+        .sidebar nav { flex: 1; }
+        .sidebar nav ul { list-style: none; }
+        .sidebar nav a {
+            display: flex; align-items: center; gap: 10px;
+            color: var(--text-muted); text-decoration: none;
+            padding: 12px 15px; margin: 4px 0;
+            border-radius: 10px; font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+        .sidebar nav a:hover {
+            color: var(--accent-cyan);
+            background: rgba(79,172,254,0.1);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2), inset -2px -2px 5px rgba(255,255,255,0.05);
+            transform: translateX(5px);
+        }
+        .sidebar nav a.active {
+            color: var(--accent-cyan);
+            background: linear-gradient(135deg, rgba(79,172,254,0.15), rgba(0,242,254,0.1));
+            box-shadow: 0 4px 15px rgba(79,172,254,0.2);
+        }
+        .nav-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+        .nav-section-label {
+            color: rgba(255,255,255,0.4); font-size: 0.7rem; padding: 8px 12px;
+            text-transform: uppercase; letter-spacing: 1px; margin-top: 15px;
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 220px; flex: 1;
+            padding: 40px 40px 40px 50px;
+        }
+
+        /* Header */
+        header {
+            text-align: center; margin-bottom: 50px; padding: 45px;
+            background: linear-gradient(135deg, rgba(79,172,254,0.1), rgba(0,242,254,0.05));
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow:
+                8px 8px 20px rgba(0,0,0,0.4),
+                -4px -4px 15px rgba(255,255,255,0.03),
+                inset 1px 1px 2px rgba(255,255,255,0.1);
+        }
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            text-shadow: 0 0 40px rgba(79,172,254,0.3);
+        }
+        .subtitle { font-size: 1.2rem; color: #8892b0; margin-bottom: 10px; }
+        .date { color: #6c757d; font-size: 0.95rem; }
+        .status-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            color: white; padding: 10px 25px; border-radius: 25px;
+            font-weight: 600; margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(40,167,69,0.4);
+        }
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            color: #1a1a2e; padding: 8px 20px; border-radius: 20px;
+            font-weight: 600; margin-left: 10px;
+            box-shadow: 0 4px 15px rgba(79,172,254,0.4);
+        }
+
+        /* Sections */
+        section {
+            background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            border-radius: 24px; padding: 0; margin-bottom: 35px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow:
+                10px 10px 25px rgba(0,0,0,0.35),
+                -5px -5px 15px rgba(255,255,255,0.02);
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 25px 35px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(90deg, rgba(79,172,254,0.08), transparent);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        .section-header:hover {
+            background: linear-gradient(90deg, rgba(79,172,254,0.15), rgba(0,242,254,0.05));
+        }
+        .section-header h2 {
+            font-size: 1.5rem; color: #4facfe; margin: 0; padding: 0; border: none;
+        }
+        .collapse-icon {
+            font-size: 1.2rem; color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+        .section-header.collapsed .collapse-icon { transform: rotate(-90deg); }
+        .section-content {
+            padding: 30px 35px;
+            max-height: 8000px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+        }
+        .section-content.collapsed {
+            max-height: 0; padding-top: 0; padding-bottom: 0;
+        }
+
+        h3 { font-size: 1.15rem; color: #00f2fe; margin: 25px 0 15px; }
+        p { color: #c9d1d9; margin-bottom: 15px; }
+        ul, ol { color: #c9d1d9; margin-left: 25px; margin-bottom: 15px; }
+        li { margin-bottom: 8px; }
+
+        /* Tables */
+        table {
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden;
+            box-shadow: inset 2px 2px 8px rgba(0,0,0,0.3);
+        }
+        th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        th {
+            color: #4facfe; font-weight: 600;
+            background: rgba(79,172,254,0.1);
+            font-size: 0.85rem; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        td { color: #c9d1d9; }
+        tr:hover td { background: rgba(255,255,255,0.03); }
+
+        /* Highlight boxes */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(79,172,254,0.12), rgba(0,242,254,0.08));
+            border: 1px solid rgba(79,172,254,0.25);
+            border-radius: 16px; padding: 22px; margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(79,172,254,0.15);
+        }
+        .highlight-box.success {
+            background: linear-gradient(135deg, rgba(40,167,69,0.12), rgba(32,201,151,0.08));
+            border-color: rgba(40,167,69,0.25);
+            box-shadow: 0 4px 20px rgba(40,167,69,0.15);
+        }
+        .highlight-box.warning {
+            background: linear-gradient(135deg, rgba(255,193,7,0.12), rgba(255,152,0,0.08));
+            border-color: rgba(255,193,7,0.25);
+            box-shadow: 0 4px 20px rgba(255,193,7,0.15);
+        }
+
+        /* Code blocks */
+        code, pre {
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: #00f2fe;
+        }
+        pre {
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Mermaid container */
+        .mermaid-container {
+            background: rgba(0,0,0,0.25);
+            border-radius: 16px; padding: 35px; margin: 25px 0;
+            overflow-x: auto;
+            box-shadow: inset 3px 3px 10px rgba(0,0,0,0.3);
+        }
+        .mermaid { display: flex; justify-content: center; }
+
+        /* Pipeline steps */
+        .pipeline-step {
+            display: flex; align-items: center; gap: 20px;
+            padding: 20px 28px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border-radius: 16px;
+            border-left: 4px solid #4facfe;
+            margin-bottom: 14px;
+            box-shadow:
+                6px 6px 15px rgba(0,0,0,0.3),
+                -3px -3px 10px rgba(255,255,255,0.02);
+            transition: all 0.3s ease;
+        }
+        .pipeline-step:hover {
+            transform: translateX(8px);
+            box-shadow:
+                8px 8px 20px rgba(0,0,0,0.35),
+                -4px -4px 12px rgba(255,255,255,0.03),
+                0 0 20px rgba(79,172,254,0.1);
+        }
+        .step-number {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #1a1a2e; flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(79,172,254,0.4);
+        }
+        .step-content { flex: 1; }
+        .step-title { font-weight: 600; color: #fff; margin-bottom: 5px; }
+        .step-desc { font-size: 0.9rem; color: #8892b0; }
+
+        /* Field cards */
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px; margin: 20px 0;
+        }
+        .field-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            border-radius: 12px; padding: 18px;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 4px 4px 12px rgba(0,0,0,0.25);
+        }
+        .field-card .field-name { color: #00f2fe; font-weight: 600; font-size: 0.95rem; }
+        .field-card .field-type { color: #8892b0; font-size: 0.8rem; margin: 5px 0; }
+        .field-card .field-desc { color: #c9d1d9; font-size: 0.85rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; margin-top: 50px; padding: 30px;
+            color: #8892b0; font-size: 0.9rem;
+            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border-radius: 16px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { width: 180px; }
+            .main-content { margin-left: 180px; padding: 30px 25px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 20px 15px; }
+            h1 { font-size: 1.8rem; }
+            .section-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'dark' });</script>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🔗</div>
+                <div class="sidebar-title">UCID Design<br/>Document</div>
+            </div>
+            <nav>
+                <ul>
+                    <li class="nav-section-label">Overview</li>
+                    <li><a href="#purpose"><span class="nav-icon">›</span>Purpose</a></li>
+                    <li><a href="#problem"><span class="nav-icon">›</span>The Problem</a></li>
+
+                    <li class="nav-section-label">Architecture</li>
+                    <li><a href="#architecture"><span class="nav-icon">›</span>Solution</a></li>
+                    <li><a href="#schema"><span class="nav-icon">›</span>Schema</a></li>
+                    <li><a href="#format"><span class="nav-icon">›</span>UCID Format</a></li>
+
+                    <li class="nav-section-label">Algorithm</li>
+                    <li><a href="#haversine"><span class="nav-icon">›</span>Haversine Distance</a></li>
+                    <li><a href="#tolerance"><span class="nav-icon">›</span>Tolerances</a></li>
+                    <li><a href="#matching"><span class="nav-icon">›</span>Matching Steps</a></li>
+
+                    <li class="nav-section-label">Implementation</li>
+                    <li><a href="#scripts"><span class="nav-icon">›</span>Scripts</a></li>
+                    <li><a href="#workflow"><span class="nav-icon">›</span>Workflow</a></li>
+                    <li><a href="#config"><span class="nav-icon">›</span>Configuration</a></li>
+
+                    <li class="nav-section-label">Reference</li>
+                    <li><a href="#outcomes"><span class="nav-icon">›</span>Expected Outcomes</a></li>
+                    <li><a href="#related"><span class="nav-icon">›</span>Related Docs</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>🔗 Universal Campus ID (UCID)</h1>
+                <p class="subtitle">Design Document</p>
+                <p class="date">Created: December 18, 2025 | Last Updated: February 11, 2026</p>
+                <span class="status-badge">✅ Implemented</span>
+                <span class="version-badge">Version 2.0</span>
+            </header>
+
+            <!-- Related Documents -->
+            <section id="related">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>📚 Related Documents</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><a href="UCID_VISUAL_SUMMARY.html" style="color: #4facfe;">UCID_VISUAL_SUMMARY.html</a></td>
+                                <td>Visual diagrams and confidence analysis</td>
+                            </tr>
+                            <tr>
+                                <td>MATCH_CONFIDENCE_ANALYSIS.md</td>
+                                <td>Match validation strategies</td>
+                            </tr>
+                            <tr>
+                                <td>SA_DCH_METHODOLOGY_RECOMMENDATIONS.md</td>
+                                <td>Comparison methodology</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Purpose -->
+            <section id="purpose">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🎯 Purpose</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <p>Create a <strong>source-agnostic universal identifier</strong> for data center campuses that enables:</p>
+                    <ol>
+                        <li><strong>Cross-source comparison</strong> — "What does DCH vs Semianalysis report for campus X?"</li>
+                        <li><strong>Rumor/signal intake matching</strong> — "New rumor about Site Y" → instantly links to UCID</li>
+                        <li><strong>Historical tracking</strong> across vendor data updates</li>
+                        <li><strong>Ground truth benchmarking</strong> against Meta Canonical</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- The Problem -->
+            <section id="problem">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>📊 The Problem</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <p>Currently, the same physical campus can appear multiple times in <code>gold_campus_full</code> with different source-specific <code>campus_id</code> values:</p>
+                    <table>
+                        <thead>
+                            <tr><th>Physical Campus</th><th>Source</th><th>Current campus_id</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>AWS Ashburn</td><td>DCH</td><td><code>aws|ashburn|awsashburn</code></td></tr>
+                            <tr><td>AWS Ashburn</td><td>Semianalysis</td><td><code>amazonwebservices|ashburn|awsiad</code></td></tr>
+                            <tr><td>AWS Ashburn</td><td>DCM</td><td><code>amazon|ashburn|amazonashburnva</code></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="highlight-box warning">
+                        <strong>Result:</strong> No way to link these 3 records as the same campus.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Solution Architecture -->
+            <section id="architecture">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🏗️ Solution Architecture</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <h3>New Feature Class: campus_master</h3>
+                    <p>A canonical registry where each unique physical campus location gets ONE record with a UCID.</p>
+                </div>
+            </section>
+
+            <!-- Schema -->
+            <section id="schema">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>📋 campus_master Schema</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <table>
+                        <thead>
+                            <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>ucid</code></td><td>TEXT(20)</td><td>Universal Campus ID (e.g., <code>UCID-AMER-00142</code>)</td></tr>
+                            <tr><td><code>canonical_name</code></td><td>TEXT(100)</td><td>Standardized campus name</td></tr>
+                            <tr><td><code>company_canonical</code></td><td>TEXT(50)</td><td>Standardized company name</td></tr>
+                            <tr><td><code>city</code></td><td>TEXT(50)</td><td>City</td></tr>
+                            <tr><td><code>state_abbr</code></td><td>TEXT(10)</td><td>State abbreviation</td></tr>
+                            <tr><td><code>country</code></td><td>TEXT(50)</td><td>Country</td></tr>
+                            <tr><td><code>region</code></td><td>TEXT(10)</td><td>AMER/EMEA/APAC</td></tr>
+                            <tr><td><code>latitude</code></td><td>DOUBLE</td><td>Representative latitude</td></tr>
+                            <tr><td><code>longitude</code></td><td>DOUBLE</td><td>Representative longitude</td></tr>
+                            <tr><td><code>source_count</code></td><td>SHORT</td><td>Number of sources reporting this campus</td></tr>
+                            <tr><td><code>sources</code></td><td>TEXT(200)</td><td>Semicolon-separated list of sources</td></tr>
+                            <tr><td><code>meta_canonical_match</code></td><td>TEXT(1)</td><td>Y/N - matches Meta Canonical?</td></tr>
+                            <tr><td><code>match_tolerance_m</code></td><td>SHORT</td><td>Tolerance used for matching (250 or 1000)</td></tr>
+                            <tr><td><code>cluster_method</code></td><td>TEXT(20)</td><td>TIGHT or LOOSE</td></tr>
+                            <tr><td><code>created_date</code></td><td>DATE</td><td>Date UCID was created</td></tr>
+                            <tr><td><code>last_updated</code></td><td>DATE</td><td>Last update date</td></tr>
+                            <tr><td><code>notes</code></td><td>TEXT(500)</td><td>Manual notes/overrides</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Fields Added to Existing Feature Classes</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Feature Class</th><th>New Field</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>gold_campus_full</code></td><td><code>ucid</code></td><td>Links to campus_master</td></tr>
+                            <tr><td><code>gold_buildings_full</code></td><td><code>ucid</code></td><td>Inherited from campus assignment</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- UCID Format -->
+            <section id="format">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🏷️ UCID Format</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <pre>UCID-{REGION}-{SEQUENCE}
+
+Examples:
+├── UCID-AMER-00001  — First campus in Americas
+├── UCID-EMEA-00142  — 142nd campus in EMEA
+└── UCID-APAC-00033  — 33rd campus in APAC</pre>
+                </div>
+            </section>
+
+            <!-- Haversine Distance -->
+            <section id="haversine">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🔬 Distance Calculation: Haversine</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <p>The UCID system uses <strong>Haversine distance</strong> for all spatial calculations, which is critical for accurate global matching.</p>
+
+                    <h3>Why Not Euclidean (Planar) Distance?</h3>
+                    <p>Euclidean distance treats coordinates as flat X/Y points, which fails for lat/lon:</p>
+                    <pre>Problem: 1° of longitude varies by latitude!
+├── At Equator:  1° longitude ≈ 111 km
+├── At 45°N:     1° longitude ≈ 78 km
+├── At 60°N:     1° longitude ≈ 55 km
+└── At 89°N:     1° longitude ≈ 2 km
+
+Result: A "500m buffer" in Euclidean lat/lon would be:
+├── Huge ellipse at equator
+└── Tiny circle near poles</pre>
+
+                    <h3>Haversine Distance (What We Use)</h3>
+                    <p>Calculates great-circle distance on a sphere, returning <strong>actual meters</strong>:</p>
+                    <pre>def haversine_distance(lat1, lon1, lat2, lon2):
+    """
+    Calculate great-circle distance between two points in meters.
+    Used in generate_text_ucid.py and compare_sa_vs_dch_v2.py
+    """
+    R = 6371000  # Earth's radius in meters
+
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+
+    a = math.sin(delta_lat/2)**2 + \
+        math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(delta_lon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+
+    return R * c  # Distance in meters</pre>
+
+                    <h3>Accuracy at Different Scales</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Distance</th><th>Haversine Error*</th><th>Impact on Matching</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>100 m</td><td>&lt; 0.1 m</td><td>Negligible</td></tr>
+                            <tr><td>500 m</td><td>&lt; 1.5 m</td><td>Negligible</td></tr>
+                            <tr><td>1 km</td><td>~ 3 m</td><td>Negligible</td></tr>
+                            <tr><td>10 km</td><td>~ 30 m</td><td>Negligible</td></tr>
+                            <tr><td>100 km</td><td>~ 500 m</td><td>Minor (0.5%)</td></tr>
+                        </tbody>
+                    </table>
+                    <p><em>*Error vs geodesic (ellipsoid) calculation. Haversine assumes perfect sphere.</em></p>
+
+                    <div class="highlight-box success">
+                        <strong>For UCID matching (250m - 1000m thresholds), Haversine error is &lt;3 meters — completely acceptable.</strong>
+                    </div>
+
+                    <h3>🌐 Coordinate System: WGS 1984 (GCS)</h3>
+                    <p>This pipeline uses <strong>WGS 1984 (EPSG:4326)</strong> — a Geographic Coordinate System (GCS), not a Projected Coordinate System (PCS).</p>
+
+                    <table>
+                        <thead>
+                            <tr><th>Aspect</th><th>GCS (WGS 1984) ✅</th><th>PCS (e.g., Web Mercator)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>WKID</strong></td><td>4326</td><td>3857 (Web Mercator)</td></tr>
+                            <tr><td><strong>Units</strong></td><td>Degrees (lat/lon)</td><td>Meters</td></tr>
+                            <tr><td><strong>Coverage</strong></td><td>✅ Global</td><td>⚠️ Often regional or distorted</td></tr>
+                            <tr><td><strong>Distance Calc</strong></td><td>Need Haversine/Geodesic</td><td>Can use Euclidean</td></tr>
+                            <tr><td><strong>Your Use Case</strong></td><td>✅ Correct choice</td><td>Would distort at high latitudes</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Why WGS 1984 is Right for This Pipeline</h4>
+                    <pre>Your Data Coverage:
+├── AMER: USA, Canada, Brazil, Mexico...
+├── EMEA: UK, Germany, Netherlands, UAE...
+├── APAC: Japan, Singapore, Australia, India...
+└── Global: 50+ countries, all latitudes
+
+Why WGS84 works:
+✅ No projection distortion
+✅ Consistent storage format
+✅ Matches GPS coordinates from source data
+✅ Works with Haversine for distance calculations
+✅ Native format for web GIS (Leaflet, Mapbox)</pre>
+
+                    <h4>Code Reference</h4>
+                    <pre># From import_dch_csvs.py and import_meta_canonical_v3.py
+coordinate_system = arcpy.SpatialReference(4326)  # WGS84</pre>
+
+                    <h4>Quick Reference: Common Coordinate Systems</h4>
+                    <table>
+                        <thead>
+                            <tr><th>WKID</th><th>Name</th><th>Type</th><th>Use Case</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>4326</strong></td><td>WGS 1984</td><td>GCS</td><td>✅ Your data storage</td></tr>
+                            <tr><td>3857</td><td>Web Mercator</td><td>PCS</td><td>Web maps (distorts at poles)</td></tr>
+                            <tr><td>32618</td><td>UTM Zone 18N</td><td>PCS</td><td>High-precision in Virginia area</td></tr>
+                            <tr><td>102003</td><td>USA Contiguous Albers</td><td>PCS</td><td>Equal-area analysis for CONUS</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="highlight-box">
+                        <strong>Key Insight:</strong> For a global dataset, GCS (WGS 1984) + Haversine distance is the correct approach. ArcGIS Pro handles on-the-fly projection for display.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tolerance -->
+            <section id="tolerance">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>📏 Two-Tolerance Approach</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <p>We test two spatial tolerances to determine which performs better:</p>
+                    <table>
+                        <thead>
+                            <tr><th>Tolerance</th><th>Distance</th><th>Use Case</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>TIGHT</strong></td><td>250 meters</td><td>Dense urban areas, neighboring campuses</td></tr>
+                            <tr><td><strong>LOOSE</strong></td><td>1000 meters</td><td>Sprawling rural campuses, multi-building sites</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="highlight-box">
+                        <strong>Validation Question:</strong><br/>
+                        "Are there more sprawling campuses that are difficult to capture (LOOSE wins), or more clustered neighboring campuses that are difficult to distinguish (TIGHT wins)?"
+                    </div>
+                </div>
+            </section>
+
+            <!-- Matching Steps -->
+            <section id="matching">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🔄 Matching Algorithm</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="pipeline-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Company Normalization</div>
+                            <div class="step-desc">Standardize company names (AWS = Amazon = Amazon Web Services). Use <code>company_clean</code> field as primary match key.</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Spatial Clustering</div>
+                            <div class="step-desc">Group campus centroids within tolerance distance. Same <code>company_clean</code> + within tolerance = candidate match.</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Name Similarity (Tiebreaker)</div>
+                            <div class="step-desc">For ambiguous cases, use campus_name fuzzy matching. Levenshtein distance &lt; 0.3 = likely same campus.</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">UCID Assignment</div>
+                            <div class="step-desc">Each unique cluster gets a new UCID. Sequence number auto-increments per region.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Scripts -->
+            <section id="scripts">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>📁 Scripts</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <table>
+                        <thead>
+                            <tr><th>Script</th><th>Purpose</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>06_ucid/create_campus_master.py</code></td><td>Creates empty campus_master FC</td></tr>
+                            <tr><td><code>06_ucid/generate_ucid_tight.py</code></td><td>Generates UCIDs with 250m tolerance</td></tr>
+                            <tr><td><code>06_ucid/generate_ucid_loose.py</code></td><td>Generates UCIDs with 1000m tolerance</td></tr>
+                            <tr><td><code>06_ucid/validate_ucid_comparison.py</code></td><td>Compares TIGHT vs LOOSE results</td></tr>
+                            <tr><td><code>06_ucid/assign_ucid_to_gold.py</code></td><td>Assigns final UCIDs to gold tables</td></tr>
+                            <tr><td><code>06_ucid/ucid_intake_matcher.py</code></td><td>Matches new rumors/signals to UCIDs</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Workflow -->
+            <section id="workflow">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🔄 Workflow</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <h3>Initial Generation</h3>
+                    <pre># 1. Create campus_master feature class
+exec(open(r"...\scripts\06_ucid\create_campus_master.py").read())
+
+# 2. Generate UCIDs with both tolerances
+exec(open(r"...\scripts\06_ucid\generate_ucid_tight.py").read())
+exec(open(r"...\scripts\06_ucid\generate_ucid_loose.py").read())
+
+# 3. Compare and validate
+exec(open(r"...\scripts\06_ucid\validate_ucid_comparison.py").read())
+
+# 4. After choosing winner, assign to gold tables
+exec(open(r"...\scripts\06_ucid\assign_ucid_to_gold.py").read())</pre>
+
+                    <h3>Rumor/Signal Intake</h3>
+                    <pre># Match incoming rumor to existing UCID
+from ucid_intake_matcher import find_ucid_match
+
+match = find_ucid_match(
+    company="Microsoft",
+    city="San Antonio",
+    lat=29.4241,
+    lon=-98.4936
+)
+# Returns: {'ucid': 'UCID-AMER-00088', 'confidence': 0.92, 'canonical_name': 'Microsoft San Antonio'}</pre>
+                </div>
+            </section>
+
+            <!-- Configuration -->
+            <section id="config">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>📝 Configuration</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <p>Added to <code>_utils/config.py</code>:</p>
+                    <pre># UCID Feature Classes
+CAMPUS_MASTER = os.path.join(GDB, "campus_master")
+CAMPUS_MASTER_TIGHT = os.path.join(GDB, "campus_master_tight")
+CAMPUS_MASTER_LOOSE = os.path.join(GDB, "campus_master_loose")
+
+# UCID Tolerances (meters)
+UCID_TOLERANCE_TIGHT = 250
+UCID_TOLERANCE_LOOSE = 1000</pre>
+                </div>
+            </section>
+
+            <!-- Expected Outcomes -->
+            <section id="outcomes">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>📈 Expected Outcomes</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <h3>Metrics to Compare</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Metric</th><th>TIGHT (250m)</th><th>LOOSE (1000m)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Total unique UCIDs</td><td>Higher</td><td>Lower</td></tr>
+                            <tr><td>Multi-source matches</td><td>Lower</td><td>Higher</td></tr>
+                            <tr><td>False merges</td><td>Lower</td><td>Higher</td></tr>
+                            <tr><td>Orphan splits</td><td>Higher</td><td>Lower</td></tr>
+                            <tr><td>Meta Canonical match rate</td><td>?</td><td>?</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Success Criteria</h3>
+                    <ol>
+                        <li><strong>Meta Canonical campuses:</strong> Each should have exactly 1 UCID</li>
+                        <li><strong>Major hyperscaler sites:</strong> Known mega-campuses should merge correctly</li>
+                        <li><strong>Urban clusters:</strong> Distinct campuses in same city should stay separate</li>
+                    </ol>
+
+                    <div class="highlight-box success">
+                        <strong>Result:</strong> TIGHT (250m) was selected as the winner after validation showed it matches Meta Canonical 7.4x better than LOOSE while preventing 748 high-severity false merges.
+                    </div>
+                </div>
+            </section>
+
+            <footer>
+                <p>Universal Campus ID (UCID) Design Document | Version 2.0</p>
+                <p>Last Updated: December 18, 2024</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        function toggleSection(header) {
+            header.classList.toggle('collapsed');
+            const content = header.nextElementSibling;
+            content.classList.toggle('collapsed');
+        }
+
+        // Highlight active nav link on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.sidebar nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

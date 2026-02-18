@@ -1,0 +1,29 @@
+clusterid,gpu_owner,cluster,num_instances
+b174e39c-96bb-5093-ba7e-1dc769c94a82,AWS,Project Rainier Indiana,1
+a8549b03-4425-421a-a7b3-4f1a2ebf3a7f,AWS,Project Rainier North Carolina,1
+8afdeae4-b5e7-53de-86c7-d8391ec57b2d,CoreWeave,Coreweave Denton,1
+02a50660-e676-41be-bee2-e05d63cb44b5,CoreWeave,Galaxy Digital_Afton_1,1
+8c273f8c-57d2-4b84-8abc-61a890a4ffcd,Fluidstack,Cipher_BarberLake_1,1
+8dee7c2e-4154-569d-cd5f-6b33322b6432,Fluidstack,TeraWulf_Barker_1,1
+dac28e9d-8bf1-4709-ac12-6e84bc463d13,Fluidstack,Terawulf_Abernathy_1,1
+c4fe3714-5ab4-5906-a436-765ec360db22,Google,Google/Crusoe_Goodnight_1,1
+6cb3fdba-27a1-5a7e-a309-1c823f117510,Google,Google_Cedar Rapids_1,1
+b481f04a-e194-552c-a8f9-165746d94d6a,Google,Google_Hamina_1,1
+57da925a-698f-563b-9d47-21c31b05a3a8,Google,Google_Haskell_1,1
+88da925a-aa8f-563b-aa47-21c31b05a312,Google,Google_Haskell_2,1
+b863f907-afc8-4a13-a37e-05377992582d,Google,Google_Shakelford_1,1
+6811fd1d-ff84-40da-8196-7afc7e18d665,Meta,Meta Hyperion,1
+74e1d1c9-ac72-5071-ba1b-b9d094fcbeee,Meta,Meta Prometheus,1
+f32ee0b8-7e57-52c9-9c6d-6848fd55d927,Meta,Meta Titan - Cedar Rapids,1
+718cdee0-d894-5ebb-bb10-3d21499be0b3,Meta,Meta Titan - El Paso,1
+022180d4-3670-54d3-bf16-bba2a5a0ff0a,Microsoft,Microsoft Fairwater ATL,1
+f7cca9d7-1c2f-5f1d-b790-1c49bb8cff91,Microsoft,Microsoft Fairwater Wisconsin,1
+c4fe3714-5ab4-5906-a436-765ec360db47,Oracle,"Stargate Abilene, TX",1
+cc3be8ba-1ce0-5392-9ce6-c83345914221,Oracle,"Stargate Borden County, TX",1
+11112983-0691-5e77-bab2-a5843caaa4b1,Oracle,"Stargate Doña Ana, Nex Mexico",1
+a38d1cbd-1800-12bb-81eb-31865b31d644,Oracle,Stargate Michigan,1
+a232e8ba-1ce0-5392-9ce6-c8664591422a,Oracle,"Stargate Milam County, TX",1
+bc919877-7644-5205-b2cd-dea83220223a,Oracle,"Stargate Shackelford County, TX",1
+8a401491-dbbd-451c-9851-8d710fe333df,Oracle,Stargate Wisconsin,1
+cc3be8ba-1ce0-5392-9ce6-c83345914221,SoftBank,"Stargate Borden County, TX",1
+24935bde-4578-4032-ae36-43261a63cdbf,xAI,Colossus 2,1
